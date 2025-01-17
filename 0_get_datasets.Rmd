@@ -1,0 +1,113 @@
+---
+title: "AST"
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  include = TRUE,
+  message= FALSE, 
+  warning= FALSE
+)
+
+```
+
+```{r include=F}
+rm(list=ls())
+source("./ast_functions.R")
+```
+
+
+```{r}
+# База данных moodle.tsu.su
+if (!exists("db_moodle_tsu")) {
+  load_dot_env(file = "../../.env")
+  db_moodle_tsu <- dbConnect(RMySQL::MySQL(),
+                     user=Sys.getenv("USER"),
+                     password=Sys.getenv("PASSWORD"),
+                     dbname=Sys.getenv("DBNAME"),
+                     host=Sys.getenv("HOST"),
+                     port=as.numeric(Sys.getenv("PORT")),
+                     encoding = "UTF-8")
+  
+  dbGetQuery(db_moodle_tsu,'SET NAMES utf8') #для установления кодировки, если появляются "???" в данных
+}
+
+
+if (!exists("db")) {
+  load_dot_env(file = "../Accu/.env")
+  db <- dbConnect(RMySQL::MySQL(max.con=1000, fetch.default.rec=100000),
+                     user=Sys.getenv("USER"),
+                     password=Sys.getenv("PASSWORD"),
+                     dbname=Sys.getenv("DBNAME"),
+                     host=Sys.getenv("HOST"),
+                     port=as.numeric(Sys.getenv("PORT")),
+                     encoding="UTF-8")
+  
+  dbSendQuery(db, "SET GLOBAL local_infile=1;")
+  dbSendQuery(db, "SET NAMES utf8;")
+}
+
+email_for_exclusion <- read.csv("../../emails_for_exclusion.csv", header = F)[, 1]
+
+if (!exists("ast_raw")) {
+  ast_raw <- dbGetQuery(db_moodle_tsu,'SELECT DISTINCT mdl_accu_data.*, mdl_user.firstname, mdl_user.lastname, mdl_user.email FROM mdl_accu_data INNER JOIN mdl_user ON mdl_user.id = mdl_accu_data.userid;')
+  ast_raw <- ast_raw[!duplicated(select(ast_raw, userid, testid, email)), ]
+  ast_raw$id <- NULL #удаляем переменную id записи
+  names(ast_raw) <- gsub("^userid", "user_id", names(ast_raw))
+  names(ast_raw) <- gsub("^testid", "test_id", names(ast_raw))
+}
+
+personal_data <- select(ast_raw, user_id, test_id, email, firstname, lastname)
+```
+
+```{r}
+tracker_id <- 1 # ID tracker для сервиса mouse tracking
+```
+
+
+# Получение данных из файлов
+
+```{r}
+unique_users <- unique(ast_raw$user_id)
+df.users <- data.frame()
+df.sessions <- data.frame()
+df.event_tracks <- data.frame()
+df.mouse_tracks <- data.frame()
+
+for (user_id in unique_users) {
+  user <- dbGetQuery(db,'SELECT * FROM users WHERE tracker_id = ' %+% tracker_id %+% ' and user_id = ' %+% user_id)
+  df.users <- rbind(df.users, user)
+  user_sessions <- dbGetQuery(db,'SELECT * FROM sessions WHERE user_id = ' %+% user_id)
+  df.sessions <- rbind(df.sessions, user_sessions)
+  event_tracks <- dbGetQuery(db,'SELECT * FROM event_tracks WHERE '  %+% paste0('session_id = "', user_sessions$session_id, '"', collapse = " OR "))
+  df.event_tracks <- rbind(df.event_tracks, event_tracks)
+  mouse_tracks <- dbGetQuery(db,'SELECT * FROM mouse_tracks WHERE ' %+% paste0('session_id = "', user_sessions$session_id, '"', collapse = " OR "))
+  df.mouse_tracks <- rbind(df.mouse_tracks, mouse_tracks)
+}
+```
+
+
+
+```{r}
+# write.csv(ast_raw, file = "./data/raw/2024-10-21 - accu.csv", row.names = F)
+# write.csv(df.users, file = "./data/raw/2024-10-21 - users.csv", row.names = F)
+# write.csv(df.sessions, file = "./data/raw/2024-10-21 - sessions.csv", row.names = F)
+# write.csv(df.event_tracks, file = "./data/raw/2024-10-21 - event_tracks.csv", row.names = F)
+# write.csv(df.mouse_tracks, file = "./data/raw/2024-10-21 - mouse_tracks.csv", row.names = F)
+
+saveRDS(ast_raw, file = "./data/raw/2024-10-21 - accu.rds")
+saveRDS(df.users, file = "./data/raw/2024-10-21 - users.rds")
+saveRDS(df.sessions, file = "./data/raw/2024-10-21 - sessions.rds")
+saveRDS(df.event_tracks, file = "./data/raw/2024-10-21 - event_tracks.rds")
+saveRDS(df.mouse_tracks, file = "./data/raw/2024-10-21 - mouse_tracks.rds")
+```
+
+
+
+
+
+
