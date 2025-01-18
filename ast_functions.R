@@ -355,12 +355,8 @@ get_distance_features <- function(ast_merged) {
 }
 
 
-get_missings_features <- function(ast, ast_long, ast_data, radius=38, ideal_coords=NULL) {
+get_missings_features <- function(ast, ast_long, ast_data, radius=38, ideal_coords) {
   debug(logger, "get_missings_features")
-  
-  if (is.null(ideal_coords)) {
-    ideal_coords <- read.csv2("./data/IdealCoords.csv", stringsAsFactors = F, col.names = c("x_mouse_pos","y_mouse_pos"), header = F)[0:(ncol(ast_data)/3),]
-  }
   
   miss_distance <- get_distance_a_b(ideal_coords$x_mouse_pos + ast$canvas_coords_x, ast_long$x_mouse_pos,
                                     ideal_coords$y_mouse_pos + ast$canvas_coords_y, ast_long$y_mouse_pos)
@@ -370,24 +366,36 @@ get_missings_features <- function(ast, ast_long, ast_data, radius=38, ideal_coor
   ## Количество попаданий
   hits <- nrow(ast_long) - missings
   
-  #Расстояние промахов
-  missings_distance <- round(sum(miss_distance), 0)
-  missings_distance_mean <- round(mean(miss_distance), 2)
-  missings_distance_sd <- round(sd(miss_distance), 2)
+  df <- describe(miss_distance, quant = c(0.25, 0.75))
+  df <- select(df, -vars, -n)
+  names(df) <- paste0("missings", "_", names(df))
+  df$missings <- missings
+  df$hits <- hits
+  df$missings_distance <- sum(miss_distance)
+  df <- select(df, missings_distance, everything())
   
-  return(list(missings=missings, missings_distance=missings_distance, missings_distance_mean=missings_distance_mean, missings_distance_sd=missings_distance_sd, hits=hits))
+  model <- lm(miss_distance ~ n, data = data.frame(n=seq_along(miss_distance), miss_distance=miss_distance))
+  df$missings_trend <- model$coefficients[2]
+  
+  df <- round(df, 2)
+  
+  return(as.list(df))
 }
 
 
 get_pauses_features <- function(pauses) {
-  total_pauses <- sum(pauses) # упаковать в функцию. Функция для вектора пауз отдельно
-  pauses_mean <- round(mean(pauses), 2)
-  pauses_sd <- round(sd(pauses), 2)
-  pauses_number <- length(pauses)
-  pause_min <- min(pauses)
-  pause_max <- max(pauses)
+  df <- describe(pauses, quant = c(0.25, 0.75))
+  df <- select(df, -vars, -n)
+  names(df) <- paste0("pause", "_", names(df))
+  df$pause_total <- sum(pauses)
+  df$pause_number <- length(pauses)
+  df <- select(df, pause_total, pause_number, everything())
   
-  return(list(total_pauses=total_pauses, pauses_mean=pauses_mean, pauses_sd=pauses_sd, pauses_number=pauses_number, pause_min=pause_min, pause_max=pause_max))
+  model <- lm(pauses ~ n, data = data.frame(n=seq_along(pauses), pauses=pauses))
+  df$pause_trend <- model$coefficients[2]
+  
+  df <- round(df, 2)
+  return(as.list(df))
 }
 
 
@@ -477,12 +485,13 @@ get_all_datasets <- function(db=NULL, ast, ast_data, mouse_tracks=NULL, ideal_co
   time <- get_time_features(ast_long, units = "s")
   
   ast_long$distance <- get_distances_points(ast_merged$x_mouse_pos, ast_merged$y_mouse_pos, which(!is.na(ast_merged$event_type)))
-  point_to_point_distance <- get_distance(ast_merged$x_mouse_pos, ast_merged$y_mouse_pos) #вектор со всеми отрезками пройденного расстояния
   distance <- get_distance_features(ast_merged) # пройденное расстояние мышью
   
+  point_to_point_distance <- get_distance(ast_merged$x_mouse_pos, ast_merged$y_mouse_pos) #вектор со всеми отрезками пройденного расстояния
   pauses <- get_pauses(ast_merged, point_to_point_distance, 1, units = "ms") #вектор с паузами
   pauses_features <- get_pauses_features(pauses) # признаки пауз
-  missings <- get_missings_features(ast, ast_long, ast_data) # промахи
+  
+  missings <- get_missings_features(ast, ast_long, ast_data, ideal_coords = ideal_coords) # промахи
   
   velocity_list <- get_velocity_features(ast_mt)
   velocity <- get_velocity(ast_mt)
