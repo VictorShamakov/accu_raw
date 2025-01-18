@@ -294,18 +294,22 @@ get_session_from_file <- function(ast, ast_data, sessions, event_tracks) {
 
 get_time_features <- function(ast_long, units = "ms") {
   debug(logger, "get_time_features")
-  time <- (ast_long$timestamp[nrow(ast_long)] - ast_long$timestamp[1])
-  time_mean <- round(mean(ast_long$timestamp[-1] - 
-                            ast_long$timestamp[-nrow(ast_long)]), 2)
-  time_sd <- round(sd(ast_long$timestamp[-1] - 
-                        ast_long$timestamp[-nrow(ast_long)]), 2)
+  time_vector <- ast_long$timestamp[-1] - ast_long$timestamp[-nrow(ast_long)]
+  df <- describe(time_vector, quant = c(0.25, 0.75))
+  df <- select(df, -vars, -n)
+  names(df) <- paste0("time", "_", names(df))
+  df$time_total <- sum(time_vector)
+  df <- select(df, time_total, everything())
+  
+  model <- lm(time_vector ~ n, data = data.frame(n=seq_along(time_vector), time_vector=time_vector))
+  df$time_trend <- model$coefficients[2]
   
   if (units == "s") {
-    time <- time / 1000
-    time_mean <- time_mean / 1000
-    time_sd <- time_sd / 1000
+    df[, -grep("skew|kurtosis|trend", names(df))] <- df[, -grep("skew|kurtosis|trend", names(df))] / 1000
   }
-  return(list(time=time, time_mean=time_mean, time_sd=time_sd))
+  
+  df <- round(df, 2)
+  return(as.list(df))
 }
 
 #' Временные интервалы
@@ -471,6 +475,7 @@ get_all_datasets <- function(db=NULL, ast, ast_data, mouse_tracks=NULL, ideal_co
   ast_long$distance <- get_distances_points(ast_merged$x_mouse_pos, ast_merged$y_mouse_pos, which(!is.na(ast_merged$event_type)))
   point_to_point_distance <- get_distance(ast_merged$x_mouse_pos, ast_merged$y_mouse_pos) #вектор со всеми отрезками пройденного расстояния
   distance <- get_distance_features(ast_merged, point_to_point_distance) # пройденное расстояние мышью
+  
   pauses <- get_pauses(ast_merged, point_to_point_distance, 1, units = "ms") #вектор с паузами
   pauses_features <- get_pauses_features(pauses) # признаки пауз
   missings <- get_missings_features(ast, ast_long, ast_data) # промахи
