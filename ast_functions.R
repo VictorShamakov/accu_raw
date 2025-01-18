@@ -334,20 +334,24 @@ get_time_intervals <- function(timestamps, units = "ms") {
 }
 
 
-get_distance_features <- function(ast_merged, point_to_point_distance) {
+get_distance_features <- function(ast_merged) {
   debug(logger, "get_distance_features")
   #Добавить проверку на дистанцию, если пользователь прошел 0 или сильно меньше идеальной дистанции, то выдавать ошибку
-  distance <- round(sum(point_to_point_distance), 0)
   
-  distance_mean <- round(mean(get_distances_points(ast_merged$x_mouse_pos, 
-                                                   ast_merged$y_mouse_pos, 
-                                                   which(!is.na(ast_merged$event_type)))), 2)
+  distances_vector <- get_distances_points(ast_merged$x_mouse_pos, ast_merged$y_mouse_pos, which(!is.na(ast_merged$event_type)))
   
-  distance_sd <- round(sd(get_distances_points(ast_merged$x_mouse_pos, 
-                                               ast_merged$y_mouse_pos, 
-                                               which(!is.na(ast_merged$event_type)))), 2)
+  df <- describe(distances_vector, quant = c(0.25, 0.75))
+  df <- select(df, -vars, -n)
+  names(df) <- paste0("distance", "_", names(df))
+  df$distance_total <- sum(distances_vector)
+  df <- select(df, distance_total, everything())
   
-  return(list(distance=distance, distance_mean=distance_mean, distance_sd=distance_sd))
+  model <- lm(distances_vector ~ n, data = data.frame(n=seq_along(distances_vector), distances_vector=distances_vector))
+  df$distance_trend <- model$coefficients[2]
+  
+  df <- round(df, 2)
+  
+  return(as.list(df))
 }
 
 
@@ -474,7 +478,7 @@ get_all_datasets <- function(db=NULL, ast, ast_data, mouse_tracks=NULL, ideal_co
   
   ast_long$distance <- get_distances_points(ast_merged$x_mouse_pos, ast_merged$y_mouse_pos, which(!is.na(ast_merged$event_type)))
   point_to_point_distance <- get_distance(ast_merged$x_mouse_pos, ast_merged$y_mouse_pos) #вектор со всеми отрезками пройденного расстояния
-  distance <- get_distance_features(ast_merged, point_to_point_distance) # пройденное расстояние мышью
+  distance <- get_distance_features(ast_merged) # пройденное расстояние мышью
   
   pauses <- get_pauses(ast_merged, point_to_point_distance, 1, units = "ms") #вектор с паузами
   pauses_features <- get_pauses_features(pauses) # признаки пауз
