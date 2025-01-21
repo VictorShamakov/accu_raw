@@ -440,6 +440,35 @@ get_velocity_smoothed <- function(velocity, velocity_limit=4) {
   return(velocity_smoothed)
 }
 
+get_velocity_by_target <- function(ast_merged) {
+  target_speeds <- vector()
+  
+  for (target in unique(ast_merged$target_numbers)) {
+    ast_by_target <- ast_merged[ast_merged$target_numbers == target, ]
+    velocity <- get_velocity(ast_by_target$x_mouse_pos, ast_by_target$y_mouse_pos, ast_by_target$timestamp)
+    distance_for_velocity <- get_distance(ast_by_target$x_mouse_pos, ast_by_target$y_mouse_pos)
+    velocity_mean <- round(velocity_harmonic_mean(velocity, distance_for_velocity, units = "s"), 2)
+    
+    target_speeds <- c(target_speeds, velocity_mean)
+  }
+  
+  target_speeds[is.nan(target_speeds)] <- 0
+  return(target_speeds)
+}
+
+get_velocity_features <- function(velocity_vector) {
+  df <- describe(velocity_vector, quant = c(0.25, 0.75))
+  df <- select(df, -vars, -n, -mean, -median, -trimmed)
+  names(df) <- paste0("velocity", "_", names(df))
+  df <- select(df, everything())
+  
+  model <- lm(velocity_vector ~ n, data = data.frame(n=seq_along(velocity_vector), velocity_vector=velocity_vector))
+  df$velocity_trend <- model$coefficients[2]
+  
+  df <- round(df, 2)
+  return(as.list(df))
+}
+
 
 get_fitts_time <- function(distance, target_size = 76, a = 0, b = 1) {
   if (b > 0 & target_size > 0) {
@@ -500,8 +529,12 @@ get_all_datasets <- function(db=NULL, ast, ast_data, mouse_tracks=NULL, ideal_co
   distance_for_velocity <- get_distance(ast_mt$x_mouse_pos, ast_mt$y_mouse_pos)
   velocity_mean <- round(velocity_harmonic_mean(ast_mt$velocity, distance_for_velocity, units = "s"), 2)
   
-  features <- collect_features(ast, time, distance, pauses_features, velocity_mean, missings)
-  return(list(ast_mt=ast_mt, features=features, ast_long=ast_long, ast_merged=ast_merged))
+  ast_long$velocity <- get_velocity_by_target(ast_merged)
+  velocity <- get_velocity_features(ast_long$velocity)
+  
+  features <- collect_features(ast, time, distance, pauses_features, velocity_mean, velocity, missings)
+  
+  return(list(features=features, ast_mt=ast_mt, ast_long=ast_long, ast_merged=ast_merged))
 }
 
 
