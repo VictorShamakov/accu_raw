@@ -133,11 +133,13 @@ get_distance_a_b <- function(x1, x2, y1, y2) {
 }
 
 
-get_velocity <- function(data) {
-  d <- get_distance(data$x_mouse_pos, data$y_mouse_pos)
-  t <- c(0, data$timestamp[-1] - data$timestamp[-nrow(data)])
-  
+get_velocity <- function(x, y, timestamp) {
+  d <- get_distance(x, y)
+  t <- c(0, timestamp[-1] - timestamp[-length(timestamp)])
+
   v <- c(d/t)
+  v[is.nan(v)] <- 0
+
   return(v)
 }
 
@@ -181,6 +183,7 @@ draw_tracks <- function(mt, events=NULL, velocity=NULL, acceleration=NULL, title
           axis.title.y = element_text(size = 20))
   
   if (!missing(velocity)) {
+    mt$velocity_smoothed <- get_velocity_smoothed(mt$velocity)
     plot <- plot + geom_path(data = mt, alpha = I(1), linewidth=0.5, aes(col=velocity_smoothed)) +
       scale_colour_gradient2(low="chartreuse", mid="yellow", high="red", midpoint = 2)
   }
@@ -423,19 +426,18 @@ get_vel_acc_features <- function(ast_mt, velocity_limit=4, acceleration_limit=0.
 }
 
 
-get_velocity_features <- function(ast_mt, velocity_limit=4) {
+get_velocity_smoothed <- function(velocity, velocity_limit=4) {
   debug(logger, "get_velocity_features")
-  #Скорость и ускорение для каждого участка пути
-  ast_mt$velocity <- round(get_velocity(ast_mt), 2)
-  ast_mt$velocity_smoothed <- ast_mt$velocity
+  #Скорость для каждого участка пути
   
-  # if (min(ast_mt$velocity) < 0) {next} #добавить проверку, если минимальная скорость ниже нуля, это артефакт
-  ast_mt$velocity_smoothed[ast_mt$velocity_smoothed > velocity_limit] <- velocity_limit
-  ast_mt$velocity_smoothed <- sleek(ast_mt$velocity_smoothed)
+  # if (min(velocity) < 0) {next} #добавить проверку, если минимальная скорость ниже нуля, это артефакт
+  velocity[velocity > velocity_limit] <- velocity_limit
+  velocity_smoothed <- sleek(velocity)
   # Если двигать слишком быстро, почему-то возникают NaN 
-  ast_mt$velocity_smoothed[1] <- 0 # устанавливаем нижнюю границу скорости для построения графиков
-  ast_mt$velocity_smoothed[length(ast_mt$velocity_smoothed)] <- velocity_limit # устанавливаем верхнюю границу скорости для построения графиков
-  return(list(ast_mt=ast_mt))
+  velocity_smoothed[1] <- 0 # устанавливаем нижнюю границу скорости для построения графиков
+  velocity_smoothed[length(velocity_smoothed)] <- velocity_limit # устанавливаем верхнюю границу скорости для построения графиков
+  
+  return(velocity_smoothed)
 }
 
 
@@ -493,12 +495,11 @@ get_all_datasets <- function(db=NULL, ast, ast_data, mouse_tracks=NULL, ideal_co
   
   missings <- get_missings_features(ast, ast_long, ast_data, ideal_coords = ideal_coords) # промахи
   
-  velocity_list <- get_velocity_features(ast_mt)
-  velocity <- get_velocity(ast_mt)
-  distance_for_velocity <- get_distance(ast_mt$x_mouse_pos, ast_mt$y_mouse_pos)
-  velocity_mean <- round(velocity_harmonic_mean(velocity, distance_for_velocity, units = "s"), 2)
+  ast_mt$velocity <- get_velocity(ast_mt$x_mouse_pos, ast_mt$y_mouse_pos, ast_mt$timestamp)
   
-  ast_mt <- velocity_list$ast_mt
+  distance_for_velocity <- get_distance(ast_mt$x_mouse_pos, ast_mt$y_mouse_pos)
+  velocity_mean <- round(velocity_harmonic_mean(ast_mt$velocity, distance_for_velocity, units = "s"), 2)
+  
   features <- collect_features(ast, time, distance, pauses_features, velocity_mean, missings)
   return(list(ast_mt=ast_mt, features=features, ast_long=ast_long, ast_merged=ast_merged))
 }
