@@ -28,15 +28,16 @@ DATA_FROM_DB <- T #FALSE - from files
 tracker_id <- 1 # ID tracker для сервиса mouse tracking
 
 ## Психодиагностика
-user_id <- 2 # Ускорения и замедления имеют Inf
-# user_id <- 2115 # Ускорения и замедления имеют Inf
+# user_id <- 2 # Ускорения и замедления имеют Inf
+# test_id <- 100 # ID экземпляра теста в Moodle LMS - Отладка
+
+user_id <- 2115 # Ускорения и замедления имеют Inf
 # user_id <- 1010
 # user_id <- 1498 # ID пользователя
 # user_id <- 1908 # Ускорения и замедления имеют Inf
 # user_id <- 979 # ID пользователя
 # user_id <- 2506 # Точность выполнения максимальная, но показывает, что расстояние промахов ~1000 px, что вроде как неверно
 test_id <- 66 # ID экземпляра теста в Moodle LMS - Психодиагностика
-test_id <- 100 # ID экземпляра теста в Moodle LMS - Отладка
 
 
 ## Медитация
@@ -439,8 +440,6 @@ grid.arrange(p, p1, nrow = 2, ncol = 1)
 
 
 ## Компромисс между скоростью и точностью
-sat_a
-sat_b
 
 ```{r fig.height=5, fig.width=10}
 ggplot(ast_long, aes(velocity, miss_distance)) + geom_point(aes(col=hits)) + stat_smooth(method = "lm") +
@@ -462,14 +461,10 @@ ggplot(ast_long, aes(velocity, miss_distance, col=hits)) + geom_point() + stat_s
   ggtitle("Компромисс между скоростью и точностью, общий") 
 ```
 
+
 ```{r}
-ast_long.accuracy <- ast_long[ast_long$stage == "accuracy", ]
-ast_long.speed <- ast_long[ast_long$stage == "speed", ]
-
-
-cor(ast_long.accuracy$miss_distance, ast_long.accuracy$velocity)
-cor(ast_long.speed$miss_distance, ast_long.speed$velocity)
-cor(ast_long$miss_distance, ast_long$velocity)
+cor(ast_long[ast_long$stage == "accuracy", ]$miss_distance, ast_long[ast_long$stage == "accuracy", ]$velocity)
+cor(ast_long[ast_long$stage == "speed", ]$miss_distance, ast_long[ast_long$stage == "speed", ]$velocity)
 ```
 
 ## Паузы

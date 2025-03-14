@@ -888,7 +888,9 @@ get_all_datasets <- function(db=NULL, ast, ast_data, mouse_tracks=NULL, ideal_co
   ast_long$velocity <- get_velocity_by_target(ast_merged)
   velocity <- get_velocity_features(ast_long$velocity)
   
-  features <- collect_features(ast, time, fitts_a = fitts_coef[1], fitts_b = fitts_coef[2], distance, pauses_features, stops, velocity_mean, velocity, acceleration_features, decceleration_features, acceleration_per_second, missings, combo_hits, combo_missings)
+  corr_sat <- round(cor(ast_long$miss_distance, ast_long$velocity), 3)
+  
+  features <- collect_features(ast, time, fitts_a = fitts_coef[1], fitts_b = fitts_coef[2], distance, pauses_features, stops, velocity_mean, velocity, acceleration_features, decceleration_features, acceleration_per_second, missings, combo_hits, combo_missings, corr_sat)
   
   return(list(features=features, ast_mt=ast_mt, ast_long=ast_long, ast_merged=ast_merged))
 }
