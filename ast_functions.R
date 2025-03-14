@@ -63,7 +63,7 @@ get_mouse_tracks_from_file <- function(mouse_tracks, session_id) {
   
   mouse_tracks <- mouse_tracks[mouse_tracks$session_id == session_id, c("timestamp", "x_mouse_pos", "y_mouse_pos")] 
   mouse_tracks$timestamp <- as.numeric(mouse_tracks$timestamp)
-  mouse_tracks <- unique(mouse_tracks)
+  mouse_tracks <- unique(mouse_tracks) # удаление дубликатов, чтобы не повторялись event_type == click
   mouse_tracks <- mouse_tracks[order(mouse_tracks$timestamp),]
   #добавить удаление дубликатов
   return(mouse_tracks)
@@ -145,28 +145,112 @@ get_velocity <- function(x, y, timestamp) {
 
 
 get_acceleration <- function(timestamp, velocity) {
+  # Проверка на одинаковую длину векторов
+  if (length(timestamp) != length(velocity)) {
+    stop("Векторы timestamp и velocity должны иметь одинаковую длину")
+  }
+  
   delta_v <- velocity[-1] - velocity[-length(velocity)]
   delta_t <- timestamp[-1] - timestamp[-length(timestamp)]
   
   a <- c(0, delta_v/delta_t)
+  
+  # Замена бесконечных значений на NA
+  a[is.infinite(a)] <- NA
+  
   return(a)
 }
 
 
+# velocity_harmonic_mean <- function(speeds, distances, units = "ms") {
+#   if (length(speeds) != length(distances)) {
+#     stop("Длины векторов скоростей и расстояний должны быть равны")
+#   }
+#   total_distance <- sum(distances)
+#   weighted <- distances / speeds
+#   weighted[is.nan(weighted)] <- 0
+#   weighted_sum <- sum(weighted)
+# 
+#   if (units == "s") {
+#     weighted_sum <- weighted_sum / 1000
+#   }
+# 
+#   return(total_distance / weighted_sum)
+# }
+
+
 velocity_harmonic_mean <- function(speeds, distances, units = "ms") {
+  # Проверяем длины векторов
   if (length(speeds) != length(distances)) {
     stop("Длины векторов скоростей и расстояний должны быть равны")
   }
+
+  # Проверяем на наличие нулевых или отрицательных скоростей
+  if (any(speeds < 0)) {
+    stop("Скорости должны быть положительными")
+  }
+
+  # Вычисляем общую дистанцию
   total_distance <- sum(distances)
+
+  # Вычисляем взвешенную сумму
   weighted <- distances / speeds
   weighted[is.nan(weighted)] <- 0
   weighted_sum <- sum(weighted)
-  
+
+  # Конвертация единиц, если требуется
   if (units == "s") {
     weighted_sum <- weighted_sum / 1000
+  } else if (units != "ms") {
+    stop("Неверная единица измерения. Используйте 'ms' или 's'")
+  }
+
+  # Возвращаем среднее гармоническое значение скорости
+  return(total_distance / weighted_sum)
+}
+
+
+calculate_scaled_curvature <- function(time, x, y) {
+  # Сортировка данных по времени
+  ord <- order(time)
+  time <- time[ord]
+  x <- x[ord]
+  y <- y[ord]
+  
+  if (length(time) < 3) return(0)
+  
+  # Инициализация векторов
+  n <- length(time)
+  curvature <- rep(NA, n)
+  
+  # Вычисление центральных разностей
+  for (i in 2:(n-1)) {
+    dt_prev <- time[i] - time[i-1]
+    dt_next <- time[i+1] - time[i]
+    
+    # Первые производные
+    x_prime <- (x[i+1] - x[i-1]) / (dt_prev + dt_next)
+    y_prime <- (y[i+1] - y[i-1]) / (dt_prev + dt_next)
+    
+    # Вторые производные
+    x_dbl_prime <- (x[i+1] - 2*x[i] + x[i-1]) / (mean(c(dt_prev, dt_next))^2)
+    y_dbl_prime <- (y[i+1] - 2*y[i] + y[i-1]) / (mean(c(dt_prev, dt_next))^2)
+    
+    # Расчет кривизны
+    numerator <- abs(x_prime * y_dbl_prime - y_prime * x_dbl_prime)
+    denominator <- (x_prime^2 + y_prime^2)^1.5
+    
+    curvature[i] <- ifelse(denominator != 0, numerator / denominator, 0)
   }
   
-  return(total_distance / weighted_sum)
+  # Нормализация к шкале 0-100
+  valid_curv <- curvature[!is.na(curvature)]
+  if (all(valid_curv == 0)) return(rep(0, n))
+  
+  max_curv <- max(valid_curv, na.rm = TRUE)
+  scaled_curvature <- round(curvature / max_curv * 100, 2)
+  
+  return(scaled_curvature)
 }
 
 
@@ -184,12 +268,13 @@ draw_tracks <- function(mt, events=NULL, velocity=NULL, acceleration=NULL, title
   
   if (!missing(velocity)) {
     mt$velocity_smoothed <- get_velocity_smoothed(mt$velocity)
-    plot <- plot + geom_path(data = mt, alpha = I(1), linewidth=0.5, aes(col=velocity_smoothed)) +
+    plot <- plot + geom_path(data = mt, alpha = I(0.5), linewidth=0.5, aes(col=velocity_smoothed)) +
       scale_colour_gradient2(low="chartreuse", mid="yellow", high="red", midpoint = 2)
   }
   
   if (!missing(acceleration)) {
-    plot <- plot + geom_path(data = mt, alpha = I(1), linewidth=0.5, aes(col=acceleration)) +
+    mt$acceleration <- get_acceleration_smoothed(mt$acceleration, acceleration_limit = 0.05)
+    plot <- plot + geom_path(data = mt, alpha = I(0.5), linewidth=0.5, aes(col=acceleration)) +
       scale_colour_gradient2(low="chartreuse", mid="yellow", high="red", midpoint = 0)
   }
   
@@ -385,6 +470,13 @@ get_missings_features <- function(ast, ast_long, ast_data, radius=38, ideal_coor
   return(as.list(df))
 }
 
+get_accuracy_rate <- function(miss_distance) {
+  miss_distance_percent <- 100 - miss_distance * 100 / 38
+  miss_distance_percent[miss_distance_percent < 0] <- 0
+  
+  return(miss_distance_percent)
+}
+
 
 get_pauses_features <- function(pauses) {
   df <- describe(pauses, quant = c(0.25, 0.75))
@@ -401,33 +493,8 @@ get_pauses_features <- function(pauses) {
   return(as.list(df))
 }
 
-
-get_vel_acc_features <- function(ast_mt, velocity_limit=4, acceleration_limit=0.05) {
-  debug(logger, "get_vel_acc_features")
-  #Скорость и ускорение для каждого участка пути
-  ast_mt$velocity <- round(get_velocity(ast_mt), 2)
-  ast_mt$acceleration <- round(get_acceleration(ast_mt$timestamp, ast_mt$velocity), 2)
-  
-  # if (min(ast_mt$velocity) < 0) {next} #добавить проверку, если минимальная скорость ниже нуля, это артефакт
-  ast_mt$velocity[ast_mt$velocity > velocity_limit] <- velocity_limit
-  ast_mt$velocity <- sleek(ast_mt$velocity)
-  # velocity_mean <- round(exp(mean(log(ast_mt$velocity[!is.infinite(ast_mt$velocity)]))), 2) # гармоническое среднее
-  # Если двигать слишком быстро, почему-то возникают NaN 
-  ast_mt$velocity[1] <- 0 # устанавливаем нижнюю границу скорости для построения графиков
-  ast_mt$velocity[length(ast_mt$velocity)] <- velocity_limit # устанавливаем верхнюю границу скорости для построения графиков
-  
-  ast_mt$acceleration <- sleek(ast_mt$acceleration) #сглаживание
-  ast_mt$acceleration[ast_mt$acceleration > acceleration_limit] <- acceleration_limit
-  ast_mt$acceleration[ast_mt$acceleration < -acceleration_limit] <- -acceleration_limit
-  ast_mt$acceleration[1] <- -acceleration_limit # устанавливаем нижнюю границу ускорения для построения графиков
-  ast_mt$acceleration[length(ast_mt$acceleration)] <- acceleration_limit # устанавливаем верхнюю границу ускорения для построения графиков
-  
-  return(list(ast_mt=ast_mt))
-}
-
-
 get_velocity_smoothed <- function(velocity, velocity_limit=4) {
-  debug(logger, "get_velocity_features")
+  debug(logger, "get_velocity_smoothed")
   #Скорость для каждого участка пути
   
   # if (min(velocity) < 0) {next} #добавить проверку, если минимальная скорость ниже нуля, это артефакт
@@ -469,14 +536,151 @@ get_velocity_features <- function(velocity_vector) {
   return(as.list(df))
 }
 
+get_acceleration_features <- function(acceleration_vector, prefix) {
+  df <- describe(acceleration_vector, quant = c(0.25, 0.75))
+  df <- select(df, -vars)
+  names(df) <- paste0(prefix, "_", names(df))
+  df <- select(df, everything())
+  
+  if (prefix == "acc") {
+    df$jerk_line <- sort(boxplot.stats(acceleration_vector)$out, decreasing = T)[4]
+    df$n_jerk <- length(boxplot.stats(acceleration_vector)$out)
+  } else {
+    df$braking_line <- sort(boxplot.stats(acceleration_vector)$out, decreasing = F)[4]
+    df$n_braking <- length(boxplot.stats(acceleration_vector)$out)
+  }
+  
+  df <- round(df, 2)
+  return(as.list(df))
+}
 
-get_fitts_time <- function(distance, target_size = 76, a = 0, b = 1) {
-  if (b > 0 & target_size > 0) {
-    time <- a + b * log2(distance / target_size + 1)
+#' Merge acceleration vector and decceleration vector
+#'
+#' Данная функция возвращает data frame с значениями ускорений и замедлений
+#'
+#' @param acceleration list
+#' @param deceleration list
+#' @return Dataframe
+#' @examples
+#' merge_acc_dec(acceleration, deceleration)
+#' @export
+merge_acc_dec <- function(acceleration, deceleration) {
+  acc_dec <- vector()
+  acc_dec_time <- vector()
+  
+  for (i in seq_along(acceleration$values)) {
+    acc_dec <- c(acc_dec, acceleration$values[i], deceleration$values[i])
+    acc_dec_time <- c(acc_dec_time, acceleration$time[i], deceleration$time[i])
+  }
+  
+  acc_dec <- na.omit(acc_dec)
+  acc_dec_time <- na.omit(acc_dec_time)
+  
+  df <- data.frame(time=0, acceleration=0)
+  df <- rbind(df, data.frame(time=acc_dec_time, acceleration=acc_dec))
+  df$acceleration_smd <- sleek(df$acceleration)
+  
+  return(df)
+}
+
+get_acceleration_smoothed <- function(acceleration, acceleration_limit=0.05) {
+  acceleration_smoothed <- sleek(acceleration) #сглаживание
+  acceleration_smoothed[acceleration_smoothed > acceleration_limit] <- acceleration_limit
+  acceleration_smoothed[acceleration_smoothed < -acceleration_limit] <- -acceleration_limit
+  acceleration_smoothed[1] <- -acceleration_limit # устанавливаем нижнюю границу ускорения для построения графиков
+  acceleration_smoothed[length(acceleration_smoothed)] <- acceleration_limit # устанавливаем верхнюю границу ускорения для построения графиков
+  
+  return(acceleration_smoothed)
+}
+
+get_acceleration_by_target <- function(target_numbers, acceleration, last_target_number = 128, dec = NULL) {
+  target_mean_acceleration <- vector()
+  
+  for (target_number in unique(target_numbers)) {
+    acc_by_target <- acceleration[target_numbers == target_number]
+    
+    if (is.null(dec)) {
+      sequences <- extract_true_sequences(acc_by_target >= 0)
+      if (target_number != last_target_number) {
+        tryCatch(expr = {
+          mean_acc <- mean(acc_by_target[sequences[[1]]])
+        },
+        error = function(err) { 
+          mean_acc <- 0
+        })
+      } else {
+        mean_acc <- 0
+      }
+    } else {
+      sequences <- extract_true_sequences(acc_by_target < 0)
+      if (target_number == 1 | target_number == last_target_number) {
+        mean_acc <- 0
+      } else {
+        tryCatch(expr = {
+          mean_acc <- mean(acc_by_target[sequences[[length(sequences)]]])
+        },
+        error = function(err) { 
+          mean_acc <- 0
+        })
+      }
+    }
+    
+    target_mean_acceleration[target_number] <- mean_acc
+  }
+  
+  return(target_mean_acceleration)
+}
+
+get_fitts_coefs <- function(time_intervals, ideal_distance, target_size) {
+  df <- data.frame(time_intervals, ideal_distance)
+  df <- df[-1, ]
+  
+  model <- lm(time_intervals ~ log2(ideal_distance / 76 + 1), data = df)
+  
+  return(model$coefficients)
+}
+
+get_fitts_time <- function(distance, target_size = 76, a = 0, b = 0.1) {
+  if (b != 0 & target_size > 0) {
+    time <- ifelse(distance != 0, a + b * log2(distance / target_size + 1), 0)
     return(time)
   } else {
-    return("b, либо размер цели меньше, либо равно 0")
+    return("Коэффициент b, либо размер мишени меньше 0, либо равно 0")
   }
+}
+
+#' Число ускорений за определенное время
+#'
+#' Данная функция возвращает вектор количеством ускорений за единицу времени. (по умолчанию: за секунду)
+#'
+#' @param acceleration vector
+#' @param time vector
+#' @return вектор с количеством ускорений за каждую секунду
+#' @examples
+#' get_number_accelerations_per_time(acceleration, time)
+#' @export
+get_number_accelerations_per_time <- function(acceleration, time) {
+  n_acc_sec <- vector()
+  for (i in 0:floor(max(time))) {
+    n <- length(acceleration[time >= i & time < i + 1])
+    n_acc_sec <- c(n_acc_sec, n)
+  }
+  
+  return(n_acc_sec)
+}
+
+
+get_acceleration_features_per_time <- function(acceleration_per_time) {
+  df <- describe(acceleration_per_time, quant = c(0.25, 0.75))
+  df <- select(df, -vars, -n)
+  df$max_pos <- which.max(acceleration_per_time) - 1 # секунда, на которой случилось максимальное количество ускорений в секунду
+  df$min_pos <- which.min(acceleration_per_time) - 1 # секунда, на которой случилось минимальное количество ускорений в секунду
+  names(df) <- paste0("acc_per_sec", "_", names(df))
+  df <- select(df, everything())
+  
+  df <- round(df, 2)
+  return(as.list(df))
+  
 }
 
 
@@ -485,58 +689,6 @@ collect_features <- function(ast, ...) {
   features <- data.frame(user_id=ast$user_id, session_id=ast$session_id, test_id=ast$test_id, ratio=ast$ratio, ...)
   return(features)
 }
-
-
-get_all_datasets <- function(db=NULL, ast, ast_data, mouse_tracks=NULL, ideal_coords) {
-  debug(logger, "get_all_datasets")
-  ast_long <- get_ast_long(ast_data)
-  ast_long$miss_distance <- round(get_distance_a_b(ideal_coords$x_mouse_pos + ast$canvas_coords_x, ast_long$x_mouse_pos,
-                                             ideal_coords$y_mouse_pos + ast$canvas_coords_y, ast_long$y_mouse_pos), 2)
-  
-  ast_long$hits <- ifelse(ast_long$miss_distance > 38, F, T)
-  ast_long$time_intervals <- get_time_intervals(ast_long$timestamp, units = "s")
-  ast_long$time <- cumsum(ast_long$time_intervals)
-  
-  if (!missing(db) & missing(mouse_tracks)) {
-    ast_mt <- get_mouse_tracks(db, session_id = ast$session_id)
-  } else {
-    ast_mt <- get_mouse_tracks_from_file(mouse_tracks, session_id = ast$session_id)
-  }
-  
-  ast_mt <- ast_mt[ast_mt$timestamp >= ast_long$timestamp[1] & ast_mt$timestamp <= ast_long$timestamp[nrow(ast_long)],]
-  ast_mt$time_intervals <- get_time_intervals(ast_mt$timestamp, units = "s")
-  ast_mt$time <- cumsum(ast_mt$time_intervals)
-  
-  if (nrow(ast_mt) == 0) {warning("No mouse tracks")}
-  ast_merged <- merge(ast_mt, ast_long, by = c("timestamp", "x_mouse_pos", "y_mouse_pos"), all = T) # треки мыши + попадания
-  click_positions <- which(ast_merged$event_type == "click") # обрезка датасета, чтобы не было движений после последнего клика
-  ast_merged <- ast_merged[click_positions[1]:click_positions[length(click_positions)], ]
-  ast_merged$target_numbers <- get_target_numbers(ast_merged$event_type, "click")
-  
-  time <- get_time_features(ast_long, units = "s")
-  
-  ast_long$distance <- get_distances_points(ast_merged$x_mouse_pos, ast_merged$y_mouse_pos, which(!is.na(ast_merged$event_type)))
-  distance <- get_distance_features(ast_merged) # пройденное расстояние мышью
-  
-  point_to_point_distance <- get_distance(ast_merged$x_mouse_pos, ast_merged$y_mouse_pos) #вектор со всеми отрезками пройденного расстояния
-  pauses <- get_pauses(ast_merged, point_to_point_distance, 1, units = "ms") #вектор с паузами
-  pauses_features <- get_pauses_features(pauses) # признаки пауз
-  
-  missings <- get_missings_features(ast, ast_long, ast_data, ideal_coords = ideal_coords) # промахи
-  
-  ast_mt$velocity <- get_velocity(ast_mt$x_mouse_pos, ast_mt$y_mouse_pos, ast_mt$timestamp)
-  
-  distance_for_velocity <- get_distance(ast_mt$x_mouse_pos, ast_mt$y_mouse_pos)
-  velocity_mean <- round(velocity_harmonic_mean(ast_mt$velocity, distance_for_velocity, units = "s"), 2)
-  
-  ast_long$velocity <- get_velocity_by_target(ast_merged)
-  velocity <- get_velocity_features(ast_long$velocity)
-  
-  features <- collect_features(ast, time, distance, pauses_features, velocity_mean, velocity, missings)
-  
-  return(list(features=features, ast_mt=ast_mt, ast_long=ast_long, ast_merged=ast_merged))
-}
-
 
 #' Вектор с нумерацией мишеней для mouse tracking
 #'
@@ -559,5 +711,185 @@ get_target_numbers <- function(event_type, event_name) {
   }
   
   return(target_n)
+}
+
+#' Вектор с нумерацией мишеней для треков движений
+#'
+#' Данная функция возвращает вектор с номерами мишеней для треков движений основываясь на временных метках
+#'
+#' @param target_timestamps vector
+#' @param movement_timestamps vector
+#' @return Вектор с номерами мишеней
+#' @examples
+#' get_target_numbers_by_timestamp(target_timestamps, movement_timestamps)
+#' @export
+get_target_numbers_by_timestamp <- function(target_timestamps, movement_timestamps) {
+  target_n <- vector()
+  
+  for (n in seq_along(target_timestamps)) {
+    if (n == 1) {
+      numbers <- movement_timestamps[movement_timestamps == target_timestamps[n]]
+    } else {
+      numbers <- movement_timestamps[movement_timestamps > target_timestamps[n - 1] & movement_timestamps <= target_timestamps[n]]
+    }
+    
+    target_n <- c(target_n, rep(n, length(numbers)))
+  }
+
+  return(target_n)
+}
+
+
+
+extract_true_sequences <- function(vec) {
+  # Определяем, где начинается и заканчивается каждая группа TRUE
+  starts <- which(diff(c(FALSE, vec)) == 1) # Начала последовательностей TRUE
+  ends <- which(diff(c(vec, FALSE)) == -1)  # Концы последовательностей TRUE
+  
+  # Извлекаем индексы для каждой последовательности
+  sequences <- mapply(function(start, end) c(start, end), starts, ends, SIMPLIFY = FALSE)
+  
+  return(sequences)
+}
+
+#' Преобразования ускорения
+#'
+#' Данная функция преобразовывает объединяет последовательность ускорений
+#'
+#' @param acceleration vector
+#' @param timestamp vector
+#' @param velocity vector
+#' @param time vector
+#' @return Вектор с ускорениями, либо список со временем и ускорениями
+#' @examples
+#' convert_acceleration(sequences, timestamp, velocity, time)
+#' @export
+convert_acceleration <- function(acceleration, timestamp, velocity, time = NULL, deceleration = NULL) {
+  if (is.null(deceleration)) {
+    acc_logical <- acceleration >= 0
+    acc_logical[1] <- FALSE # переводим первое значение FALSE для корректного нахождения самого первого ускорения
+  } else {
+    acc_logical <- acceleration < 0
+  }
+  
+  
+  sequences <- extract_true_sequences(acc_logical)
+  
+  vec <- vector()
+  for (sequence in sequences) {
+    delta_time <- timestamp[sequence[2]] - (timestamp[sequence[1] - 1])
+    delta_velocity <- velocity[sequence[2]] - (velocity[sequence[1] - 1])
+    vec <- c(vec, delta_velocity / delta_time)
+  }
+  
+  if(!is.null(time)) {
+    time <- time[sapply(sequences, `[`, 2)]
+    
+    return(list(time=time, values=vec))
+  }
+  
+  return(vec)
+}
+
+
+get_combo_targets <- function(hits) {
+  max_hits <- vector()
+  
+  if (length(extract_true_sequences(hits)) == 0) {
+    return(0)
+  }
+  
+  for (i in extract_true_sequences(hits)) {
+    max_hits <- c(max_hits, i[2] - i[1] + 1)
+  }
+  
+  return(max_hits)
+}
+
+
+get_all_datasets <- function(db=NULL, ast, ast_data, mouse_tracks=NULL, ideal_coords) {
+  debug(logger, "get_all_datasets")
+  ast_long <- get_ast_long(ast_data)
+  ast_long$miss_distance <- round(get_distance_a_b(ideal_coords$x_mouse_pos + ast$canvas_coords_x, ast_long$x_mouse_pos,
+                                                   ideal_coords$y_mouse_pos + ast$canvas_coords_y, ast_long$y_mouse_pos), 2)
+  
+  ast_long$hits <- ifelse(ast_long$miss_distance > 38, F, T)
+  ast_long$time_intervals <- get_time_intervals(ast_long$timestamp, units = "s")
+  ast_long$time <- cumsum(ast_long$time_intervals)
+  
+  if (!missing(db) & missing(mouse_tracks)) {
+    ast_mt <- get_mouse_tracks(db, session_id = ast$session_id)
+  } else {
+    ast_mt <- get_mouse_tracks_from_file(mouse_tracks, session_id = ast$session_id)
+  }
+  
+  # Добавляем в треки мыши данные первой и последней мишени, чтобы успешно проставить номера мишеней для треков мыши.
+  ast_mt <- rbind(ast_mt, ast_long[c(1, nrow(ast_long)), 1:3]) 
+  ast_mt <- ast_mt[order(ast_mt$timestamp), ] 
+  ast_mt <- unique(ast_mt)
+  
+  # Выбираем треки мыши, которые были совершены во время прохождения теста
+  ast_mt <- ast_mt[ast_mt$timestamp >= ast_long$timestamp[1] & ast_mt$timestamp <= ast_long$timestamp[nrow(ast_long)], ]
+  if (nrow(ast_mt) == 0) {warning("No mouse tracks")}
+  
+  ast_mt$time_intervals <- get_time_intervals(ast_mt$timestamp, units = "s")
+  ast_mt$time <- cumsum(ast_mt$time_intervals)
+  ast_mt$target_numbers <- get_target_numbers_by_timestamp(ast_long$timestamp, ast_mt$timestamp)
+  
+  ast_merged <- merge(ast_mt, ast_long, by = c("timestamp", "x_mouse_pos", "y_mouse_pos"), all = T) # треки мыши + попадания
+  click_positions <- which(ast_merged$event_type == "click") # обрезка датасета, чтобы не было движений после последнего клика
+  ast_merged <- ast_merged[click_positions[1]:click_positions[length(click_positions)], ]
+  ast_merged$target_numbers <- get_target_numbers(ast_merged$event_type, "click")
+  
+  time <- get_time_features(ast_long, units = "s")
+  
+  ast_long$ideal_distance <- get_distance(ideal_coords$x_mouse_pos, ideal_coords$y_mouse_pos)
+  ast_long$distance <- get_distances_points(ast_merged$x_mouse_pos, ast_merged$y_mouse_pos, which(!is.na(ast_merged$event_type)))
+  
+  fitts_coef <- get_fitts_coefs(ast_long$time_intervals, ast_long$ideal_distance, 76)
+  ast_long$fitts_time_invervals <- get_fitts_time(distance = ast_long$ideal_distance, a = fitts_coef[1], b = fitts_coef[2])
+  ast_long$fitts_time <- cumsum(ast_long$fitts_time_invervals)
+  
+  distance <- get_distance_features(ast_merged) # пройденное расстояние мышью
+  
+  point_to_point_distance <- get_distance(ast_merged$x_mouse_pos, ast_merged$y_mouse_pos) #вектор со всеми отрезками пройденного расстояния
+  pauses <- get_pauses(ast_merged, point_to_point_distance, 1, units = "ms") #вектор с паузами
+  pauses_features <- get_pauses_features(pauses) # признаки пауз
+  
+  missings <- get_missings_features(ast, ast_long, ast_data, ideal_coords = ideal_coords) # промахи
+  miss_distance <- get_distance_a_b(ideal_coords$x_mouse_pos + ast$canvas_coords_x, ast_long$x_mouse_pos,
+                                    ideal_coords$y_mouse_pos + ast$canvas_coords_y, ast_long$y_mouse_pos)
+  ast_long$accuracy_rate <- get_accuracy_rate(miss_distance)
+  missings$accuracy_rate <- round(mean(ast_long$accuracy_rate), 2)
+  
+  ast_mt$velocity <- get_velocity(ast_mt$x_mouse_pos, ast_mt$y_mouse_pos, ast_mt$timestamp)
+  ast_mt$acceleration <- get_acceleration(ast_mt$timestamp, ast_mt$velocity)
+  stops <- sum(ast_mt$velocity[-1] == 0)
+  
+  acceleration <- convert_acceleration(ast_mt$acceleration, timestamp = ast_mt$timestamp, velocity = ast_mt$velocity, time = ast_mt$time)
+  acceleration_features <- get_acceleration_features(acceleration$values, "acc")
+  
+  decceleration <- convert_acceleration(ast_mt$acceleration, timestamp = ast_mt$timestamp, velocity = ast_mt$velocity, time = ast_mt$time, deceleration = T)
+  decceleration_features <- get_acceleration_features(decceleration$values, "dec")
+  
+  df.acceleration <- merge_acc_dec(acceleration, decceleration)
+  number_acceleration_per_second <- get_number_accelerations_per_time(df.acceleration$acceleration, df.acceleration$time)
+  acceleration_per_second <- get_acceleration_features_per_time(number_acceleration_per_second)
+  
+  ast_long$acceleration <- get_acceleration_by_target(ast_mt$target_numbers, ast_mt$acceleration, last_target_number = nrow(ast_long))
+  ast_long$decceleration <- get_acceleration_by_target(ast_mt$target_numbers, ast_mt$acceleration, last_target_number = nrow(ast_long), dec = T)
+  
+  combo_hits <- max(get_combo_targets(ast_long$hits))
+  combo_missings <- max(get_combo_targets(!ast_long$hits))
+  
+  distance_for_velocity <- get_distance(ast_mt$x_mouse_pos, ast_mt$y_mouse_pos)
+  velocity_mean <- round(velocity_harmonic_mean(ast_mt$velocity, distance_for_velocity, units = "s"), 2)
+  
+  ast_long$velocity <- get_velocity_by_target(ast_merged)
+  velocity <- get_velocity_features(ast_long$velocity)
+  
+  features <- collect_features(ast, time, fitts_a = fitts_coef[1], fitts_b = fitts_coef[2], distance, pauses_features, stops, velocity_mean, velocity, acceleration_features, decceleration_features, acceleration_per_second, missings, combo_hits, combo_missings)
+  
+  return(list(features=features, ast_mt=ast_mt, ast_long=ast_long, ast_merged=ast_merged))
 }
 
