@@ -20,16 +20,32 @@ library("readxl")
 library("gridExtra")
 ideal_coords <- read.csv2("./data/IdealCoords.csv", stringsAsFactors = F, col.names = c("x_mouse_pos","y_mouse_pos"), header = F)
 options(scipen = 10)
-DATA_FROM_DB <- F #FALSE - from files
+DATA_FROM_DB <- T #FALSE - from files
 
 ```
 
 ```{r}
-# user_id <- 1010 # ID пользователя
-user_id <- 1498 # ID пользователя
-test_id <- 66 # ID экземпляра теста в Moodle LMS
-
 tracker_id <- 1 # ID tracker для сервиса mouse tracking
+
+## Психодиагностика
+user_id <- 2 # Ускорения и замедления имеют Inf
+# user_id <- 2115 # Ускорения и замедления имеют Inf
+# user_id <- 1010
+# user_id <- 1498 # ID пользователя
+# user_id <- 1908 # Ускорения и замедления имеют Inf
+# user_id <- 979 # ID пользователя
+# user_id <- 2506 # Точность выполнения максимальная, но показывает, что расстояние промахов ~1000 px, что вроде как неверно
+test_id <- 66 # ID экземпляра теста в Moodle LMS - Психодиагностика
+test_id <- 100 # ID экземпляра теста в Moodle LMS - Отладка
+
+
+## Медитация
+# user_id <- 3438 # ID пользователя
+# user_id <- 3439 # ID пользователя
+# user_id <- 3486 # ID пользователя
+# user_id <- 3440 # ID пользователя
+# test_id <- 84 # Test ID - До медитации
+# test_id <- 85 # Test ID - После медитации
 ```
 
 ```{r}
@@ -133,20 +149,21 @@ if (DATA_FROM_DB) {
 ```
 
 
-## Tracks
+## Карта движений. Скорость
 
 ```{r fig.height=8, fig.width=9}
 accuracy_vel_plot <- draw_tracks(accuracy_datasets$ast_mt, 
                                  events=accuracy_datasets$ast_long, 
                                  velocity = T, 
-                                 labels=paste0("Time: ", accuracy_datasets$features$time, " s\n", 
-                                               "Dist.: ", accuracy_datasets$features$distance, " px\n", 
-                                               "Av. speed: ", accuracy_datasets$features$velocity_mean, " px/s\n", 
-                                               "Missings: ", accuracy_datasets$features$missings_distance, " px"), 
+                                 labels=paste0("Время: ", accuracy_datasets$features$time_total, " s\n", 
+                                               "Расстояние: ", accuracy_datasets$features$distance_total, " px\n", 
+                                               "Ср.скорость: ", accuracy_datasets$features$velocity_mean, " px/s\n", 
+                                               "Промахи: ", accuracy_datasets$features$missings_distance, " px\n", 
+                                               "Точность: ", accuracy_datasets$features$accuracy_rate, " %"), 
                                  canvas_coords_x = ast$canvas_coords_x, 
                                  canvas_coords_y = ast$canvas_coords_y, 
                                  # title=paste0("1. Точность: ", ast$lastname, " ", ast$firstname),
-                                 title=paste0("1. Точность. User ID: ", ast$user_id),
+                                 title=paste0("1. Точность. User ID: ", ast$user_id, ", TEST: ", ast$test_id),
                                  # ideal_coords = ideal_coords # наложить идеальные координаты
                                  )
 accuracy_vel_plot
@@ -155,17 +172,53 @@ accuracy_vel_plot
 speed_vel_plot <- draw_tracks(speed_datasets$ast_mt, 
                               events=speed_datasets$ast_long, 
                               velocity = T, 
-                              labels=paste0("Time: ", speed_datasets$features$time, " s\n", 
-                                            "Dist.: ", speed_datasets$features$distance, " px\n", 
-                                            "Av. speed: ", speed_datasets$features$velocity_mean, " px/s\n", 
-                                            "Missings: ", speed_datasets$features$missings_distance, " px"), 
+                              labels=paste0("Время: ", speed_datasets$features$time_total, " s\n", 
+                                            "Расстояние: ", speed_datasets$features$distance_total, " px\n", 
+                                            "Ср.скорость: ", speed_datasets$features$velocity_mean, " px/s\n", 
+                                            "Промахи: ", speed_datasets$features$missings_distance, " px\n",
+                                            "Точность: ", speed_datasets$features$accuracy_rate, " %"), 
                               canvas_coords_x = ast$canvas_coords_x, 
                               canvas_coords_y = ast$canvas_coords_y, 
                               # title=paste0("2. Скорость: ", ast$lastname, " ", ast$firstname),
-                              title=paste0("2. Скорость. User ID: ", ast$user_id),
+                              title=paste0("2. Скорость. User ID: ", ast$user_id, ", TEST: ", ast$test_id),
                               # ideal_coords = ideal_coords # наложить идеальные координаты
                               )
 speed_vel_plot
+```
+
+## Карта движений. Ускорение
+
+```{r fig.height=8, fig.width=9}
+accuracy_acc_plot <- draw_tracks(accuracy_datasets$ast_mt, 
+                                 events=accuracy_datasets$ast_long, 
+                                 acceleration = T, 
+                                 labels=paste0("Время: ", accuracy_datasets$features$time_total, " s\n", 
+                                               "Расстояние: ", accuracy_datasets$features$distance_total, " px\n", 
+                                               "Ср.скорость: ", accuracy_datasets$features$velocity_mean, " px/s\n", 
+                                               "Промахи: ", accuracy_datasets$features$missings_distance, " px"), 
+                                 canvas_coords_x = ast$canvas_coords_x, 
+                                 canvas_coords_y = ast$canvas_coords_y, 
+                                 # title=paste0("1. Точность: ", ast$lastname, " ", ast$firstname),
+                                 title=paste0("1. Точность. User ID: ", ast$user_id, ", TEST: ", ast$test_id),
+                                 # ideal_coords = ideal_coords # наложить идеальные координаты
+                                 )
+accuracy_acc_plot
+
+
+speed_acc_plot <- draw_tracks(speed_datasets$ast_mt, 
+                              events=speed_datasets$ast_long, 
+                              acceleration = T, 
+                              labels=paste0("Время: ", speed_datasets$features$time_total, " s\n", 
+                                            "Расстояние: ", speed_datasets$features$distance_total, " px\n", 
+                                            "Ср.скорость: ", speed_datasets$features$velocity_mean, " px/s\n", 
+                                            "Промахи: ", speed_datasets$features$missings_distance, " px"), 
+                              canvas_coords_x = ast$canvas_coords_x, 
+                              canvas_coords_y = ast$canvas_coords_y, 
+                              # title=paste0("2. Скорость: ", ast$lastname, " ", ast$firstname),
+                              title=paste0("2. Скорость. User ID: ", ast$user_id, ", TEST: ", ast$test_id),
+                              # ideal_coords = ideal_coords # наложить идеальные координаты
+                              )
+speed_acc_plot
 ```
 
 
@@ -190,7 +243,7 @@ ast_long.wo <- ast_long[!(ast_long$miss_distance %in% outliers),]
 ```
 
 
-## Комбинированный график скорости и точности
+## График компромисса скорости и точности
 
 Сглаживание промахов и скорости
 ```{r}
@@ -214,8 +267,8 @@ p_bar_time <- ggplot(ast_long, aes(seq_along(ast_long$timestamp), time_intervals
   theme(axis.text.x = element_text(size = 7, angle = 0, hjust = .5, vjust = .5),
         axis.text.y = element_text(size = 9, angle = 0, hjust = .5, vjust = .5),
     plot.margin=unit(c(0,0,0,3), "mm")) + guides(fill = "none") + 
-  annotate("label", x = 1, y = 3, label = paste0("T1: ", accuracy_datasets$features$time, " s."), size = 4, hjust = -0.5, vjust = 1.5) +
-  annotate("label", x = 129, y = 3, label = paste0("T2: ", speed_datasets$features$time, " s."), size = 4, hjust = -0.5, vjust = 1.5) + 
+  annotate("label", x = 1, y = 3, label = paste0("T1: ", accuracy_datasets$features$time_total, " s."), size = 4, hjust = -0.5, vjust = 1.5) +
+  annotate("label", x = 129, y = 3, label = paste0("T2: ", speed_datasets$features$time_total, " s."), size = 4, hjust = -0.5, vjust = 1.5) + 
   ggtitle("Диаграмма соотношения времени и точности попадания")
 
 
@@ -239,22 +292,26 @@ p_missings_bar <- ggplot(ast_long, aes(seq_along(ast_long$timestamp), miss_dista
 grid.arrange(p_bar_time, p_missings_bar, nrow = 2, ncol = 1)
 ```
 
+
 ## Дистанции между кликами
 
-Интересно, если будет нелинейная зависимость
-Равномерность выбросов
+```{r}
+ast_long$distance_smd <-  sleek(ast_long$distance)
+```
+
 
 ```{r fig.height=6, fig.width=10}
 p_bar_distance <- ggplot(ast_long, aes(seq_along(ast_long$timestamp), distance)) + 
   geom_bar(stat = "identity", aes(fill=hits), col="grey90") +
   geom_vline(xintercept= 129, col = "grey10", alpha=0.5) +
+  geom_line(aes(y = distance_smd)) +
   xlab("Target") + ylab("Distance, px") +
   scale_x_continuous(breaks = seq(0, nrow(ast_long) + 10, 10), expand = c(0.01, 0.1)) +
   scale_y_continuous(breaks = seq(0, max(ast_long$distance), 200), expand = c(0, 0.1)) +
   ylim(0, 2000) +
   scale_fill_manual(breaks = c(T, F), values=c("#00bfc4", "#f8766d")) +
-  annotate("label", x = 1, y = max(ast_long$distance), label = paste0("T1: ", accuracy_datasets$features$time, " s."), size = 4, hjust = -0.5, vjust = 1.5) +
-  annotate("label", x = 129, y = max(ast_long$distance), label = paste0("T2: ", speed_datasets$features$time, " s."), size = 4, hjust = -0.5, vjust = 1.5) +
+  annotate("label", x = 1, y = max(ast_long$distance), label = paste0("T1: ", accuracy_datasets$features$time_total, " s."), size = 4, hjust = -0.5, vjust = 1.5) +
+  annotate("label", x = 129, y = max(ast_long$distance), label = paste0("T2: ", speed_datasets$features$time_total, " s."), size = 4, hjust = -0.5, vjust = 1.5) +
   ggtitle("Диаграмма пройденной дистанции до каждой цели") +
   theme(legend.position = "bottom")
 
@@ -277,87 +334,92 @@ ggplot(ast_long, aes(distance, col=stage)) + geom_boxplot() + coord_flip()
 ```
 
 
-Больше появляется выбросов на высокой скорости, значит больше появляется рывков.
-А рывки могут говорить о напряжении. о чем говорят рывки?
 
 
-У участника ID 1356 выбросы появляются в дистанциях к целям появляются на этапе на точность. Может быть это говорит о том, что скорость стимулирует данного испытуемого, провоцирует сгруппироваться.
 
-
-## Скорость для всех целей
-
-Добавить направление движения
-Наложить клики
+## Скорость для каждой цели
 
 ```{r}
-ast_merged$target_numbers <- get_target_numbers(ast_merged$event_type, "click")
-target_speeds <- vector()
-
-for (target in unique(ast_merged$target_numbers)) {
-  ast_by_target <- ast_merged[ast_merged$target_numbers == target, ]
-  velocity <- get_velocity(ast_by_target)
-  distance_for_velocity <- get_distance(ast_by_target$x_mouse_pos, ast_by_target$y_mouse_pos)
-  velocity_mean <- round(velocity_harmonic_mean(velocity, distance_for_velocity, units = "s"), 2)
-  
-  target_speeds <- c(target_speeds, velocity_mean)
-}
-
-target_speeds[is.nan(target_speeds)] <- 0
-ast_long$speed <- target_speeds
+ast_long$velocity_smd <- sleek(ast_long$velocity)
 ```
 
-
 ```{r fig.height=6, fig.width=12}
-p_speed_bar <- ggplot(ast_long, aes(seq_along(ast_long$timestamp), speed, col = stage)) + 
-  geom_bar(stat = "identity", aes(fill=hits), col="grey90") +
-  geom_vline(xintercept= 129, col = "grey10", alpha=0.5) +
+p_speed_bar <- ggplot(ast_long, aes(seq_along(ast_long$timestamp), velocity, col = stage)) + 
+  geom_bar(stat = "identity", aes(fill=hits), col="white") +
+  geom_line(aes(y = velocity_smd), col = "black") +
+  geom_vline(xintercept= 129, col = "black", alpha=0.5, size=1.5) +
   scale_fill_manual(breaks = c(T, F), values=c("#00bfc4", "#f8766d")) +
   xlab("Target") + ylab("Speed, px/s") +
-  ylim(0, 2000) +
-  scale_x_continuous(breaks = seq(0, max(seq_along(ast_long$timestamp)) + 10, 10)) + scale_y_continuous(breaks = seq(0, 2000, 100)) +
+  # ylim(0, 2000) +
+  # scale_x_continuous(breaks = seq(0, max(seq_along(ast_long$timestamp)) + 10, 10)) + scale_y_continuous(breaks = seq(0, 2000, 100)) +
   ggtitle("Скорость достижения каждой цели")
 
-p_speed_line <- ggplot(ast_long, aes(time, speed, col = stage)) + 
+p_speed_line <- ggplot(ast_long, aes(time, velocity, col = stage)) + 
   geom_line() +
-  ylim(0, 2000) +
+  # ylim(0, 2000) +
   xlab("Time, s") + ylab("Speed, px/s") +
-  scale_x_continuous(breaks = seq(0, 200, 50)) + 
-  xlim(0, 200) +
-  scale_y_continuous(breaks = seq(0, 2000, 100)) +
+  # scale_x_continuous(breaks = seq(0, 200, 50)) + 
+  # xlim(0, 200) +
+  # scale_y_continuous(breaks = seq(0, 2000, 100)) +
   facet_grid(. ~ stage) + 
   ggtitle("Скорость в зависимости от времени выполнения")
 
 grid.arrange(p_speed_bar, p_speed_line, nrow = 2, ncol = 1)
 ```
 
+## Алфавит движений
 
-Скорость идет волнообразно, и постепенно увеличивается. Несмотря на то, что средняя скорость невысокая, но есть достаточно высокие пики.
+## Кривизна/прямота траекторий.
+Чем прямее траектории между мишенями, тем ближе к 100%
 
-## Разделение на алфавит
 
-Добавить визуализацию скорости
-
+### Задание на точность
 ```{r fig.height=4, fig.width=5}
-ast_merged$target_numbers <- get_target_numbers(ast_merged$event_type, "click")
+accuracy_datasets$ast_mt$velocity_smd <- sleek(accuracy_datasets$ast_mt$velocity)
 
-for (n in unique(ast_merged$target_numbers)) {
-  slice <- ast_merged[ast_merged$target_numbers == n, ]
+for (n in unique(accuracy_datasets$ast_mt$target_numbers)) {
+  
+  slice <- accuracy_datasets$ast_mt[accuracy_datasets$ast_mt$target_numbers == n, ]
+  curvature <- round(mean(calculate_scaled_curvature(slice$timestamp, slice$x_mouse_pos, slice$y_mouse_pos), na.rm = T), 3)
+
+  
   p <- ggplot(data = slice) + 
-    geom_path(aes(x_mouse_pos, y_mouse_pos)) + 
-    geom_point(data = ast_long[n,], aes(x_mouse_pos, y_mouse_pos), shape=21, size=11, alpha=0.8, fill="white") +
+    geom_path(aes(x_mouse_pos, y_mouse_pos, col=velocity_smd), alpha = I(0.5), linewidth=0.5) + 
+    scale_colour_gradient2(low="chartreuse", mid="yellow", high="red", midpoint = 2) +
+    geom_point(data = accuracy_datasets$ast_long[n,], aes(x_mouse_pos, y_mouse_pos), shape=21, size=11, alpha=0.8, fill="white") +
     scale_y_reverse(limits=c(ast$canvas_height + ast$canvas_coords_y, ast$canvas_coords_y)) +
-    xlim(ast$canvas_coords_x, ast$canvas_coords_x + ast$canvas_width)
+    xlim(ast$canvas_coords_x, ast$canvas_coords_x + ast$canvas_width) +
+    annotate("label", x = ast$canvas_coords_x, y = 50, label = paste0("Кривизна линии: ", curvature), size = 4, hjust = 0, vjust = 0) +
+    ggtitle(paste("Задание на Точность.", "Цель:", n))
+  
+  print(p)
+}
+```
+
+### Задание на скорость
+```{r fig.height=4, fig.width=5}
+speed_datasets$ast_mt$velocity_smd <- sleek(speed_datasets$ast_mt$velocity)
+
+for (n in unique(speed_datasets$ast_mt$target_numbers)[6]) {
+  
+  slice <- speed_datasets$ast_mt[speed_datasets$ast_mt$target_numbers == n, ]
+  curvature <- round(mean(calculate_scaled_curvature(slice$timestamp, slice$x_mouse_pos, slice$y_mouse_pos), na.rm = T), 3)
+  
+  p <- ggplot(data = slice) + 
+    geom_path(aes(x_mouse_pos, y_mouse_pos, col=velocity_smd), alpha = I(0.5), linewidth=0.5) + 
+    scale_colour_gradient2(low="chartreuse", mid="yellow", high="red", midpoint = 2) +
+    geom_point(data = speed_datasets$ast_long[n,], aes(x_mouse_pos, y_mouse_pos), shape=21, size=11, alpha=0.8, fill="white") +
+    scale_y_reverse(limits=c(ast$canvas_height + ast$canvas_coords_y, ast$canvas_coords_y)) +
+    xlim(ast$canvas_coords_x, ast$canvas_coords_x + ast$canvas_width) +
+    annotate("label", x = ast$canvas_coords_x, y = 50, label = paste0("Кривизна линии: ", curvature), size = 4, hjust = 0, vjust = 0) +
+    ggtitle(paste("Задание на Скорость.", "Цель:", n))
   
   print(p)
 }
 
 ```
 
-
-
-## Визуализация траектории движений по осям в зависимости от времени
-
-Начинают прослеживаться ритмы в движениях. Медленные ритмы и быстрые ритмы
+## Траектории движений по осям X и Y в зависимости от времени
 
 ```{r fig.height=6, fig.width=10}
 p <- ggplot(ast_mt) + geom_line(data=ast_mt, aes(time, x_mouse_pos, col=stage)) + 
@@ -377,35 +439,40 @@ grid.arrange(p, p1, nrow = 2, ncol = 1)
 
 
 ## Компромисс между скоростью и точностью
+sat_a
+sat_b
 
 ```{r fig.height=5, fig.width=10}
-ggplot(ast_long, aes(speed, miss_distance, col = stage)) + geom_point() + stat_smooth(method = "lm") +
+ggplot(ast_long, aes(velocity, miss_distance)) + geom_point(aes(col=hits)) + stat_smooth(method = "lm") +
   facet_grid(. ~ stage) +
-  xlab("Скорость, px/s") + ylab("Расстояние промахов, px")
+  xlab("Скорость, px/s") + ylab("Расстояние промахов, px") +
+  ggtitle("Компромисс между скоростью и точностью на каждом этапе") 
+
+ggplot(ast_long, aes(velocity, miss_distance, col = hits)) + geom_point() + stat_smooth(method = "lm") +
+  facet_grid(. ~ stage) +
+  xlab("Скорость, px/s") + ylab("Расстояние промахов, px") +
   ggtitle("Компромисс между скоростью и точностью на каждом этапе") 
   
-ggplot(ast_long, aes(speed, miss_distance)) + geom_point() + stat_smooth(method = "lm") +
-  xlab("Скорость, px/s") + ylab("Расстояние промахов, px")
+ggplot(ast_long, aes(velocity, miss_distance)) + geom_point(aes(col=hits)) + stat_smooth(method = "lm") +
+  xlab("Скорость, px/s") + ylab("Расстояние промахов, px") +
+  ggtitle("Компромисс между скоростью и точностью, общий")
+
+ggplot(ast_long, aes(velocity, miss_distance, col=hits)) + geom_point() + stat_smooth(method = "lm") +
+  xlab("Скорость, px/s") + ylab("Расстояние промахов, px") +
   ggtitle("Компромисс между скоростью и точностью, общий") 
 ```
-
-Испытуемый увеличивает скорость, но уменьшает расстояние промахов.
-
-?Чем корреляция между скоростью и расстоянием промахов ближе к 0, тем лучше найден компромисс между скоростью и точностью
 
 ```{r}
 ast_long.accuracy <- ast_long[ast_long$stage == "accuracy", ]
 ast_long.speed <- ast_long[ast_long$stage == "speed", ]
 
 
-cor(ast_long.accuracy$miss_distance, ast_long.accuracy$speed)
-cor(ast_long.speed$miss_distance, ast_long.speed$speed)
-cor(ast_long$miss_distance, ast_long$speed)
+cor(ast_long.accuracy$miss_distance, ast_long.accuracy$velocity)
+cor(ast_long.speed$miss_distance, ast_long.speed$velocity)
+cor(ast_long$miss_distance, ast_long$velocity)
 ```
 
 ## Паузы
-
-Удалить остановки (слишком долгие паузы). Дольше 3 или 5 секунд это остановка
 
 ```{r fig.height=3, fig.width=10}
 point_to_point_distance.accuracy <- get_distance(ast_merged$x_mouse_pos[ast_merged$stage == "accuracy"], ast_merged$y_mouse_pos[ast_merged$stage == "accuracy"])
@@ -419,11 +486,12 @@ pauses.accuracy <- data.frame(pauses=pauses.accuracy, n=seq_along(pauses.accurac
 pauses.speed <- data.frame(pauses=pauses.speed, n=seq_along(pauses.speed), stage = "speed")
 
 pauses <- rbind(pauses.accuracy, pauses.speed)
+pauses$pauses_smd <- sleek(pauses$pauses)
 
 
 ggplot(pauses, aes(n, pauses, fill = stage)) + 
-  # geom_line() +
   geom_bar(stat = "identity") +
+  geom_line(aes(y = pauses_smd)) +
   scale_x_continuous(breaks = seq(0, max(pauses$n), 5)) + scale_y_continuous(breaks = seq(0, max(pauses$pauses), 100)) + 
   facet_grid(. ~ stage) +
   xlab("Количество пауз") + ylab("Продолжительность пауз, ms") +
@@ -435,19 +503,8 @@ ggplot(pauses, aes(n, pauses, fill = stage)) +
 ggplot(pauses, aes(pauses, col = stage)) + geom_boxplot() + coord_flip()
 ```
 
-Слишком много пауз на этапе на точность, могут свидетельствовать о чрезмерном прицеливании. Это там куда уходит время.
-
-Расставить паузы на временной шкале
-Паузы рядом с кликами по мишеням или паузы в процессе движения? Привязать к попаданиям.
-
-Паузы более 5 секунд нужно считать за остановки и выбрасывать из анализа микропауз
-
 
 ## Ускорения и замедления
-Количество ускорений и замедлений
-Непрерывность движений (плавность)
-Среднее стартовое ускорение (после клика)
-Среднее замедление (до клика)
 
 ```{r fig.height=5, fig.width=10}
 ast_mt$acceleration <- round(get_acceleration(ast_mt$timestamp, velocity), 2)
@@ -458,23 +515,7 @@ ggplotly(p)
 ```
 
 
-Добавить ускорение (Цветом) и промахи (Z)
-
-
-ускорения и замедления после начала движения от цели после попадания в цель
-
-Посмотреть время, которое затрчивает человек на чтение второй инструкции (на скорость). Может быть он торопится и случайно кликает на инструкцию и не успевает ее прочитать.
-
-## Тремор в руках (аналог саккад в EyeTracker)
-
-
-
-
-
-## Временные интервалы кликов
-График с временными интервалами между кликами
-Y - продолжительность клика
-X - время / номер клика / временная метка
+## Временные интервалы кликов для каждой мишени
 
 ```{r fig.height=3, fig.width=10}
 p_line_time <- ggplot(ast_long, aes(seq_along(ast_long$timestamp), time_intervals)) +
@@ -484,8 +525,9 @@ p_line_time <- ggplot(ast_long, aes(seq_along(ast_long$timestamp), time_interval
   scale_x_continuous(breaks = seq(0, nrow(ast_long) + 10, 10), expand = c(0.01, 0.1)) +
   scale_y_continuous(breaks = seq(0, max(ast_long$time_intervals), 0.5), expand = c(0, 0.1)) +
   xlab("Target") + ylab("Time, sec") +
-  annotate("label", x = 1, y = max(ast_long$time_intervals), label = paste0("T1: ", accuracy_datasets$features$time, " s."), size = 4, hjust = -0.5, vjust = 1.5) +
-  annotate("label", x = 129, y = max(ast_long$time_intervals), label = paste0("T2: ", speed_datasets$features$time, " s."), size = 4, hjust = -0.5, vjust = 1.5)
+  annotate("label", x = 1, y = max(ast_long$time_intervals), label = paste0("T1: ", accuracy_datasets$features$time_total, " s."), size = 4, hjust = -0.5, vjust = 1.5) +
+  annotate("label", x = 129, y = max(ast_long$time_intervals), label = paste0("T2: ", speed_datasets$features$time_total, " s."), size = 4, hjust = -0.5, vjust = 1.5) +
+  ggtitle("Временные интервалы кликов для каждой мишени")
 
 p_line_time
 ```
@@ -494,7 +536,9 @@ p_line_time
 ## Точность для каждой цели в зависимости от времени
 
 ```{r fig.height=3, fig.width=10}
-p <- ggplot(ast_long) + geom_line(aes(time, miss_distance, col = stage)) + facet_grid(. ~ stage)
+p <- ggplot(ast_long) + geom_line(aes(time, miss_distance, col = stage)) + 
+  facet_grid(. ~ stage) +
+  ggtitle("Точность для каждой мишений на временной шкале")
   # scale_x_continuous(breaks = seq(0, max(distances_between_clicks$timestamp) + 10, 10)) + scale_y_continuous(breaks = seq(0, max(distances_between_clicks$distance), 100))
 
 p
@@ -502,13 +546,104 @@ p
 
 Без выбросов
 ```{r fig.height=3, fig.width=10}
-ast_long$speed_scale <- scale(ast_long$speed)
+ast_long$velocity_scale <- scale(ast_long$velocity)
 ast_long$miss_distance_scale <- scale(ast_long$miss_distance)
 
 p <- ggplot(ast_long.wo) + geom_line(aes(time, miss_distance, col = stage)) + 
   # geom_line(aes(time, speed_scale)) + 
-  facet_grid(. ~ stage)
+  facet_grid(. ~ stage) +
+  ggtitle("Точность для каждой мишений на временной шкале")
   # scale_x_continuous(breaks = seq(0, max(distances_between_clicks$timestamp) + 10, 10)) + scale_y_continuous(breaks = seq(0, max(distances_between_clicks$distance), 100))
 
 p
 ```
+
+
+## Время Фиттса для каждой мишени
+
+```{r}
+ggplot(accuracy_datasets$ast_long[-1, ]) + 
+  geom_histogram(aes(time_intervals), fill="red", alpha=0.7, binwidth = 0.01) +
+  geom_histogram(aes(fitts_time_invervals), fill="skyblue", alpha=0.7, binwidth = 0.01)
+
+ggplot(accuracy_datasets$ast_long[-1, ]) + 
+  geom_point(aes(1:127, time_intervals, fill=hits), shape=21, size=2, alpha=0.8) +
+  geom_line(aes(1:127, fitts_time_invervals)) + 
+  labs(x="Номер мишени", y = "Время")
+```
+
+
+
+## Ускорения и замедления
+
+
+```{r}
+# acceleration <- convert_acceleration(accuracy_datasets$ast_mt$acceleration, 
+#                                      accuracy_datasets$ast_mt$timestamp, 
+#                                      accuracy_datasets$ast_mt$velocity, 
+#                                      accuracy_datasets$ast_mt$time)
+```
+
+```{r}
+# ggplot(data.frame(acceleration), aes(time, values)) + geom_point() +
+#   geom_hline(yintercept = accuracy_datasets$features$jerk_line, color = "red")
+# ggplotly(ggplot(data.frame(acceleration), aes(values)) + geom_histogram())
+# ggplot(data.frame(acceleration), aes(values)) + geom_boxplot() + coord_flip()
+
+```
+
+```{r}
+# deceleration <- convert_acceleration(accuracy_datasets$ast_mt$acceleration, 
+#                                      accuracy_datasets$ast_mt$timestamp, 
+#                                      accuracy_datasets$ast_mt$velocity, 
+#                                      accuracy_datasets$ast_mt$time, deceleration = T)
+```
+
+
+```{r}
+# ggplot(data.frame(deceleration), aes(time, values)) + geom_point() +
+#   geom_hline(yintercept = accuracy_datasets$features$braking_line, color = "red")
+# ggplotly(ggplot(data.frame(deceleration), aes(values)) + geom_histogram())
+# ggplot(data.frame(deceleration), aes(values)) + geom_boxplot() + coord_flip()
+```
+
+```{r}
+# describe(df.acceleration$acceleration)
+```
+
+
+```{r}
+# ggplotly(
+#   ggplot(df.acceleration, aes(time, acceleration)) + geom_path() +
+#     geom_point(data = accuracy_datasets$ast_long, aes(time, 0, fill=hits), shape=21, size=3, alpha=0.8)
+# )
+
+# ggplot(df.acceleration, aes(time, acceleration_smd)) + geom_path()
+# ggplotly(ggplot(df.acceleration, aes(acceleration)) + geom_histogram())
+# ggplot(df.acceleration, aes(acceleration)) + geom_boxplot() + coord_flip()
+```
+
+
+
+
+```{r}
+# target_acceleration <- vector()
+# for (target_time in 1:length(accuracy_datasets$ast_long$time)) {
+#   if (target_time < 128) {
+#     target_acceleration <- c(target_acceleration, mean(accuracy_datasets$ast_mt$acceleration[accuracy_datasets$ast_mt$time >= accuracy_datasets$ast_long$time[target_time] & accuracy_datasets$ast_mt$time <= accuracy_datasets$ast_long$time[target_time + 1]]))
+#   } else {
+#     target_acceleration <- c(target_acceleration, mean(accuracy_datasets$ast_mt$acceleration[accuracy_datasets$ast_mt$time <= accuracy_datasets$ast_long$time[target_time]]))
+#   }
+# }
+# 
+# accuracy_datasets$ast_long$acceleration <- target_acceleration
+# 
+# ggplotly(ggplot(accuracy_datasets$ast_long, aes(1:128, acceleration)) + geom_path() +
+#   geom_point(aes(1:128, acceleration, fill=hits), shape=21, size=3, alpha=0.8))
+# 
+# 
+# accuracy_datasets$ast_merged
+```
+
+
+
