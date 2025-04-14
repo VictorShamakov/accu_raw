@@ -1,0 +1,127 @@
+---
+title: "Описательная статистика"
+author: "SVA"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    df_print: paged
+    toc: yes
+    toc_depth: 4
+    toc_float:
+      collapsed: no
+  word_document:
+    toc: yes
+    toc_depth: '4'
+editor_options:
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  include = TRUE,
+  message = FALSE, 
+  warning = FALSE
+)
+
+rm(list=ls())
+source("functions.R")
+```
+
+
+```{r}
+df <- read.csv("./data/accuracy_features.csv")
+
+df$acc_max[is.infinite(df$acc_max)] <- NA
+df$acc_range[is.infinite(df$acc_range)] <- NA
+df$X <- NULL
+
+```
+
+
+# Описательные статистики
+{% for feature in data_dictionary %}
+{% if feature.type == "numeric" %}
+### {{feature.short_name}} {.tabset .tabset-fade .tabset-pills}
+**{{feature.name}}**
+
+#### Descriptive stat
+```{r}
+quantile(df${{feature.short_name}}, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df${{feature.short_name}}))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "{{feature.short_name}}"
+plot_list <- draw_plots_continuous(df, var = df${{feature.short_name}}, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df${{feature.short_name}});print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df${{feature.short_name}}, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df, aes(sample = {{feature.short_name}})) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - {{feature.short_name}}", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df, df${{feature.short_name}}, 1.5)
+outliers[order(outliers${{feature.short_name}}, decreasing = T),]
+outliers[order(outliers${{feature.short_name}}),]
+```
+
+
+{% elif feature.type == "character" %}
+### {{feature.short_name}} {.tabset .tabset-fade .tabset-pills}
+**{{feature.short_name}} - {{feature.name}}**
+
+```{r}
+df[, c("id", "{{feature.short_name}}")]
+```
+
+```{r}
+table(df${{feature.short_name}})
+```
+
+{% elif feature.type == "factor" %}
+
+### {{feature.short_name}} {.tabset .tabset-fade .tabset-pills}
+**{{feature.name}}**
+
+#### Tables
+
+Распределение по переменной "{{feature.short_name}}"
+```{r}
+table(df${{feature.short_name}})
+```
+
+Распределение по переменной "{{feature.short_name}}", %
+```{r}
+round(prop.table(table(df${{feature.short_name}})) * 100, 2)
+```
+
+{% else %}
+
+{% endif %}
+
+{% endfor %}
+
+
+

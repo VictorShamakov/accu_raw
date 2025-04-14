@@ -1,0 +1,9 @@
+name: "SAT Project"
+include: ["img"]
+exclude: ["*.Rmd", "*.py", "requirements.txt", "data", "help", "templates", "reports", "slices"]
+navbar:
+  left:
+    - text: "Главная"
+      href: index.html
+    - text: "Описательная статистика"
+      href: 3_desc_stat_general.html
