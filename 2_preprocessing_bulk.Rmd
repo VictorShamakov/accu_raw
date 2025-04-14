@@ -16,10 +16,12 @@ knitr::opts_chunk$set(
 ```{r include=F}
 rm(list=ls())
 source("./ast_functions.R")
+source("./functions.R")
 library("readxl")
 library("gridExtra")
 ideal_coords <- read.csv2("./data/IdealCoords.csv", stringsAsFactors = F, col.names = c("x_mouse_pos","y_mouse_pos"), header = F)
 options(scipen = 10)
+img_path <- "./data/users/"
 ```
 
 ```{r}
@@ -28,63 +30,179 @@ tracker_id <- 1 # ID tracker для сервиса mouse tracking
 ```
 
 ```{r}
-validated_results <- read_xlsx("../Accu/results/features_ast_prepaired.xlsx") # Валидные данные  теста
+validated_results <- read_xlsx("../Accu/results/ast_impersonal_results.xlsx") # Валидные данные  теста
+validated_results <- validated_results[order(as.numeric(validated_results$user_id)),]
 validated_results$test_id <- test_id
 
-# accu_data <- read.csv("./data/raw/accu.csv") # Результаты эксперимента компромисс скорость-точность
 accu_data <- readRDS("./data/raw/2024-10-21 - accu.rds") # Результаты эксперимента компромисс скорость-точность
 accu_data <- merge(accu_data, select(validated_results, user_id, test_id), by = c("user_id", "test_id"), all.y = F)
 
-# users <- read.csv("./data/raw/users.csv") # Пользователи прошедшие тестирование
 users <- readRDS("./data/raw/2024-10-21 - users.rds")
 users <- merge(users, select(accu_data, user_id), by = "user_id")
 
-# sessions <- read.csv("./data/raw/sessions.csv") # Сессии mouse tracker'a
 sessions <- readRDS("./data/raw/2024-10-21 - sessions.rds") # Сессии mouse tracker'a
 sessions <- merge(sessions, select(users, user_id), by = "user_id")
 
-# event_tracks <- read.csv("./data/raw/event_tracks.csv") # Треки событий 
 event_tracks <- readRDS("./data/raw/2024-10-21 - event_tracks.rds") # Треки событий 
 event_tracks <- merge(event_tracks, select(sessions, session_id), by = "session_id")
 
-# mouse_tracks <- read.csv("./data/raw/mouse_tracks.csv") # Треки мыши
 mouse_tracks <- readRDS("./data/raw/2024-10-21 - mouse_tracks.rds") # Треки мыши
 mouse_tracks <- merge(mouse_tracks, select(sessions, session_id), by = "session_id")
 
 ```
 
 ```{r}
+accuracy_features <- data.frame()
+speed_features <- data.frame()
+
 for (user_id in validated_results$user_id) {
   print(user_id)
-  ast <- accu_data[accu_data$user_id == user_id & accu_data$test_id == test_id,]
-  ast$tracker_id <- tracker_id
-  ast_data <- form_ast_data(ast$data)
+  tryCatch(expr = {
+    ast <- accu_data[accu_data$user_id == user_id & accu_data$test_id == test_id,]
+    ast$tracker_id <- tracker_id
+    ast_data <- form_ast_data(ast$data)
+  
+    ast <- get_session_from_file(ast, ast_data, sessions, event_tracks)
+  
+    accuracy_ast_data <- ast_data[, 1:(ncol(ast_data) / 2)] # выбираем часть эксперимента на точность
+    accuracy_datasets <- get_all_datasets(ast=ast, ast_data=accuracy_ast_data, mouse_tracks = mouse_tracks, ideal_coords = ideal_coords)
+  
+    speed_ast_data <- ast_data[, ((ncol(ast_data) / 2) + 1):ncol(ast_data)]
+    speed_datasets <- get_all_datasets(ast=ast, ast_data=speed_ast_data, mouse_tracks=mouse_tracks, ideal_coords = ideal_coords)
+    
+    accuracy_features <- rbind(accuracy_features, accuracy_datasets$features)
+    speed_features <- rbind(speed_features, speed_datasets$features)
+  },
+  error = function(err) {
+    print("Error")
+  })
+  
+  
+  
+  
+#   ##Визуализация
+#   dir.create(paste0(img_path, user_id))
+#   
+#   accuracy_vel_plot <- draw_tracks(accuracy_datasets$ast_mt, 
+#                                    events=accuracy_datasets$ast_long, 
+#                                    velocity = T, 
+#                                    labels=paste0("Время: ", accuracy_datasets$features$time_total, " s\n", 
+#                                                  "Расстояние: ", accuracy_datasets$features$distance_total, " px\n", 
+#                                                  "Ср.скорость: ", accuracy_datasets$features$velocity_mean, " px/s\n", 
+#                                                  "Промахи: ", accuracy_datasets$features$missings_distance, " px\n", 
+#                                                  "Точность: ", accuracy_datasets$features$accuracy_rate, " %"), 
+#                                    canvas_coords_x = ast$canvas_coords_x, 
+#                                    canvas_coords_y = ast$canvas_coords_y, 
+#                                    title=paste0("1. Точность. User ID: ", ast$user_id, ", TEST: ", ast$test_id),
+#                                    )
+#   
+#   speed_vel_plot <- draw_tracks(speed_datasets$ast_mt, 
+#                                 events=speed_datasets$ast_long, 
+#                                 velocity = T, 
+#                                 labels=paste0("Время: ", speed_datasets$features$time_total, " s\n", 
+#                                               "Расстояние: ", speed_datasets$features$distance_total, " px\n", 
+#                                               "Ср.скорость: ", speed_datasets$features$velocity_mean, " px/s\n", 
+#                                               "Промахи: ", speed_datasets$features$missings_distance, " px\n",
+#                                               "Точность: ", speed_datasets$features$accuracy_rate, " %"), 
+#                                 canvas_coords_x = ast$canvas_coords_x, 
+#                                 canvas_coords_y = ast$canvas_coords_y, 
+#                                 title=paste0("2. Скорость. User ID: ", ast$user_id, ", TEST: ", ast$test_id),
+#                                 )
+#   
+#   
+#   ggsave(paste0(img_path, user_id, "/accuracy_vel_plot.jpg"), accuracy_vel_plot, width = 1920, height = 1080, units = "px", dpi = 150)
+#   ggsave(paste0(img_path, user_id, "/speed_vel_plot.jpg"), speed_vel_plot, width = 1920, height = 1080, units = "px", dpi = 150)
+#   
+#   
+#   accuracy_vel_plot <- draw_tracks(accuracy_datasets$ast_mt, 
+#                                    events=accuracy_datasets$ast_long, 
+#                                    velocity = T, 
+#                                    labels=paste0("Время: ", accuracy_datasets$features$time_total, " s\n", 
+#                                                  "Расстояние: ", accuracy_datasets$features$distance_total, " px\n", 
+#                                                  "Ср.скорость: ", accuracy_datasets$features$velocity_mean, " px/s\n", 
+#                                                  "Промахи: ", accuracy_datasets$features$missings_distance, " px\n", 
+#                                                  "Точность: ", accuracy_datasets$features$accuracy_rate, " %"), 
+#                                    canvas_coords_x = ast$canvas_coords_x, 
+#                                    canvas_coords_y = ast$canvas_coords_y, 
+#                                    title=paste0("1. Точность. User ID: ", ast$user_id, ", TEST: ", ast$test_id),
+#                                    fix_size = F)
+#   
+#   speed_vel_plot <- draw_tracks(speed_datasets$ast_mt, 
+#                                 events=speed_datasets$ast_long, 
+#                                 velocity = T, 
+#                                 labels=paste0("Время: ", speed_datasets$features$time_total, " s\n", 
+#                                               "Расстояние: ", speed_datasets$features$distance_total, " px\n", 
+#                                               "Ср.скорость: ", speed_datasets$features$velocity_mean, " px/s\n", 
+#                                               "Промахи: ", speed_datasets$features$missings_distance, " px\n",
+#                                               "Точность: ", speed_datasets$features$accuracy_rate, " %"), 
+#                                 canvas_coords_x = ast$canvas_coords_x, 
+#                                 canvas_coords_y = ast$canvas_coords_y, 
+#                                 title=paste0("2. Скорость. User ID: ", ast$user_id, ", TEST: ", ast$test_id),
+#                                 fix_size = F)
+#   
+#   
+#   ggsave(paste0(img_path, user_id, "/accuracy_vel_plot_non_fix.jpg"), accuracy_vel_plot, width = 1920, height = 1080, units = "px", dpi = 150)
+#   ggsave(paste0(img_path, user_id, "/speed_vel_plot_non_fix.jpg"), speed_vel_plot, width = 1920, height = 1080, units = "px", dpi = 150)
+#   
+#   
+#   ## Подготовка датасета
+#   accuracy_datasets$ast_long$stage <- "accuracy"
+#   speed_datasets$ast_long$stage <- "speed"
+#   accuracy_datasets$ast_mt$stage <- "accuracy"
+#   speed_datasets$ast_mt$stage <- "speed"
+#   accuracy_datasets$ast_merged$stage <- "accuracy"
+#   speed_datasets$ast_merged$stage <- "speed"
+#   
+#   ast_long <- rbind(accuracy_datasets$ast_long, speed_datasets$ast_long)
+#   ast_mt <- rbind(accuracy_datasets$ast_mt, speed_datasets$ast_mt)
+#   ast_merged <- rbind(accuracy_datasets$ast_merged, speed_datasets$ast_merged)
+#   
+#   
+#   ## График скорости и точности
+#   time_barplot <- draw_time_barplot(ast_long, ast$user_id, ast$test_id, accuracy_datasets$features$time_total, speed_datasets$features$time_total, fix_size = T)
+# missings_barplot <- draw_missings_barplot(ast_long, accuracy_datasets$features$missings_distance, speed_datasets$features$missings_distance, fix_size = T)
+#   
+#   ast_plot <- grid.arrange(time_barplot, missings_barplot, nrow = 2, ncol = 1)
+#   ggsave(paste0(img_path, user_id, "/ast_plot_fix_size.jpg"), ast_plot, width = 1920, height = 1080, units = "px", dpi = 150)
+#   
+#   ## График скорости и точности (non-fix size)
+#   time_barplot_non_fix_size <- draw_time_barplot(ast_long, ast$user_id, ast$test_id, accuracy_datasets$features$time_total, speed_datasets$features$time_total, fix_size = F)
+#   missings_barplot_non_fix_size <- draw_missings_barplot(ast_long, accuracy_datasets$features$missings_distance, speed_datasets$features$missings_distance, fix_size = F)
+#   
+#   ast_plot_non_fix_size <- grid.arrange(time_barplot_non_fix_size, missings_barplot_non_fix_size, nrow = 2, ncol = 1)
+#   ggsave(paste0(img_path, user_id, "/ast_plot_non_fix_size.jpg"), ast_plot_non_fix_size, width = 1920, height = 1080, units = "px", dpi = 150)
+    
+}
 
-  ast <- get_session_from_file(ast, ast_data, sessions, event_tracks)
+```
 
-  accuracy_ast_data <- ast_data[, 1:(ncol(ast_data) / 2)] # выбираем часть эксперимента на точность
-  accuracy_datasets <- get_all_datasets(ast=ast, ast_data=accuracy_ast_data, mouse_tracks = mouse_tracks, ideal_coords = ideal_coords)
 
-  speed_ast_data <- ast_data[, ((ncol(ast_data) / 2) + 1):ncol(ast_data)]
-  speed_datasets <- get_all_datasets(ast=ast, ast_data=speed_ast_data, mouse_tracks=mouse_tracks, ideal_coords = ideal_coords)
-  
-  ## Обработка всех данных
-  if (!file.exists(file.path("./data/alphabet/", user_id))){
-    dir.create(file.path("./data/alphabet/", user_id))
-  }
-  
-  accuracy_datasets$ast_long$stage <- "accuracy"
-  speed_datasets$ast_long$stage <- "speed"
-  accuracy_datasets$ast_mt$stage <- "accuracy"
-  speed_datasets$ast_mt$stage <- "speed"
-  accuracy_datasets$ast_merged$stage <- "accuracy"
-  speed_datasets$ast_merged$stage <- "speed"
-  
-  ast_long <- rbind(accuracy_datasets$ast_long, speed_datasets$ast_long)
-  ast_mt <- rbind(accuracy_datasets$ast_mt, speed_datasets$ast_mt)
-  ast_merged <- rbind(accuracy_datasets$ast_merged, speed_datasets$ast_merged)
-  
-  saveRDS(ast_long, file = paste0("./data/alphabet/" %+% user_id %+% "/ast_results.rds"))
+```{r}
+write.csv(accuracy_features, "./data/accuracy_features.csv")
+write.csv(speed_features, "./data/speed_features.csv")
+
+
+```
+
+
+```{r}
+  # ## Обработка всех данных
+  # if (!file.exists(file.path("./data/alphabet/", user_id))){
+  #   dir.create(file.path("./data/alphabet/", user_id))
+  # }
+  # 
+  # accuracy_datasets$ast_long$stage <- "accuracy"
+  # speed_datasets$ast_long$stage <- "speed"
+  # accuracy_datasets$ast_mt$stage <- "accuracy"
+  # speed_datasets$ast_mt$stage <- "speed"
+  # accuracy_datasets$ast_merged$stage <- "accuracy"
+  # speed_datasets$ast_merged$stage <- "speed"
+  # 
+  # ast_long <- rbind(accuracy_datasets$ast_long, speed_datasets$ast_long)
+  # ast_mt <- rbind(accuracy_datasets$ast_mt, speed_datasets$ast_mt)
+  # ast_merged <- rbind(accuracy_datasets$ast_merged, speed_datasets$ast_merged)
+  # 
+  # saveRDS(ast_long, file = paste0("./data/alphabet/" %+% user_id %+% "/ast_results.rds"))
   
   ## Разделение на алфавит
   # ast_merged$target_numbers <- get_target_numbers(ast_merged$event_type, "click")
@@ -102,10 +220,5 @@ for (user_id in validated_results$user_id) {
   #   # 
   #   # print(p)
   # }
-}
-
-
-
 ```
-
 
