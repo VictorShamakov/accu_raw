@@ -99,11 +99,13 @@ for (user_id in unique_users) {
 # write.csv(df.event_tracks, file = "./data/raw/2024-10-21 - event_tracks.csv", row.names = F)
 # write.csv(df.mouse_tracks, file = "./data/raw/2024-10-21 - mouse_tracks.csv", row.names = F)
 
-saveRDS(ast_raw, file = "./data/raw/2024-10-21 - accu.rds")
-saveRDS(df.users, file = "./data/raw/2024-10-21 - users.rds")
-saveRDS(df.sessions, file = "./data/raw/2024-10-21 - sessions.rds")
-saveRDS(df.event_tracks, file = "./data/raw/2024-10-21 - event_tracks.rds")
-saveRDS(df.mouse_tracks, file = "./data/raw/2024-10-21 - mouse_tracks.rds")
+nowdate <- format(Sys.time(), '%Y-%m-%d ')
+
+saveRDS(ast_raw, file = paste0("./data/raw/", nowdate, "- accu.rds"))
+saveRDS(df.users, file = paste0("./data/raw/", nowdate, '%d %B, %Y'), "- users.rds"))
+saveRDS(df.sessions, file = paste0("./data/raw/", nowdate, '%d %B, %Y'), "- sessions.rds"))
+saveRDS(df.event_tracks, file = paste0("./data/raw/", nowdate, '%d %B, %Y'), "- event_tracks.rds"))
+saveRDS(df.mouse_tracks, file = paste0("./data/raw/", nowdate, '%d %B, %Y'), "- mouse_tracks.rds"))
 ```
 
 
