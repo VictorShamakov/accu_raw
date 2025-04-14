@@ -10,6 +10,9 @@ suppressMessages(library("jsonlite"))
 suppressMessages(library("log4r"))
 suppressMessages(library("plotly"))
 suppressMessages(library("psych"))
+suppressMessages(library("scales")) # для задания формата подписей на осях координат
+suppressMessages(library("readxl")) 
+suppressMessages(library("gridExtra")) 
 
 logger <- logger("DEBUG", 
                  appenders = list(file_appender("ast.log"), 
@@ -96,7 +99,7 @@ get_distances_points <- function(x, y, clicks) {
 
 
 get_pauses <- function(df, distance, treshhold=1, units="ms") {
-  debug(logger, "get_pause")
+  # debug(logger, "get_pause")
   zero_distance <- (distance==0)
   counter <- 0
   pauses <- numeric()
@@ -133,12 +136,19 @@ get_distance_a_b <- function(x1, x2, y1, y2) {
 }
 
 
-get_velocity <- function(x, y, timestamp) {
+get_velocity <- function(x, y, timestamp, units = "ms") {
   d <- get_distance(x, y)
   t <- c(0, timestamp[-1] - timestamp[-length(timestamp)])
 
   v <- c(d/t)
   v[is.nan(v)] <- 0
+  
+  # Конвертация единиц, если требуется
+  if (units == "s") {
+    v <- v * 1000
+  } else if (units != "ms") {
+    stop("Неверная единица измерения. Используйте 'ms' или 's'")
+  }
 
   return(v)
 }
@@ -156,7 +166,7 @@ get_acceleration <- function(timestamp, velocity) {
   a <- c(0, delta_v/delta_t)
   
   # Замена бесконечных значений на NA
-  a[is.infinite(a)] <- NA
+  a[is.infinite(a)] <- max(a)
   
   return(a)
 }
@@ -179,7 +189,7 @@ get_acceleration <- function(timestamp, velocity) {
 # }
 
 
-velocity_harmonic_mean <- function(speeds, distances, units = "ms") {
+velocity_harmonic_mean <- function(speeds, distances, units = "origin") {
   # Проверяем длины векторов
   if (length(speeds) != length(distances)) {
     stop("Длины векторов скоростей и расстояний должны быть равны")
@@ -201,8 +211,8 @@ velocity_harmonic_mean <- function(speeds, distances, units = "ms") {
   # Конвертация единиц, если требуется
   if (units == "s") {
     weighted_sum <- weighted_sum / 1000
-  } else if (units != "ms") {
-    stop("Неверная единица измерения. Используйте 'ms' или 's'")
+  } else if (units == "ms") {
+    weighted_sum <- weighted_sum  * 1000
   }
 
   # Возвращаем среднее гармоническое значение скорости
@@ -253,12 +263,10 @@ calculate_scaled_curvature <- function(time, x, y) {
   return(scaled_curvature)
 }
 
-
-draw_tracks <- function(mt, events=NULL, velocity=NULL, acceleration=NULL, title=NULL, facet=NULL, labels=NULL, line_color="magenta", point_color="black", canvas_width=800, canvas_height=800, canvas_coords_x=0, canvas_coords_y=0, ideal_coords=NULL) {
+## Graphics
+draw_tracks <- function(mt, events=NULL, velocity=NULL, acceleration=NULL, title=NULL, facet=NULL, labels=NULL, line_color="magenta", point_color="black", canvas_width=800, canvas_height=800, canvas_coords_x=0, canvas_coords_y=0, ideal_coords=NULL, fix_size = T) {
   plot <- ggplot(data = mt, aes(x_mouse_pos, y_mouse_pos)) + 
-    xlim(canvas_coords_x, canvas_coords_x + canvas_width) + 
-    # ylim(canvas_height + canvas_coords_y, canvas_coords_y) +
-    scale_y_reverse(limits=c(canvas_height + canvas_coords_y, canvas_coords_y)) +
+    scale_y_reverse() +
     ggtitle(title) + xlab("x") + ylab("y") + theme_bw() + 
     theme(plot.title = element_text(size=22),
           axis.text.x = element_text(size = 16),
@@ -266,16 +274,26 @@ draw_tracks <- function(mt, events=NULL, velocity=NULL, acceleration=NULL, title
           axis.title.x = element_text(size = 20),
           axis.title.y = element_text(size = 20))
   
+  if (fix_size == T) {
+    plot <-  plot + xlim(canvas_coords_x, canvas_coords_x + canvas_width) +
+      ylim(canvas_height + canvas_coords_y, canvas_coords_y)
+    labels_position_x <- canvas_coords_x 
+  } else {
+    plot <-  plot + xlim(ast$canvas_coords_x - 600, ast$canvas_coords_x + ast$canvas_width + 600) +
+      ylim(ast$canvas_height + ast$canvas_coords_y + 100, ast$canvas_coords_y - 100)
+    labels_position_x <- 0
+  }
+  
   if (!missing(velocity)) {
-    mt$velocity_smoothed <- get_velocity_smoothed(mt$velocity)
+    mt$velocity_smoothed <- get_velocity_smoothed(mt$velocity, velocity_limit = 4000)
     plot <- plot + geom_path(data = mt, alpha = I(0.5), linewidth=0.5, aes(col=velocity_smoothed)) +
-      scale_colour_gradient2(low="chartreuse", mid="yellow", high="red", midpoint = 2)
+      scale_colour_gradient2(low="chartreuse", mid="yellow", high="red", midpoint = 2000, name = "Скорость")
   }
   
   if (!missing(acceleration)) {
     mt$acceleration <- get_acceleration_smoothed(mt$acceleration, acceleration_limit = 0.05)
     plot <- plot + geom_path(data = mt, alpha = I(0.5), linewidth=0.5, aes(col=acceleration)) +
-      scale_colour_gradient2(low="chartreuse", mid="yellow", high="red", midpoint = 0)
+      scale_colour_gradient2(low="chartreuse", mid="yellow", high="red", midpoint = 0, name = "Ускорение")
   }
   
   if (!missing(ideal_coords)) {
@@ -287,16 +305,20 @@ draw_tracks <- function(mt, events=NULL, velocity=NULL, acceleration=NULL, title
   
   if (!missing(events)) {
     colors <- c("red", "chartreuse")
+    labels_legend <- c("Промахи", "Попадания")
     
     if (length(unique(events$hits)) == 1 & unique(events$hits) == T) {
       colors <- c("chartreuse")
+      labels_legend <- c("Попадания")
     } else if (length(unique(events$hits)) == 1 & unique(events$hits) == F) {
       colors <- c("red")
+      labels_legend <- c("Промахи")
     }
     
     plot <- plot + geom_point(data=events, color=I(point_color), shape=21, size=11, alpha=0.5, aes(fill=hits)) +
-    scale_fill_manual(values = colors)  +
-    geom_text(data=events, aes(label=row.names(events)), hjust=0.5, vjust=0.5, alpha=0.7, check_overlap = T, size=4)
+    scale_fill_manual(values = colors, labels = labels_legend)  +
+    geom_text(data=events, aes(label=row.names(events)), hjust=0.5, vjust=0.5, alpha=0.7, check_overlap = T, size=4) +
+    labs(fill = "Цели")
     # geom_label(data=events, aes(label=row.names(events)), hjust=0.5, vjust=0.5, label.padding = unit(15, "pt"), label.r = unit(15, "pt"), label.size = .1, size=2.5)
   }
   
@@ -308,7 +330,7 @@ draw_tracks <- function(mt, events=NULL, velocity=NULL, acceleration=NULL, title
   if (!missing(labels)) {
     plot <- plot + geom_text(
       label=labels, 
-      x=canvas_coords_x,
+      x=labels_position_x, #зависит от fix_size
       y=-canvas_coords_y,
       size=5,
       hjust = "left", vjust = "top",
@@ -316,6 +338,47 @@ draw_tracks <- function(mt, events=NULL, velocity=NULL, acceleration=NULL, title
   }
   
   return(plot)
+}
+
+
+draw_action <- function(ast_long, ast_mt, ast, ideal_coords, title="") {
+  ideal_coords$x_mouse_pos <- ideal_coords$x_mouse_pos + ast$canvas_coords_x
+  ideal_coords$y_mouse_pos <- ideal_coords$y_mouse_pos + ast$canvas_coords_y
+  
+  for (n in unique(ast_mt$target_numbers)) {
+    
+    slice <- ast_mt[ast_mt$target_numbers == n, ]
+    
+    if (nrow(slice) == 0) {
+      next
+    }
+    
+    slice$velocity_smd <- get_velocity_smoothed(slice$velocity, velocity_limit = 4000)
+    curvature <- round(mean(calculate_scaled_curvature(slice$timestamp, slice$x_mouse_pos, slice$y_mouse_pos), na.rm = T), 3)
+    line_distance <- round(ast_long$distance[n])
+    time_interval <- round(ast_long$time_intervals[n], 2)
+    miss_distance <- round(ast_long$miss_distance[n], 2)
+    velocity <- round(ast_long$velocity[n], 2)
+    
+    if (ast_long$hits[n]) {
+      target_color <- "chartreuse"
+    } else {
+      target_color <- "red"
+    }
+    
+    p <- ggplot(data = slice) + 
+      geom_rect(aes(xmin=ast$canvas_coords_x, xmax=ast$canvas_coords_x + ast$canvas_width, ymin=ast$canvas_coords_y, ymax=ast$canvas_coords_y + ast$canvas_height), color="black", fill="white") +
+      geom_path(aes(x_mouse_pos, y_mouse_pos, col=velocity_smd), alpha = I(0.5), linewidth=0.5) + 
+      scale_colour_gradient2(low="chartreuse", mid="yellow", high="red", midpoint = 2000, name = "Скорость") +
+      geom_point(data = ideal_coords[n,], aes(x_mouse_pos, y_mouse_pos), shape=21, size=10, alpha=0.5, fill="white") +
+      geom_point(data = ast_long[n,], aes(x_mouse_pos, y_mouse_pos), shape=21, size=2, fill=target_color) +
+      scale_y_reverse(limits=c(ast$canvas_height + ast$canvas_coords_y + 100, ast$canvas_coords_y - 100)) +
+      xlim(ast$canvas_coords_x - 600, ast$canvas_coords_x + ast$canvas_width + 600) +
+      annotate("text", x = ast$canvas_coords_x - 600, y = 0, label = paste0("Кривизна линии: ", curvature, "\n", "Время: ", time_interval, " сек.\n", "Дистанция: ", line_distance, " px.\n", "Ср. скорость: ", velocity, " px/s.\n", "Промах: ", miss_distance, " px.\n"), size = 4, hjust = 0, vjust = 1) +
+      ggtitle(paste(title, "Цель:", n))
+    
+    print(p)
+  }
 }
 
 
@@ -333,6 +396,97 @@ draw_composition <- function(plot_list, title) {
                        bottom = textGrob("X", gp = gpar(fontsize=21)), 
                        left = textGrob("Y", rot = 90, gp = gpar(fontsize=21)), newpage=F)
   return(plot)
+}
+
+
+draw_time_barplot <- function(ast_long, user_id, test_id, accuracy_time_total, speed_time_total, ylimit=3, fix_size=T) {
+  ast_long$time_intervals_smd <-  sleek(ast_long$time_intervals)
+  
+  if (fix_size == T) {
+    ast_long$time_intervals[ast_long$time_intervals_smd >= ylimit] <- ylimit
+    margin_left <- 3
+  } else {
+    ylimit <- max(ast_long$time_intervals)
+    margin_left <- 0
+  }
+  
+  time_barplot <- ggplot(ast_long, aes(seq_along(ast_long$timestamp), time_intervals)) + 
+    geom_bar(stat = "identity", aes(fill=hits), col="grey90") + 
+    geom_line(aes(y = time_intervals_smd)) +
+    scale_fill_manual(breaks = c(T, F), values=c("#00bfc4", "#f8766d")) +
+    geom_vline(xintercept = (nrow(ast_long) / 2) + 1, col = "black", alpha=0.5) +
+    scale_y_continuous(breaks = seq(0, ylimit, 0.5)) +
+    ylim(0, ylimit) +
+    scale_x_continuous(breaks = seq(0, nrow(ast_long) + 10, 10), expand = c(0, 0), labels = number_format(accuracy = 1)) +
+    xlab("") + ylab("Time, s") +
+    theme(axis.text.x = element_text(size = 7, angle = 0, hjust = .5, vjust = .5),
+          axis.text.y = element_text(size = 9, angle = 0, hjust = .5, vjust = .5),
+          plot.margin=unit(c(0,0,0,margin_left), "mm")) + guides(fill = "none") + 
+    annotate("label", x = 1, y = ylimit, label = paste0("T1: ", accuracy_time_total, " s."), size = 4, hjust = -0.5, vjust = 1.5) +
+    annotate("label", x = 129, y = ylimit, label = paste0("T2: ", speed_time_total, " s."), size = 4, hjust = -0.5, vjust = 1.5) + 
+    ggtitle(paste0("Диаграмма соотношения времени и точности попаданий. User ID: ", user_id, ", TEST: ", test_id))
+  
+  return(time_barplot)
+}
+
+draw_missings_barplot <- function(ast_long, accuracy_missings_distance, speed_missings_distance, ylimit=100, fix_size=T) {
+  ast_long$miss_distance_smd <-  sleek(ast_long$miss_distance)
+  
+  if (fix_size == T) {
+    ast_long$miss_distance[ast_long$miss_distance >= ylimit] <- ylimit
+    margin_left <- 0
+  } else {
+    ylimit <- max(ast_long$miss_distance)
+    margin_left <- 1
+  }
+  
+  missings_barplot <- ggplot(ast_long, aes(seq_along(ast_long$timestamp), miss_distance)) + 
+    geom_bar(stat = "identity", aes(fill=hits), col="grey90") + 
+    geom_line(aes(y = miss_distance_smd)) +
+    scale_fill_manual(breaks = c(T, F), values=c("#00bfc4", "#f8766d")) +
+    geom_vline(xintercept= (nrow(ast_long) / 2) + 1, col = "black", alpha=0.5) +
+    scale_x_continuous(breaks = seq(0, nrow(ast_long) + 10, 10), expand = c(0, 0)) +
+    scale_y_reverse(limits=c(ylimit, 0)) +
+    xlab("Target") + ylab("Missings distance, px") +
+    theme(axis.text.x = element_blank(), axis.ticks.x=element_blank(),
+          axis.text.y = element_text(size = 9, angle = 0, hjust = .5, vjust = .5),
+          legend.position = "bottom", 
+          plot.margin=unit(c(-3,0,0,margin_left), "mm")) +
+    annotate("label", x = 1, y = ylimit, label = paste0("M1: ", accuracy_missings_distance, " px."), size = 4, hjust = -0.5, vjust = -1) +
+    annotate("label", x = 129, y = ylimit, label = paste0("M2: ", speed_missings_distance, " px."), size = 4, hjust = -0.5, vjust = -1)
+  
+  return(missings_barplot)
+}
+
+
+draw_distance_barplot <- function(ast_long, user_id, test_id, accuracy_distance_total, speed_distance_total, ylimit=1000, fix_size=T) {
+  ast_long$distance_smd <-  sleek(ast_long$distance)
+  
+  if (fix_size == T) {
+    ast_long$distance[ast_long$distance_smd >= ylimit] <- ylimit
+    margin_left <- 0
+  } else {
+    ylimit <- max(ast_long$distance)
+    margin_left <- 0
+  }
+  
+  distance_barplot <- ggplot(ast_long, aes(seq_along(ast_long$timestamp), distance)) + 
+    geom_bar(stat = "identity", aes(fill=hits), col="grey90") + 
+    geom_line(aes(y = distance_smd)) +
+    scale_fill_manual(breaks = c(T, F), values=c("#00bfc4", "#f8766d")) +
+    geom_vline(xintercept = (nrow(ast_long) / 2) + 1, col = "black", alpha=0.5) +
+    scale_y_continuous(breaks = seq(0, ylimit, 0.5)) +
+    ylim(0, ylimit) +
+    scale_x_continuous(breaks = seq(0, nrow(ast_long) + 10, 10), expand = c(0, 0), labels = number_format(accuracy = 1)) +
+    xlab("") + ylab("Distance, px.") +
+    theme(axis.text.x = element_text(size = 7, angle = 0, hjust = .5, vjust = .5),
+          axis.text.y = element_text(size = 9, angle = 0, hjust = .5, vjust = .5),
+          plot.margin=unit(c(0,0,0,margin_left), "mm")) + guides(fill = "none") + 
+    annotate("label", x = 1, y = ylimit, label = paste0("D1: ", accuracy_distance_total, " px."), size = 4, hjust = -0.1, vjust = 1) +
+    annotate("label", x = 129, y = ylimit, label = paste0("D2: ", speed_distance_total, " px."), size = 4, hjust = -0.1, vjust = 1) + 
+    ggtitle(paste0("Диаграмма соотношения амплитуды и точности попаданий. User ID: ", user_id, ", TEST: ", test_id))
+  
+  return(distance_barplot)
 }
 
 
@@ -425,17 +579,20 @@ get_time_intervals <- function(timestamps, units = "ms") {
 get_distance_features <- function(ast_merged) {
   debug(logger, "get_distance_features")
   #Добавить проверку на дистанцию, если пользователь прошел 0 или сильно меньше идеальной дистанции, то выдавать ошибку
-  
   distances_vector <- get_distances_points(ast_merged$x_mouse_pos, ast_merged$y_mouse_pos, which(!is.na(ast_merged$event_type)))
-  
-  df <- describe(distances_vector, quant = c(0.25, 0.75))
+  df <- describe(distances_vector[-1], quant = c(0.25, 0.75)) #Первое значение всегда 0
   df <- select(df, -vars, -n)
   names(df) <- paste0("distance", "_", names(df))
   df$distance_total <- sum(distances_vector)
   df <- select(df, distance_total, everything())
   
-  model <- lm(distances_vector ~ n, data = data.frame(n=seq_along(distances_vector), distances_vector=distances_vector))
-  df$distance_trend <- model$coefficients[2]
+  tryCatch(expr = {
+    model <- lm(distances_vector ~ n, data = data.frame(n=seq_along(distances_vector), distances_vector=distances_vector))
+    df$distance_trend <- model$coefficients[2]
+  },
+  error = function(err) {
+    df$distance_trend <- NA
+  })
   
   df <- round(df, 2)
   
@@ -486,23 +643,33 @@ get_pauses_features <- function(pauses) {
   df$pause_number <- length(pauses)
   df <- select(df, pause_total, pause_number, everything())
   
-  model <- lm(pauses ~ n, data = data.frame(n=seq_along(pauses), pauses=pauses))
-  df$pause_trend <- model$coefficients[2]
+  tryCatch(expr = {
+    model <- lm(pauses ~ n, data = data.frame(n=seq_along(pauses), pauses=pauses))
+    df$pause_trend <- model$coefficients[2]
+  },
+  error = function(err) {
+    df$pause_trend <- 0
+  })
   
   df <- round(df, 2)
   return(as.list(df))
 }
 
 get_velocity_smoothed <- function(velocity, velocity_limit=4) {
-  debug(logger, "get_velocity_smoothed")
+  # debug(logger, "get_velocity_smoothed")
   #Скорость для каждого участка пути
   
   # if (min(velocity) < 0) {next} #добавить проверку, если минимальная скорость ниже нуля, это артефакт
-  velocity[velocity > velocity_limit] <- velocity_limit
-  velocity_smoothed <- sleek(velocity)
-  # Если двигать слишком быстро, почему-то возникают NaN 
-  velocity_smoothed[1] <- 0 # устанавливаем нижнюю границу скорости для построения графиков
-  velocity_smoothed[length(velocity_smoothed)] <- velocity_limit # устанавливаем верхнюю границу скорости для построения графиков
+  if (length(velocity) > 2) {
+    velocity[velocity > velocity_limit] <- velocity_limit
+    velocity_smoothed <- sleek(velocity)
+    # Если двигать слишком быстро, почему-то возникают NaN 
+    velocity_smoothed[1] <- 0 # устанавливаем нижнюю границу скорости для построения графиков
+    velocity_smoothed[length(velocity_smoothed)] <- velocity_limit # устанавливаем верхнюю границу скорости для построения графиков
+    
+  } else {
+    return(0)
+  }
   
   return(velocity_smoothed)
 }
@@ -512,9 +679,9 @@ get_velocity_by_target <- function(ast_merged) {
   
   for (target in unique(ast_merged$target_numbers)) {
     ast_by_target <- ast_merged[ast_merged$target_numbers == target, ]
-    velocity <- get_velocity(ast_by_target$x_mouse_pos, ast_by_target$y_mouse_pos, ast_by_target$timestamp)
+    velocity <- get_velocity(ast_by_target$x_mouse_pos, ast_by_target$y_mouse_pos, ast_by_target$timestamp, units = "s")
     distance_for_velocity <- get_distance(ast_by_target$x_mouse_pos, ast_by_target$y_mouse_pos)
-    velocity_mean <- round(velocity_harmonic_mean(velocity, distance_for_velocity, units = "s"), 2)
+    velocity_mean <- round(velocity_harmonic_mean(velocity, distance_for_velocity), 2)
     
     target_speeds <- c(target_speeds, velocity_mean)
   }
@@ -524,7 +691,7 @@ get_velocity_by_target <- function(ast_merged) {
 }
 
 get_velocity_features <- function(velocity_vector) {
-  df <- describe(velocity_vector, quant = c(0.25, 0.75))
+  df <- describe(velocity_vector[-1], quant = c(0.25, 0.75)) #Начальная скорость всегда равна 0
   df <- select(df, -vars, -n, -mean, -median, -trimmed)
   names(df) <- paste0("velocity", "_", names(df))
   df <- select(df, everything())
@@ -537,10 +704,16 @@ get_velocity_features <- function(velocity_vector) {
 }
 
 get_acceleration_features <- function(acceleration_vector, prefix) {
-  df <- describe(acceleration_vector, quant = c(0.25, 0.75))
-  df <- select(df, -vars)
-  names(df) <- paste0(prefix, "_", names(df))
-  df <- select(df, everything())
+  tryCatch(expr = {
+    df <- describe(acceleration_vector, quant = c(0.25, 0.75))
+    df <- select(df, -vars)
+    names(df) <- paste0(prefix, "_", names(df))
+    df <- select(df, everything())
+  },
+  error = function(err) {
+    df <- data.frame()
+    names(df) <- paste0(prefix, "_", c("n", "mean", "sd", "median", "trimmed", "mad", "min", "max", "range", "skew", "kurtosis", "se", "Q0.25", "Q0.75"))
+  })
   
   if (prefix == "acc") {
     df$jerk_line <- sort(boxplot.stats(acceleration_vector)$out, decreasing = T)[4]
@@ -601,6 +774,7 @@ get_acceleration_by_target <- function(target_numbers, acceleration, last_target
     
     if (is.null(dec)) {
       sequences <- extract_true_sequences(acc_by_target >= 0)
+      
       if (target_number != last_target_number) {
         tryCatch(expr = {
           mean_acc <- mean(acc_by_target[sequences[[1]]])
@@ -772,7 +946,6 @@ convert_acceleration <- function(acceleration, timestamp, velocity, time = NULL,
     acc_logical <- acceleration < 0
   }
   
-  
   sequences <- extract_true_sequences(acc_logical)
   
   vec <- vector()
@@ -807,9 +980,34 @@ get_combo_targets <- function(hits) {
 }
 
 
+draw_comparisons <- function(sample_feature, personal_feature, title, units = "") {
+  ecdf_func <- ecdf(sample_feature)
+  percentile <- round((ecdf_func(personal_feature)) * 100, 1)
+  
+  df <- data.frame(sample_feature)
+  
+  # plot_hist <- ggplot(df, aes(sample_feature)) + geom_histogram(fill="skyblue", color="black", alpha=0.5) +
+  #   geom_vline(xintercept=personal_feature, col = "red") +
+  #   annotate("text", x = personal_feature, y = 0, label = paste0(100 - percentile, "% "), size = 3, hjust = -0.1, vjust = 1.4) +
+  #   annotate("text", x = personal_feature, y = 0, label = paste0(percentile, "%"), size = 3, hjust = 1.1, vjust = 1.4) +
+  #   xlab(title) + 
+  #   ggtitle(paste0(title, ". Ваш результат: ", personal_feature, " ", units))
+  
+  plot_dens <- ggplot(df, aes(sample_feature)) + geom_density(fill="skyblue", alpha=0.5) +
+    geom_vline(xintercept=personal_feature, col = "red") +
+    annotate("text", x = personal_feature, y = 0, label = paste0(100 - percentile, "% "), size = 3, hjust = -0.1, vjust = 1.4) +
+    annotate("text", x = personal_feature, y = 0, label = paste0(percentile, "%"), size = 3, hjust = 1.1, vjust = 1.4) +
+    xlab(title) + 
+    ggtitle(paste0(title, ". Ваш результат: ", personal_feature, " ", units))
+  
+  return(plot_dens)
+}
+
+
 get_all_datasets <- function(db=NULL, ast, ast_data, mouse_tracks=NULL, ideal_coords) {
   debug(logger, "get_all_datasets")
   ast_long <- get_ast_long(ast_data)
+  
   ast_long$miss_distance <- round(get_distance_a_b(ideal_coords$x_mouse_pos + ast$canvas_coords_x, ast_long$x_mouse_pos,
                                                    ideal_coords$y_mouse_pos + ast$canvas_coords_y, ast_long$y_mouse_pos), 2)
   
@@ -830,7 +1028,6 @@ get_all_datasets <- function(db=NULL, ast, ast_data, mouse_tracks=NULL, ideal_co
   
   # Выбираем треки мыши, которые были совершены во время прохождения теста
   ast_mt <- ast_mt[ast_mt$timestamp >= ast_long$timestamp[1] & ast_mt$timestamp <= ast_long$timestamp[nrow(ast_long)], ]
-  if (nrow(ast_mt) == 0) {warning("No mouse tracks")}
   
   ast_mt$time_intervals <- get_time_intervals(ast_mt$timestamp, units = "s")
   ast_mt$time <- cumsum(ast_mt$time_intervals)
@@ -862,35 +1059,38 @@ get_all_datasets <- function(db=NULL, ast, ast_data, mouse_tracks=NULL, ideal_co
   ast_long$accuracy_rate <- get_accuracy_rate(miss_distance)
   missings$accuracy_rate <- round(mean(ast_long$accuracy_rate), 2)
   
-  ast_mt$velocity <- get_velocity(ast_mt$x_mouse_pos, ast_mt$y_mouse_pos, ast_mt$timestamp)
+  ast_mt$velocity <- get_velocity(ast_mt$x_mouse_pos, ast_mt$y_mouse_pos, ast_mt$timestamp, units = "s")
   ast_mt$acceleration <- get_acceleration(ast_mt$timestamp, ast_mt$velocity)
   stops <- sum(ast_mt$velocity[-1] == 0)
   
   acceleration <- convert_acceleration(ast_mt$acceleration, timestamp = ast_mt$timestamp, velocity = ast_mt$velocity, time = ast_mt$time)
   acceleration_features <- get_acceleration_features(acceleration$values, "acc")
-  
+
   decceleration <- convert_acceleration(ast_mt$acceleration, timestamp = ast_mt$timestamp, velocity = ast_mt$velocity, time = ast_mt$time, deceleration = T)
   decceleration_features <- get_acceleration_features(decceleration$values, "dec")
-  
+
   df.acceleration <- merge_acc_dec(acceleration, decceleration)
   number_acceleration_per_second <- get_number_accelerations_per_time(df.acceleration$acceleration, df.acceleration$time)
   acceleration_per_second <- get_acceleration_features_per_time(number_acceleration_per_second)
-  
+
   ast_long$acceleration <- get_acceleration_by_target(ast_mt$target_numbers, ast_mt$acceleration, last_target_number = nrow(ast_long))
   ast_long$decceleration <- get_acceleration_by_target(ast_mt$target_numbers, ast_mt$acceleration, last_target_number = nrow(ast_long), dec = T)
   
   combo_hits <- max(get_combo_targets(ast_long$hits))
   combo_missings <- max(get_combo_targets(!ast_long$hits))
   
+  ast_long$clicked_through_targets <- ast_long$hits == F & ast_long$distance <= 100
+  clicked_through_targets <- sum(ast_long$clicked_through_targets)
+  
   distance_for_velocity <- get_distance(ast_mt$x_mouse_pos, ast_mt$y_mouse_pos)
-  velocity_mean <- round(velocity_harmonic_mean(ast_mt$velocity, distance_for_velocity, units = "s"), 2)
+  velocity_mean <- round(velocity_harmonic_mean(ast_mt$velocity, distance_for_velocity), 2)
   
   ast_long$velocity <- get_velocity_by_target(ast_merged)
   velocity <- get_velocity_features(ast_long$velocity)
   
   corr_sat <- round(cor(ast_long$miss_distance, ast_long$velocity), 3)
   
-  features <- collect_features(ast, time, fitts_a = fitts_coef[1], fitts_b = fitts_coef[2], distance, pauses_features, stops, velocity_mean, velocity, acceleration_features, decceleration_features, acceleration_per_second, missings, combo_hits, combo_missings, corr_sat)
+  features <- collect_features(ast, time, fitts_a = fitts_coef[1], fitts_b = fitts_coef[2], distance, pauses_features, stops, velocity_mean, velocity, acceleration_features, decceleration_features, acceleration_per_second, missings, combo_hits, combo_missings, clicked_through_targets, corr_sat)
   
   return(list(features=features, ast_mt=ast_mt, ast_long=ast_long, ast_merged=ast_merged))
 }
