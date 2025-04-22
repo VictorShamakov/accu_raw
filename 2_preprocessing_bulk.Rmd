@@ -30,12 +30,12 @@ tracker_id <- 1 # ID tracker для сервиса mouse tracking
 ```
 
 ```{r}
-validated_results <- read_xlsx("../Accu/results/ast_impersonal_results.xlsx") # Валидные данные  теста
-validated_results <- validated_results[order(as.numeric(validated_results$user_id)),]
-validated_results$test_id <- test_id
+ast_results <- read_xlsx("../Accu/results/ast_impersonal_results.xlsx") # Валидные данные  теста
+ast_results <- ast_results[order(as.numeric(ast_results$user_id)),]
+ast_results$test_id <- test_id
 
 accu_data <- readRDS("./data/raw/2024-10-21 - accu.rds") # Результаты эксперимента компромисс скорость-точность
-accu_data <- merge(accu_data, select(validated_results, user_id, test_id), by = c("user_id", "test_id"), all.y = F)
+accu_data <- merge(accu_data, select(ast_results, user_id, test_id), by = c("user_id", "test_id"), all.y = F)
 
 users <- readRDS("./data/raw/2024-10-21 - users.rds")
 users <- merge(users, select(accu_data, user_id), by = "user_id")
@@ -55,8 +55,8 @@ mouse_tracks <- merge(mouse_tracks, select(sessions, session_id), by = "session_
 accuracy_features <- data.frame()
 speed_features <- data.frame()
 
-for (user_id in validated_results$user_id) {
-  print(user_id)
+for (user_id in ast_results$user_id) {
+  print("user_id: " %+% user_id)
   tryCatch(expr = {
     ast <- accu_data[accu_data$user_id == user_id & accu_data$test_id == test_id,]
     ast$tracker_id <- tracker_id
@@ -73,13 +73,61 @@ for (user_id in validated_results$user_id) {
     accuracy_features <- rbind(accuracy_features, accuracy_datasets$features)
     speed_features <- rbind(speed_features, speed_datasets$features)
   },
-  error = function(err) {
-    print("Error")
+  error = function(e) {
+    cat("Error:", e$message)
   })
   
+}
+```
+
+
+```{r}
+write.csv(accuracy_features, "./data/accuracy_features.csv")
+write.csv(speed_features, "./data/speed_features.csv")
+```
+
+
+Алфавит движений
+```{r}
+  # ## Обработка всех данных
+  # if (!file.exists(file.path("./data/alphabet/", user_id))){
+  #   dir.create(file.path("./data/alphabet/", user_id))
+  # }
+  # 
+  # accuracy_datasets$ast_long$stage <- "accuracy"
+  # speed_datasets$ast_long$stage <- "speed"
+  # accuracy_datasets$ast_mt$stage <- "accuracy"
+  # speed_datasets$ast_mt$stage <- "speed"
+  # accuracy_datasets$ast_merged$stage <- "accuracy"
+  # speed_datasets$ast_merged$stage <- "speed"
+  # 
+  # ast_long <- rbind(accuracy_datasets$ast_long, speed_datasets$ast_long)
+  # ast_mt <- rbind(accuracy_datasets$ast_mt, speed_datasets$ast_mt)
+  # ast_merged <- rbind(accuracy_datasets$ast_merged, speed_datasets$ast_merged)
+  # 
+  # saveRDS(ast_long, file = paste0("./data/alphabet/" %+% user_id %+% "/ast_results.rds"))
+  
+  ## Разделение на алфавит
+  # ast_merged$target_numbers <- get_target_numbers(ast_merged$event_type, "click")
   
   
-  
+  # for (n in unique(ast_merged$target_numbers)) {
+  #   slice <- ast_merged[ast_merged$target_numbers == n, ]
+  #   saveRDS(slice, file = paste0("./data/alphabet/" %+% user_id %+% "/" %+% n %+% ".rds"))
+  #   
+  #   # p <- ggplot(data = slice) +
+  #   #   geom_line(aes(x_mouse_pos, y_mouse_pos)) +
+  #   #   geom_point(data = ast_long[n,], aes(x_mouse_pos, y_mouse_pos), shape=21, size=11, alpha=0.8, fill="white") +
+  #   #   scale_y_reverse(limits=c(ast$canvas_height + ast$canvas_coords_y, ast$canvas_coords_y)) +
+  #   #   xlim(ast$canvas_coords_x, ast$canvas_coords_x + ast$canvas_width)
+  #   # 
+  #   # print(p)
+  # }
+```
+
+
+Сохранение графиков в папки с респондентами
+```{r}
 #   ##Визуализация
 #   dir.create(paste0(img_path, user_id))
 #   
@@ -171,54 +219,5 @@ for (user_id in validated_results$user_id) {
 #   
 #   ast_plot_non_fix_size <- grid.arrange(time_barplot_non_fix_size, missings_barplot_non_fix_size, nrow = 2, ncol = 1)
 #   ggsave(paste0(img_path, user_id, "/ast_plot_non_fix_size.jpg"), ast_plot_non_fix_size, width = 1920, height = 1080, units = "px", dpi = 150)
-    
-}
-
-```
-
-
-```{r}
-write.csv(accuracy_features, "./data/accuracy_features.csv")
-write.csv(speed_features, "./data/speed_features.csv")
-
-
-```
-
-
-```{r}
-  # ## Обработка всех данных
-  # if (!file.exists(file.path("./data/alphabet/", user_id))){
-  #   dir.create(file.path("./data/alphabet/", user_id))
-  # }
-  # 
-  # accuracy_datasets$ast_long$stage <- "accuracy"
-  # speed_datasets$ast_long$stage <- "speed"
-  # accuracy_datasets$ast_mt$stage <- "accuracy"
-  # speed_datasets$ast_mt$stage <- "speed"
-  # accuracy_datasets$ast_merged$stage <- "accuracy"
-  # speed_datasets$ast_merged$stage <- "speed"
-  # 
-  # ast_long <- rbind(accuracy_datasets$ast_long, speed_datasets$ast_long)
-  # ast_mt <- rbind(accuracy_datasets$ast_mt, speed_datasets$ast_mt)
-  # ast_merged <- rbind(accuracy_datasets$ast_merged, speed_datasets$ast_merged)
-  # 
-  # saveRDS(ast_long, file = paste0("./data/alphabet/" %+% user_id %+% "/ast_results.rds"))
-  
-  ## Разделение на алфавит
-  # ast_merged$target_numbers <- get_target_numbers(ast_merged$event_type, "click")
-  
-  
-  # for (n in unique(ast_merged$target_numbers)) {
-  #   slice <- ast_merged[ast_merged$target_numbers == n, ]
-  #   saveRDS(slice, file = paste0("./data/alphabet/" %+% user_id %+% "/" %+% n %+% ".rds"))
-  #   
-  #   # p <- ggplot(data = slice) +
-  #   #   geom_line(aes(x_mouse_pos, y_mouse_pos)) +
-  #   #   geom_point(data = ast_long[n,], aes(x_mouse_pos, y_mouse_pos), shape=21, size=11, alpha=0.8, fill="white") +
-  #   #   scale_y_reverse(limits=c(ast$canvas_height + ast$canvas_coords_y, ast$canvas_coords_y)) +
-  #   #   xlim(ast$canvas_coords_x, ast$canvas_coords_x + ast$canvas_width)
-  #   # 
-  #   # print(p)
-  # }
 ```
 
