@@ -15,8 +15,9 @@ suppressMessages(library("readxl"))
 suppressMessages(library("gridExtra")) 
 
 logger <- logger("DEBUG", 
-                 appenders = list(file_appender("ast.log"), 
-                                  console_appender()))
+                 appenders = list(file_appender("ast.log")
+                                  # console_appender()
+                                  ))
 
 "%+%" <- function(...){paste0(...)}
 
@@ -636,6 +637,8 @@ get_accuracy_rate <- function(miss_distance) {
 
 
 get_pauses_features <- function(pauses) {
+  if (length(pauses) == 0) {pauses <- 0}  # если пользователь не сделал ни одной паузы
+  
   df <- describe(pauses, quant = c(0.25, 0.75))
   df <- select(df, -vars, -n)
   names(df) <- paste0("pause", "_", names(df))
@@ -906,7 +909,6 @@ get_target_numbers_by_timestamp <- function(target_timestamps, movement_timestam
     } else {
       numbers <- movement_timestamps[movement_timestamps > target_timestamps[n - 1] & movement_timestamps <= target_timestamps[n]]
     }
-    
     target_n <- c(target_n, rep(n, length(numbers)))
   }
 
@@ -944,6 +946,7 @@ convert_acceleration <- function(acceleration, timestamp, velocity, time = NULL,
     acc_logical[1] <- FALSE # переводим первое значение FALSE для корректного нахождения самого первого ускорения
   } else {
     acc_logical <- acceleration < 0
+    acc_logical[length(acceleration)] <- TRUE 
   }
   
   sequences <- extract_true_sequences(acc_logical)
@@ -1008,12 +1011,29 @@ get_all_datasets <- function(db=NULL, ast, ast_data, mouse_tracks=NULL, ideal_co
   debug(logger, "get_all_datasets")
   ast_long <- get_ast_long(ast_data)
   
+  ast_long <- ast_long[order(ast_long$timestamp),]
+  
   ast_long$miss_distance <- round(get_distance_a_b(ideal_coords$x_mouse_pos + ast$canvas_coords_x, ast_long$x_mouse_pos,
                                                    ideal_coords$y_mouse_pos + ast$canvas_coords_y, ast_long$y_mouse_pos), 2)
   
   ast_long$hits <- ifelse(ast_long$miss_distance > 38, F, T)
   ast_long$time_intervals <- get_time_intervals(ast_long$timestamp, units = "s")
   ast_long$time <- cumsum(ast_long$time_intervals)
+  time <- get_time_features(ast_long, units = "s")
+  
+  ast_long$ideal_distance <- get_distance(ideal_coords$x_mouse_pos, ideal_coords$y_mouse_pos)
+  fitts_coef <- get_fitts_coefs(ast_long$time_intervals, ast_long$ideal_distance, 76)
+  ast_long$fitts_time_invervals <- get_fitts_time(distance = ast_long$ideal_distance, a = fitts_coef[1], b = fitts_coef[2])
+  ast_long$fitts_time <- cumsum(ast_long$fitts_time_invervals)
+  
+  missings <- get_missings_features(ast, ast_long, ast_data, ideal_coords = ideal_coords) # промахи
+  miss_distance <- get_distance_a_b(ideal_coords$x_mouse_pos + ast$canvas_coords_x, ast_long$x_mouse_pos,
+                                    ideal_coords$y_mouse_pos + ast$canvas_coords_y, ast_long$y_mouse_pos)
+  ast_long$accuracy_rate <- get_accuracy_rate(miss_distance)
+  missings$accuracy_rate <- round(mean(ast_long$accuracy_rate), 2)
+  
+  combo_hits <- max(get_combo_targets(ast_long$hits))
+  combo_missings <- max(get_combo_targets(!ast_long$hits))
   
   if (!missing(db) & missing(mouse_tracks)) {
     ast_mt <- get_mouse_tracks(db, session_id = ast$session_id)
@@ -1028,9 +1048,15 @@ get_all_datasets <- function(db=NULL, ast, ast_data, mouse_tracks=NULL, ideal_co
   
   # Выбираем треки мыши, которые были совершены во время прохождения теста
   ast_mt <- ast_mt[ast_mt$timestamp >= ast_long$timestamp[1] & ast_mt$timestamp <= ast_long$timestamp[nrow(ast_long)], ]
+
+  # Если нет треков движений мыши
+  if (nrow(ast_mt) == 0) {
+    ast_mt <- select(ast_long, timestamp, x_mouse_pos, y_mouse_pos)
+  }
   
   ast_mt$time_intervals <- get_time_intervals(ast_mt$timestamp, units = "s")
   ast_mt$time <- cumsum(ast_mt$time_intervals)
+  
   ast_mt$target_numbers <- get_target_numbers_by_timestamp(ast_long$timestamp, ast_mt$timestamp)
   
   ast_merged <- merge(ast_mt, ast_long, by = c("timestamp", "x_mouse_pos", "y_mouse_pos"), all = T) # треки мыши + попадания
@@ -1038,26 +1064,13 @@ get_all_datasets <- function(db=NULL, ast, ast_data, mouse_tracks=NULL, ideal_co
   ast_merged <- ast_merged[click_positions[1]:click_positions[length(click_positions)], ]
   ast_merged$target_numbers <- get_target_numbers(ast_merged$event_type, "click")
   
-  time <- get_time_features(ast_long, units = "s")
-  
-  ast_long$ideal_distance <- get_distance(ideal_coords$x_mouse_pos, ideal_coords$y_mouse_pos)
   ast_long$distance <- get_distances_points(ast_merged$x_mouse_pos, ast_merged$y_mouse_pos, which(!is.na(ast_merged$event_type)))
-  
-  fitts_coef <- get_fitts_coefs(ast_long$time_intervals, ast_long$ideal_distance, 76)
-  ast_long$fitts_time_invervals <- get_fitts_time(distance = ast_long$ideal_distance, a = fitts_coef[1], b = fitts_coef[2])
-  ast_long$fitts_time <- cumsum(ast_long$fitts_time_invervals)
   
   distance <- get_distance_features(ast_merged) # пройденное расстояние мышью
   
   point_to_point_distance <- get_distance(ast_merged$x_mouse_pos, ast_merged$y_mouse_pos) #вектор со всеми отрезками пройденного расстояния
   pauses <- get_pauses(ast_merged, point_to_point_distance, 1, units = "ms") #вектор с паузами
   pauses_features <- get_pauses_features(pauses) # признаки пауз
-  
-  missings <- get_missings_features(ast, ast_long, ast_data, ideal_coords = ideal_coords) # промахи
-  miss_distance <- get_distance_a_b(ideal_coords$x_mouse_pos + ast$canvas_coords_x, ast_long$x_mouse_pos,
-                                    ideal_coords$y_mouse_pos + ast$canvas_coords_y, ast_long$y_mouse_pos)
-  ast_long$accuracy_rate <- get_accuracy_rate(miss_distance)
-  missings$accuracy_rate <- round(mean(ast_long$accuracy_rate), 2)
   
   ast_mt$velocity <- get_velocity(ast_mt$x_mouse_pos, ast_mt$y_mouse_pos, ast_mt$timestamp, units = "s")
   ast_mt$acceleration <- get_acceleration(ast_mt$timestamp, ast_mt$velocity)
@@ -1076,10 +1089,8 @@ get_all_datasets <- function(db=NULL, ast, ast_data, mouse_tracks=NULL, ideal_co
   ast_long$acceleration <- get_acceleration_by_target(ast_mt$target_numbers, ast_mt$acceleration, last_target_number = nrow(ast_long))
   ast_long$decceleration <- get_acceleration_by_target(ast_mt$target_numbers, ast_mt$acceleration, last_target_number = nrow(ast_long), dec = T)
   
-  combo_hits <- max(get_combo_targets(ast_long$hits))
-  combo_missings <- max(get_combo_targets(!ast_long$hits))
-  
-  ast_long$clicked_through_targets <- ast_long$hits == F & ast_long$distance <= 100
+  ast_long$clicked_through_targets <- ast_long$hits == F & ast_long$distance <= 200
+  combo_clicked_through_targets <- max(get_combo_targets(ast_long$clicked_through_targets))
   clicked_through_targets <- sum(ast_long$clicked_through_targets)
   
   distance_for_velocity <- get_distance(ast_mt$x_mouse_pos, ast_mt$y_mouse_pos)
@@ -1090,7 +1101,7 @@ get_all_datasets <- function(db=NULL, ast, ast_data, mouse_tracks=NULL, ideal_co
   
   corr_sat <- round(cor(ast_long$miss_distance, ast_long$velocity), 3)
   
-  features <- collect_features(ast, time, fitts_a = fitts_coef[1], fitts_b = fitts_coef[2], distance, pauses_features, stops, velocity_mean, velocity, acceleration_features, decceleration_features, acceleration_per_second, missings, combo_hits, combo_missings, clicked_through_targets, corr_sat)
+  features <- collect_features(ast, time, fitts_a = fitts_coef[1], fitts_b = fitts_coef[2], distance, pauses_features, stops, velocity_mean, velocity, acceleration_features, decceleration_features, acceleration_per_second, missings, combo_hits, combo_missings, clicked_through_targets, combo_clicked_through_targets, corr_sat)
   
   return(list(features=features, ast_mt=ast_mt, ast_long=ast_long, ast_merged=ast_merged))
 }

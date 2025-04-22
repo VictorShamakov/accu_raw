@@ -15,11 +15,8 @@ output:
 editor_options:
   chunk_output_type: inline
 params:
-  # user_id: 1180
+  user_id: 2153
   test_id: 66
-  user_id: 2
-  # test_id: 73
-  report: FALSE
   data_from_db: TRUE
 ---
 
@@ -33,9 +30,6 @@ knitr::opts_chunk$set(
 ```
 
 
-```{r eval=params$report, include=FALSE}
-# rm(list=ls())
-```
 
 ```{r include=F}
 source("./ast_functions.R")
@@ -58,7 +52,6 @@ test_id <- params$test_id
 # test_id <- 100 # ID экземпляра теста в Moodle LMS - Отладка
 
 ## Психодиагностика
-# user_id <- 2506 # Точность выполнения максимальная, но показывает, что расстояние промахов ~1000 px, что вроде как неверно
 # test_id <- 66 # ID экземпляра теста в Moodle LMS - Психодиагностика
 
 ## Медитация
@@ -175,7 +168,9 @@ if (DATA_FROM_DB) {
 
 #### Features
 ```{r}
-accuracy_datasets$features
+accuracy_datasets$features_t <- as.data.frame(t(accuracy_datasets$features))
+names(accuracy_datasets$features_t) <- "value"
+accuracy_datasets$features_t
 ```
 
 #### ast_long
@@ -183,16 +178,34 @@ accuracy_datasets$features
 accuracy_datasets$ast_long
 ```
 
+
+```{r}
+write_xlsx(accuracy_datasets$features, "./data/users/" %+% user_id %+% "/features.acc.xlsx")
+write_xlsx(accuracy_datasets$ast_mt, "./data/users/" %+% user_id %+% "/ast_mt.acc.xlsx")
+write_xlsx(accuracy_datasets$ast_long, "./data/users/" %+% user_id %+% "/ast_long.acc.xlsx")
+write_xlsx(accuracy_datasets$ast_merged, "./data/users/" %+% user_id %+% "/ast_merged.acc.xlsx")
+```
+
 ### Скорость  {.tabset .tabset-fade .tabset-pills}
 
 #### Features
 ```{r}
-speed_datasets$features
+speed_datasets$features_t <-as.data.frame(t(speed_datasets$features))
+names(speed_datasets$features_t) <- "value"
+speed_datasets$features_t
 ```
 
 #### ast_long
 ```{r}
 speed_datasets$ast_long
+```
+
+
+```{r}
+write_xlsx(speed_datasets$features, "./data/users/" %+% user_id %+% "/features.spd.xlsx")
+write_xlsx(speed_datasets$ast_mt, "./data/users/" %+% user_id %+% "/ast_mt.spd.xlsx")
+write_xlsx(speed_datasets$ast_long, "./data/users/" %+% user_id %+% "/ast_long.spd.xlsx")
+write_xlsx(speed_datasets$ast_merged, "./data/users/" %+% user_id %+% "/ast_merged.spd.xlsx")
 ```
 
 
@@ -544,7 +557,7 @@ draw_action(accuracy_datasets$ast_long, accuracy_datasets$ast_mt, ast, ideal_coo
 
 ```{r results='asis'}
 cat('<swiper-container class="mySwiper" keyboard="true" effect="fade" loop="true" speed=100>\n',
-  paste0('<swiper-slide><img src="./figures/accuracy-alphabet-', 1:nrow(accuracy_datasets$ast_long), '.png"></swiper-slide>\n'),
+  paste0('<swiper-slide><img src="./figures/accuracy-alphabet-', 1:length(unique(accuracy_datasets$ast_mt$target_numbers)), '.png"></swiper-slide>\n'),
 '</swiper-container>')
 ```
 
@@ -555,7 +568,7 @@ draw_action(speed_datasets$ast_long, speed_datasets$ast_mt, ast, ideal_coords)
 
 ```{r results='asis'}
 cat('<swiper-container class="mySwiper" keyboard="true" effect="fade" loop="true" speed=100>\n',
-  paste0('<swiper-slide><img src="./figures/speed-alphabet-', 1:nrow(speed_datasets$ast_long), '.png"></swiper-slide>\n'),
+  paste0('<swiper-slide><img src="./figures/speed-alphabet-', 1:length(unique(speed_datasets$ast_mt$target_numbers)), '.png"></swiper-slide>\n'),
 '</swiper-container>')
 ```
 
@@ -589,12 +602,24 @@ point_to_point_distance.speed <- get_distance(ast_merged$x_mouse_pos[ast_merged$
 pauses.accuracy <- get_pauses(ast_merged[ast_merged$stage == "accuracy",], point_to_point_distance.accuracy, 1, units = "ms")
 pauses.speed <- get_pauses(ast_merged[ast_merged$stage == "speed",], point_to_point_distance.speed, 1, units = "ms")
 
+if (length(pauses.accuracy) != 0) {
+  pauses.accuracy <- data.frame(pauses=pauses.accuracy, n=seq_along(pauses.accuracy), stage = "accuracy")
+} else {
+  pauses.accuracy <- data.frame(pauses=0, n=1, stage = "accuracy")
+}
 
-pauses.accuracy <- data.frame(pauses=pauses.accuracy, n=seq_along(pauses.accuracy), stage = "accuracy")
-pauses.speed <- data.frame(pauses=pauses.speed, n=seq_along(pauses.speed), stage = "speed")
+if (length(pauses.speed) != 0) {
+  pauses.speed <- data.frame(pauses=pauses.speed, n=seq_along(pauses.speed), stage = "speed")
+} else {
+  pauses.speed <- data.frame(pauses=0, n=1, stage = "speed")
+}
 
 pauses <- rbind(pauses.accuracy, pauses.speed)
-pauses$pauses_smd <- sleek(pauses$pauses)
+
+if (nrow(pauses) >=5) {
+  pauses$pauses_smd <- sleek(pauses$pauses)
+} else {pauses$pauses_smd <- pauses$pauses}
+
 interval_scale_y <- ifelse(max(pauses$pauses) > 1000, 1000, 100)
 
 ggplot(pauses, aes(n, pauses, fill = stage)) + 
@@ -975,8 +1000,8 @@ grid.arrange(p1, p2, nrow = 1, ncol = 2)
 
 ```{r}
 # Получение списка всех открытых соединений
-all_connections <- dbListConnections(MySQL())
-lapply(all_connections, dbDisconnect)
+# all_connections <- dbListConnections(MySQL())
+# lapply(all_connections, dbDisconnect)
 ```
 
 
