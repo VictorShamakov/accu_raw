@@ -1,0 +1,6629 @@
+---
+title: "Описательная статистика"
+author: "SVA"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    df_print: paged
+    toc: yes
+    toc_depth: 4
+    toc_float:
+      collapsed: no
+  word_document:
+    toc: yes
+    toc_depth: '4'
+editor_options:
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  include = TRUE,
+  message = FALSE, 
+  warning = FALSE
+)
+
+rm(list=ls())
+source("functions.R")
+```
+
+
+```{r}
+df.acc <- read.csv("./data/accuracy_features.csv")
+
+df.acc$acc_max[is.infinite(df.acc$acc_max)] <- NA
+df.acc$acc_mean[is.infinite(df.acc$acc_mean)] <- NA
+df.acc$acc_range[is.infinite(df.acc$acc_range)] <- NA
+
+df.acc$dec_max[is.infinite(df.acc$dec_max)] <- NA
+df.acc$dec_mean[is.infinite(df.acc$dec_mean)] <- NA
+df.acc$dec_range[is.infinite(df.acc$dec_range)] <- NA
+
+df.acc$X <- NULL
+
+```
+
+```{r}
+df.spd <- read.csv("./data/speed_features.csv")
+
+df.spd$acc_max[is.infinite(df.spd$acc_max)] <- NA
+df.spd$acc_mean[is.infinite(df.spd$acc_mean)] <- NA
+df.spd$acc_range[is.infinite(df.spd$acc_range)] <- NA
+
+df.spd$dec_max[is.infinite(df.spd$dec_max)] <- NA
+df.spd$dec_mean[is.infinite(df.spd$dec_mean)] <- NA
+df.spd$dec_range[is.infinite(df.spd$dec_range)] <- NA
+df.spd$dec_min[is.infinite(df.spd$dec_min)] <- NA
+
+df.spd$X <- NULL
+```
+
+
+```{r}
+clickers.acc <- df.acc[df.acc$clicked_through_targets > 5 & df.acc$combo_clicked_through_targets > 5, ]
+clickers.spd <- df.spd[df.spd$clicked_through_targets > 5 & df.spd$combo_clicked_through_targets > 5, ]
+clickers <- unique(c(clickers.acc$user_id, clickers.spd$user_id))
+
+df.acc <- df.acc[!df.acc$user_id %in% clickers, ]
+df.spd <- df.spd[!df.spd$user_id %in% clickers, ]
+```
+
+```{r}
+long_stops.acc <- df.acc[df.acc$time_max >= 10, ]
+long_stops.spd <- df.spd[df.spd$time_max >= 10, ]
+long_stops <- unique(c(long_stops.acc$user_id, long_stops.spd$user_id))
+
+df.acc <- df.acc[!df.acc$user_id %in% long_stops, ]
+df.spd <- df.spd[!df.spd$user_id %in% long_stops, ]
+```
+
+
+# Описательные статистики
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### ratio {.tabset .tabset-fade .tabset-pills}
+**ratio**
+
+#### Tables
+
+Распределение по переменной "ratio"
+
+```{r}
+tab <- table(df.acc$ratio)
+
+data.frame(
+  level = names(tab),
+  frequency = as.vector(tab),
+  percent = as.vector(round(prop.table(tab) * 100, 2))
+)
+```
+
+
+
+
+
+
+### time_total {.tabset .tabset-fade .tabset-pills}
+**Общее время выполнения**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$time_total, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$time_total))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "time_total"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_total, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$time_total);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$time_total, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = time_total)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - time_total", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$time_total, 1.5)
+outliers <- select(outliers, 1:4, time_total, everything())
+outliers[order(outliers$time_total, decreasing = T),]
+outliers[order(outliers$time_total),]
+```
+
+
+
+
+
+
+### time_mean {.tabset .tabset-fade .tabset-pills}
+**Среднее время на клик**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$time_mean, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$time_mean))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "time_mean"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_mean, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$time_mean);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$time_mean, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = time_mean)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - time_mean", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$time_mean, 1.5)
+outliers <- select(outliers, 1:4, time_mean, everything())
+outliers[order(outliers$time_mean, decreasing = T),]
+outliers[order(outliers$time_mean),]
+```
+
+
+
+
+
+
+### time_sd {.tabset .tabset-fade .tabset-pills}
+**Стандартное отклонение времени на клик**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$time_sd, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$time_sd))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "time_sd"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_sd, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$time_sd);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$time_sd, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = time_sd)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - time_sd", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$time_sd, 1.5)
+outliers <- select(outliers, 1:4, time_sd, everything())
+outliers[order(outliers$time_sd, decreasing = T),]
+outliers[order(outliers$time_sd),]
+```
+
+
+
+
+
+
+### time_median {.tabset .tabset-fade .tabset-pills}
+**Медианное время на клик**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$time_median, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$time_median))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "time_median"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_median, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$time_median);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$time_median, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = time_median)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - time_median", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$time_median, 1.5)
+outliers <- select(outliers, 1:4, time_median, everything())
+outliers[order(outliers$time_median, decreasing = T),]
+outliers[order(outliers$time_median),]
+```
+
+
+
+
+
+
+### time_trimmed {.tabset .tabset-fade .tabset-pills}
+**Усеченное среднее времени на клик**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$time_trimmed, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$time_trimmed))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "time_trimmed"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_trimmed, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$time_trimmed);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$time_trimmed, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = time_trimmed)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - time_trimmed", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$time_trimmed, 1.5)
+outliers <- select(outliers, 1:4, time_trimmed, everything())
+outliers[order(outliers$time_trimmed, decreasing = T),]
+outliers[order(outliers$time_trimmed),]
+```
+
+
+
+
+
+
+### time_mad {.tabset .tabset-fade .tabset-pills}
+**Среднее Абсолютное Отклонение времени на клик**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$time_mad, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$time_mad))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "time_mad"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_mad, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$time_mad);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$time_mad, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = time_mad)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - time_mad", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$time_mad, 1.5)
+outliers <- select(outliers, 1:4, time_mad, everything())
+outliers[order(outliers$time_mad, decreasing = T),]
+outliers[order(outliers$time_mad),]
+```
+
+
+
+
+
+
+### time_min {.tabset .tabset-fade .tabset-pills}
+**Минимальное время клика**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$time_min, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$time_min))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "time_min"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_min, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$time_min);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$time_min, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = time_min)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - time_min", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$time_min, 1.5)
+outliers <- select(outliers, 1:4, time_min, everything())
+outliers[order(outliers$time_min, decreasing = T),]
+outliers[order(outliers$time_min),]
+```
+
+
+
+
+
+
+### time_max {.tabset .tabset-fade .tabset-pills}
+**Максимальное время клика**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$time_max, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$time_max))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "time_max"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_max, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$time_max);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$time_max, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = time_max)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - time_max", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$time_max, 1.5)
+outliers <- select(outliers, 1:4, time_max, everything())
+outliers[order(outliers$time_max, decreasing = T),]
+outliers[order(outliers$time_max),]
+```
+
+
+
+
+
+
+### time_range {.tabset .tabset-fade .tabset-pills}
+**Размах времени на клик**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$time_range, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$time_range))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "time_range"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_range, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$time_range);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$time_range, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = time_range)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - time_range", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$time_range, 1.5)
+outliers <- select(outliers, 1:4, time_range, everything())
+outliers[order(outliers$time_range, decreasing = T),]
+outliers[order(outliers$time_range),]
+```
+
+
+
+
+
+
+### time_skew {.tabset .tabset-fade .tabset-pills}
+**Коэффициент асимметрии времени выполнения**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$time_skew, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$time_skew))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "time_skew"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_skew, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$time_skew);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$time_skew, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = time_skew)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - time_skew", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$time_skew, 1.5)
+outliers <- select(outliers, 1:4, time_skew, everything())
+outliers[order(outliers$time_skew, decreasing = T),]
+outliers[order(outliers$time_skew),]
+```
+
+
+
+
+
+
+### time_kurtosis {.tabset .tabset-fade .tabset-pills}
+**Эксцесс времени выполнения**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$time_kurtosis, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$time_kurtosis))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "time_kurtosis"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_kurtosis, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$time_kurtosis);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$time_kurtosis, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = time_kurtosis)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - time_kurtosis", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$time_kurtosis, 1.5)
+outliers <- select(outliers, 1:4, time_kurtosis, everything())
+outliers[order(outliers$time_kurtosis, decreasing = T),]
+outliers[order(outliers$time_kurtosis),]
+```
+
+
+
+
+
+
+### time_se {.tabset .tabset-fade .tabset-pills}
+**Стандартная ошибка среднего времени выполнения**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$time_se, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$time_se))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "time_se"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_se, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$time_se);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$time_se, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = time_se)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - time_se", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$time_se, 1.5)
+outliers <- select(outliers, 1:4, time_se, everything())
+outliers[order(outliers$time_se, decreasing = T),]
+outliers[order(outliers$time_se),]
+```
+
+
+
+
+
+
+### time_Q0.25 {.tabset .tabset-fade .tabset-pills}
+**Нижний квартиль времени выполнения**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$time_Q0.25, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$time_Q0.25))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "time_Q0.25"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_Q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$time_Q0.25);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$time_Q0.25, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = time_Q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - time_Q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$time_Q0.25, 1.5)
+outliers <- select(outliers, 1:4, time_Q0.25, everything())
+outliers[order(outliers$time_Q0.25, decreasing = T),]
+outliers[order(outliers$time_Q0.25),]
+```
+
+
+
+
+
+
+### time_Q0.75 {.tabset .tabset-fade .tabset-pills}
+**Верхний квартиль времени выполнения**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$time_Q0.75, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$time_Q0.75))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "time_Q0.75"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_Q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$time_Q0.75);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$time_Q0.75, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = time_Q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - time_Q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$time_Q0.75, 1.5)
+outliers <- select(outliers, 1:4, time_Q0.75, everything())
+outliers[order(outliers$time_Q0.75, decreasing = T),]
+outliers[order(outliers$time_Q0.75),]
+```
+
+
+
+
+
+
+### time_trend {.tabset .tabset-fade .tabset-pills}
+**Линейный тренд времени выполнения**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$time_trend, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$time_trend))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "time_trend"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_trend, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$time_trend);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$time_trend, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = time_trend)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - time_trend", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$time_trend, 1.5)
+outliers <- select(outliers, 1:4, time_trend, everything())
+outliers[order(outliers$time_trend, decreasing = T),]
+outliers[order(outliers$time_trend),]
+```
+
+
+
+
+
+
+### fitts_a {.tabset .tabset-fade .tabset-pills}
+**Коэффициент a в формуле Фиттса**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$fitts_a, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$fitts_a))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "fitts_a"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$fitts_a, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$fitts_a);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$fitts_a, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = fitts_a)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - fitts_a", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$fitts_a, 1.5)
+outliers <- select(outliers, 1:4, fitts_a, everything())
+outliers[order(outliers$fitts_a, decreasing = T),]
+outliers[order(outliers$fitts_a),]
+```
+
+
+
+
+
+
+### fitts_b {.tabset .tabset-fade .tabset-pills}
+**Коэффициент b в формуле Фиттса**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$fitts_b, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$fitts_b))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "fitts_b"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$fitts_b, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$fitts_b);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$fitts_b, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = fitts_b)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - fitts_b", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$fitts_b, 1.5)
+outliers <- select(outliers, 1:4, fitts_b, everything())
+outliers[order(outliers$fitts_b, decreasing = T),]
+outliers[order(outliers$fitts_b),]
+```
+
+
+
+
+
+
+### distance_total {.tabset .tabset-fade .tabset-pills}
+**Общая амплитуда**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$distance_total, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$distance_total))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "distance_total"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_total, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$distance_total);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$distance_total, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = distance_total)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - distance_total", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$distance_total, 1.5)
+outliers <- select(outliers, 1:4, distance_total, everything())
+outliers[order(outliers$distance_total, decreasing = T),]
+outliers[order(outliers$distance_total),]
+```
+
+
+
+
+
+
+### distance_mean {.tabset .tabset-fade .tabset-pills}
+**Средняя амплитуда на клик**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$distance_mean, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$distance_mean))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "distance_mean"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_mean, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$distance_mean);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$distance_mean, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = distance_mean)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - distance_mean", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$distance_mean, 1.5)
+outliers <- select(outliers, 1:4, distance_mean, everything())
+outliers[order(outliers$distance_mean, decreasing = T),]
+outliers[order(outliers$distance_mean),]
+```
+
+
+
+
+
+
+### distance_sd {.tabset .tabset-fade .tabset-pills}
+**Стандартное отклонение амплитуда на клик**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$distance_sd, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$distance_sd))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "distance_sd"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_sd, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$distance_sd);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$distance_sd, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = distance_sd)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - distance_sd", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$distance_sd, 1.5)
+outliers <- select(outliers, 1:4, distance_sd, everything())
+outliers[order(outliers$distance_sd, decreasing = T),]
+outliers[order(outliers$distance_sd),]
+```
+
+
+
+
+
+
+### distance_median {.tabset .tabset-fade .tabset-pills}
+**Медианная амплитуда на клик**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$distance_median, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$distance_median))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "distance_median"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_median, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$distance_median);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$distance_median, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = distance_median)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - distance_median", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$distance_median, 1.5)
+outliers <- select(outliers, 1:4, distance_median, everything())
+outliers[order(outliers$distance_median, decreasing = T),]
+outliers[order(outliers$distance_median),]
+```
+
+
+
+
+
+
+### distance_trimmed {.tabset .tabset-fade .tabset-pills}
+**Усеченное среднее амплитуды на клик**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$distance_trimmed, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$distance_trimmed))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "distance_trimmed"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_trimmed, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$distance_trimmed);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$distance_trimmed, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = distance_trimmed)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - distance_trimmed", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$distance_trimmed, 1.5)
+outliers <- select(outliers, 1:4, distance_trimmed, everything())
+outliers[order(outliers$distance_trimmed, decreasing = T),]
+outliers[order(outliers$distance_trimmed),]
+```
+
+
+
+
+
+
+### distance_mad {.tabset .tabset-fade .tabset-pills}
+**Среднее Абсолютное Отклонение амплитуды на клик**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$distance_mad, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$distance_mad))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "distance_mad"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_mad, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$distance_mad);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$distance_mad, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = distance_mad)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - distance_mad", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$distance_mad, 1.5)
+outliers <- select(outliers, 1:4, distance_mad, everything())
+outliers[order(outliers$distance_mad, decreasing = T),]
+outliers[order(outliers$distance_mad),]
+```
+
+
+
+
+
+
+### distance_min {.tabset .tabset-fade .tabset-pills}
+**Минимальная амплитуда клика**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$distance_min, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$distance_min))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "distance_min"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_min, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$distance_min);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$distance_min, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = distance_min)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - distance_min", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$distance_min, 1.5)
+outliers <- select(outliers, 1:4, distance_min, everything())
+outliers[order(outliers$distance_min, decreasing = T),]
+outliers[order(outliers$distance_min),]
+```
+
+
+
+
+
+
+### distance_max {.tabset .tabset-fade .tabset-pills}
+**Максимальная амплитуда клика**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$distance_max, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$distance_max))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "distance_max"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_max, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$distance_max);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$distance_max, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = distance_max)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - distance_max", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$distance_max, 1.5)
+outliers <- select(outliers, 1:4, distance_max, everything())
+outliers[order(outliers$distance_max, decreasing = T),]
+outliers[order(outliers$distance_max),]
+```
+
+
+
+
+
+
+### distance_range {.tabset .tabset-fade .tabset-pills}
+**Размах амплитуды на клик**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$distance_range, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$distance_range))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "distance_range"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_range, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$distance_range);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$distance_range, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = distance_range)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - distance_range", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$distance_range, 1.5)
+outliers <- select(outliers, 1:4, distance_range, everything())
+outliers[order(outliers$distance_range, decreasing = T),]
+outliers[order(outliers$distance_range),]
+```
+
+
+
+
+
+
+### distance_skew {.tabset .tabset-fade .tabset-pills}
+**Коэффициент асимметрии амплитуды**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$distance_skew, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$distance_skew))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "distance_skew"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_skew, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$distance_skew);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$distance_skew, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = distance_skew)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - distance_skew", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$distance_skew, 1.5)
+outliers <- select(outliers, 1:4, distance_skew, everything())
+outliers[order(outliers$distance_skew, decreasing = T),]
+outliers[order(outliers$distance_skew),]
+```
+
+
+
+
+
+
+### distance_kurtosis {.tabset .tabset-fade .tabset-pills}
+**Эксцесс амплитуды**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$distance_kurtosis, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$distance_kurtosis))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "distance_kurtosis"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_kurtosis, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$distance_kurtosis);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$distance_kurtosis, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = distance_kurtosis)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - distance_kurtosis", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$distance_kurtosis, 1.5)
+outliers <- select(outliers, 1:4, distance_kurtosis, everything())
+outliers[order(outliers$distance_kurtosis, decreasing = T),]
+outliers[order(outliers$distance_kurtosis),]
+```
+
+
+
+
+
+
+### distance_se {.tabset .tabset-fade .tabset-pills}
+**Стандартная ошибка среднего амплитуды**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$distance_se, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$distance_se))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "distance_se"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_se, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$distance_se);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$distance_se, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = distance_se)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - distance_se", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$distance_se, 1.5)
+outliers <- select(outliers, 1:4, distance_se, everything())
+outliers[order(outliers$distance_se, decreasing = T),]
+outliers[order(outliers$distance_se),]
+```
+
+
+
+
+
+
+### distance_Q0.25 {.tabset .tabset-fade .tabset-pills}
+**Нижний квартиль амплитуды**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$distance_Q0.25, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$distance_Q0.25))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "distance_Q0.25"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_Q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$distance_Q0.25);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$distance_Q0.25, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = distance_Q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - distance_Q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$distance_Q0.25, 1.5)
+outliers <- select(outliers, 1:4, distance_Q0.25, everything())
+outliers[order(outliers$distance_Q0.25, decreasing = T),]
+outliers[order(outliers$distance_Q0.25),]
+```
+
+
+
+
+
+
+### distance_Q0.75 {.tabset .tabset-fade .tabset-pills}
+**Верхний квартиль амплитуды**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$distance_Q0.75, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$distance_Q0.75))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "distance_Q0.75"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_Q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$distance_Q0.75);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$distance_Q0.75, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = distance_Q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - distance_Q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$distance_Q0.75, 1.5)
+outliers <- select(outliers, 1:4, distance_Q0.75, everything())
+outliers[order(outliers$distance_Q0.75, decreasing = T),]
+outliers[order(outliers$distance_Q0.75),]
+```
+
+
+
+
+
+
+### distance_trend {.tabset .tabset-fade .tabset-pills}
+**Линейный тренд амплитуды**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$distance_trend, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$distance_trend))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "distance_trend"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_trend, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$distance_trend);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$distance_trend, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = distance_trend)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - distance_trend", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$distance_trend, 1.5)
+outliers <- select(outliers, 1:4, distance_trend, everything())
+outliers[order(outliers$distance_trend, decreasing = T),]
+outliers[order(outliers$distance_trend),]
+```
+
+
+
+
+
+
+### pause_total {.tabset .tabset-fade .tabset-pills}
+**Общее время пауз**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$pause_total, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$pause_total))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "pause_total"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_total, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$pause_total);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$pause_total, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = pause_total)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_total", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$pause_total, 1.5)
+outliers <- select(outliers, 1:4, pause_total, everything())
+outliers[order(outliers$pause_total, decreasing = T),]
+outliers[order(outliers$pause_total),]
+```
+
+
+
+
+
+
+### pause_number {.tabset .tabset-fade .tabset-pills}
+**Количество пауз**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$pause_number, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$pause_number))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "pause_number"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_number, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$pause_number);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$pause_number, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = pause_number)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_number", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$pause_number, 1.5)
+outliers <- select(outliers, 1:4, pause_number, everything())
+outliers[order(outliers$pause_number, decreasing = T),]
+outliers[order(outliers$pause_number),]
+```
+
+
+
+
+
+
+### pause_mean {.tabset .tabset-fade .tabset-pills}
+**Среднее пауза**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$pause_mean, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$pause_mean))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "pause_mean"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_mean, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$pause_mean);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$pause_mean, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = pause_mean)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_mean", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$pause_mean, 1.5)
+outliers <- select(outliers, 1:4, pause_mean, everything())
+outliers[order(outliers$pause_mean, decreasing = T),]
+outliers[order(outliers$pause_mean),]
+```
+
+
+
+
+
+
+### pause_sd {.tabset .tabset-fade .tabset-pills}
+**Стандартное отклонение пауз**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$pause_sd, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$pause_sd))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "pause_sd"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_sd, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$pause_sd);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$pause_sd, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = pause_sd)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_sd", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$pause_sd, 1.5)
+outliers <- select(outliers, 1:4, pause_sd, everything())
+outliers[order(outliers$pause_sd, decreasing = T),]
+outliers[order(outliers$pause_sd),]
+```
+
+
+
+
+
+
+### pause_median {.tabset .tabset-fade .tabset-pills}
+**Медианная пауза**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$pause_median, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$pause_median))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "pause_median"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_median, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$pause_median);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$pause_median, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = pause_median)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_median", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$pause_median, 1.5)
+outliers <- select(outliers, 1:4, pause_median, everything())
+outliers[order(outliers$pause_median, decreasing = T),]
+outliers[order(outliers$pause_median),]
+```
+
+
+
+
+
+
+### pause_trimmed {.tabset .tabset-fade .tabset-pills}
+**Усеченное среднее пауз**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$pause_trimmed, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$pause_trimmed))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "pause_trimmed"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_trimmed, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$pause_trimmed);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$pause_trimmed, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = pause_trimmed)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_trimmed", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$pause_trimmed, 1.5)
+outliers <- select(outliers, 1:4, pause_trimmed, everything())
+outliers[order(outliers$pause_trimmed, decreasing = T),]
+outliers[order(outliers$pause_trimmed),]
+```
+
+
+
+
+
+
+### pause_mad {.tabset .tabset-fade .tabset-pills}
+**Среднее Абсолютное Отклонение пауз**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$pause_mad, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$pause_mad))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "pause_mad"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_mad, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$pause_mad);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$pause_mad, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = pause_mad)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_mad", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$pause_mad, 1.5)
+outliers <- select(outliers, 1:4, pause_mad, everything())
+outliers[order(outliers$pause_mad, decreasing = T),]
+outliers[order(outliers$pause_mad),]
+```
+
+
+
+
+
+
+### pause_min {.tabset .tabset-fade .tabset-pills}
+**Минимальное время паузы**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$pause_min, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$pause_min))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "pause_min"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_min, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$pause_min);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$pause_min, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = pause_min)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_min", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$pause_min, 1.5)
+outliers <- select(outliers, 1:4, pause_min, everything())
+outliers[order(outliers$pause_min, decreasing = T),]
+outliers[order(outliers$pause_min),]
+```
+
+
+
+
+
+
+### pause_max {.tabset .tabset-fade .tabset-pills}
+**Максимальное время паузы**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$pause_max, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$pause_max))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "pause_max"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_max, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$pause_max);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$pause_max, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = pause_max)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_max", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$pause_max, 1.5)
+outliers <- select(outliers, 1:4, pause_max, everything())
+outliers[order(outliers$pause_max, decreasing = T),]
+outliers[order(outliers$pause_max),]
+```
+
+
+
+
+
+
+### pause_range {.tabset .tabset-fade .tabset-pills}
+**Размах пауз**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$pause_range, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$pause_range))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "pause_range"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_range, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$pause_range);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$pause_range, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = pause_range)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_range", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$pause_range, 1.5)
+outliers <- select(outliers, 1:4, pause_range, everything())
+outliers[order(outliers$pause_range, decreasing = T),]
+outliers[order(outliers$pause_range),]
+```
+
+
+
+
+
+
+### pause_skew {.tabset .tabset-fade .tabset-pills}
+**Коэффициент асимметрии пауз**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$pause_skew, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$pause_skew))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "pause_skew"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_skew, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$pause_skew);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$pause_skew, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = pause_skew)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_skew", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$pause_skew, 1.5)
+outliers <- select(outliers, 1:4, pause_skew, everything())
+outliers[order(outliers$pause_skew, decreasing = T),]
+outliers[order(outliers$pause_skew),]
+```
+
+
+
+
+
+
+### pause_kurtosis {.tabset .tabset-fade .tabset-pills}
+**Эксцесс пауз**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$pause_kurtosis, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$pause_kurtosis))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "pause_kurtosis"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_kurtosis, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$pause_kurtosis);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$pause_kurtosis, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = pause_kurtosis)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_kurtosis", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$pause_kurtosis, 1.5)
+outliers <- select(outliers, 1:4, pause_kurtosis, everything())
+outliers[order(outliers$pause_kurtosis, decreasing = T),]
+outliers[order(outliers$pause_kurtosis),]
+```
+
+
+
+
+
+
+### pause_se {.tabset .tabset-fade .tabset-pills}
+**Стандартная ошибка пауз**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$pause_se, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$pause_se))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "pause_se"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_se, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$pause_se);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$pause_se, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = pause_se)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_se", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$pause_se, 1.5)
+outliers <- select(outliers, 1:4, pause_se, everything())
+outliers[order(outliers$pause_se, decreasing = T),]
+outliers[order(outliers$pause_se),]
+```
+
+
+
+
+
+
+### pause_Q0.25 {.tabset .tabset-fade .tabset-pills}
+**Нижний квартиль пауз**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$pause_Q0.25, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$pause_Q0.25))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "pause_Q0.25"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_Q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$pause_Q0.25);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$pause_Q0.25, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = pause_Q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_Q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$pause_Q0.25, 1.5)
+outliers <- select(outliers, 1:4, pause_Q0.25, everything())
+outliers[order(outliers$pause_Q0.25, decreasing = T),]
+outliers[order(outliers$pause_Q0.25),]
+```
+
+
+
+
+
+
+### pause_Q0.75 {.tabset .tabset-fade .tabset-pills}
+**Верхний квартиль пауз**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$pause_Q0.75, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$pause_Q0.75))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "pause_Q0.75"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_Q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$pause_Q0.75);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$pause_Q0.75, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = pause_Q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_Q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$pause_Q0.75, 1.5)
+outliers <- select(outliers, 1:4, pause_Q0.75, everything())
+outliers[order(outliers$pause_Q0.75, decreasing = T),]
+outliers[order(outliers$pause_Q0.75),]
+```
+
+
+
+
+
+
+### pause_trend {.tabset .tabset-fade .tabset-pills}
+**Линейный тренд пауз**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$pause_trend, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$pause_trend))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "pause_trend"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_trend, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$pause_trend);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$pause_trend, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = pause_trend)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_trend", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$pause_trend, 1.5)
+outliers <- select(outliers, 1:4, pause_trend, everything())
+outliers[order(outliers$pause_trend, decreasing = T),]
+outliers[order(outliers$pause_trend),]
+```
+
+
+
+
+
+
+### stops {.tabset .tabset-fade .tabset-pills}
+**Количество остановок**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$stops, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$stops))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "stops"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$stops, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$stops);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$stops, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = stops)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - stops", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$stops, 1.5)
+outliers <- select(outliers, 1:4, stops, everything())
+outliers[order(outliers$stops, decreasing = T),]
+outliers[order(outliers$stops),]
+```
+
+
+
+
+
+
+### velocity_mean {.tabset .tabset-fade .tabset-pills}
+**Средняя гармоническая скорость**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$velocity_mean, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$velocity_mean))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "velocity_mean"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_mean, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$velocity_mean);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$velocity_mean, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = velocity_mean)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - velocity_mean", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$velocity_mean, 1.5)
+outliers <- select(outliers, 1:4, velocity_mean, everything())
+outliers[order(outliers$velocity_mean, decreasing = T),]
+outliers[order(outliers$velocity_mean),]
+```
+
+
+
+
+
+
+### velocity_sd {.tabset .tabset-fade .tabset-pills}
+**Стандартное отклонение скорости**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$velocity_sd, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$velocity_sd))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "velocity_sd"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_sd, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$velocity_sd);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$velocity_sd, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = velocity_sd)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - velocity_sd", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$velocity_sd, 1.5)
+outliers <- select(outliers, 1:4, velocity_sd, everything())
+outliers[order(outliers$velocity_sd, decreasing = T),]
+outliers[order(outliers$velocity_sd),]
+```
+
+
+
+
+
+
+### velocity_mad {.tabset .tabset-fade .tabset-pills}
+**Среднее абсолютное отклонение скорости**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$velocity_mad, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$velocity_mad))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "velocity_mad"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_mad, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$velocity_mad);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$velocity_mad, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = velocity_mad)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - velocity_mad", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$velocity_mad, 1.5)
+outliers <- select(outliers, 1:4, velocity_mad, everything())
+outliers[order(outliers$velocity_mad, decreasing = T),]
+outliers[order(outliers$velocity_mad),]
+```
+
+
+
+
+
+
+### velocity_min {.tabset .tabset-fade .tabset-pills}
+**Минимальная скорость**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$velocity_min, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$velocity_min))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "velocity_min"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_min, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$velocity_min);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$velocity_min, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = velocity_min)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - velocity_min", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$velocity_min, 1.5)
+outliers <- select(outliers, 1:4, velocity_min, everything())
+outliers[order(outliers$velocity_min, decreasing = T),]
+outliers[order(outliers$velocity_min),]
+```
+
+
+
+
+
+
+### velocity_max {.tabset .tabset-fade .tabset-pills}
+**Максимальная скорость**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$velocity_max, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$velocity_max))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "velocity_max"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_max, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$velocity_max);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$velocity_max, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = velocity_max)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - velocity_max", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$velocity_max, 1.5)
+outliers <- select(outliers, 1:4, velocity_max, everything())
+outliers[order(outliers$velocity_max, decreasing = T),]
+outliers[order(outliers$velocity_max),]
+```
+
+
+
+
+
+
+### velocity_range {.tabset .tabset-fade .tabset-pills}
+**Размах скорости**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$velocity_range, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$velocity_range))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "velocity_range"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_range, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$velocity_range);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$velocity_range, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = velocity_range)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - velocity_range", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$velocity_range, 1.5)
+outliers <- select(outliers, 1:4, velocity_range, everything())
+outliers[order(outliers$velocity_range, decreasing = T),]
+outliers[order(outliers$velocity_range),]
+```
+
+
+
+
+
+
+### velocity_skew {.tabset .tabset-fade .tabset-pills}
+**Коэффициент асимметрии скорости**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$velocity_skew, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$velocity_skew))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "velocity_skew"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_skew, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$velocity_skew);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$velocity_skew, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = velocity_skew)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - velocity_skew", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$velocity_skew, 1.5)
+outliers <- select(outliers, 1:4, velocity_skew, everything())
+outliers[order(outliers$velocity_skew, decreasing = T),]
+outliers[order(outliers$velocity_skew),]
+```
+
+
+
+
+
+
+### velocity_kurtosis {.tabset .tabset-fade .tabset-pills}
+**Эксцесс скорости**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$velocity_kurtosis, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$velocity_kurtosis))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "velocity_kurtosis"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_kurtosis, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$velocity_kurtosis);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$velocity_kurtosis, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = velocity_kurtosis)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - velocity_kurtosis", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$velocity_kurtosis, 1.5)
+outliers <- select(outliers, 1:4, velocity_kurtosis, everything())
+outliers[order(outliers$velocity_kurtosis, decreasing = T),]
+outliers[order(outliers$velocity_kurtosis),]
+```
+
+
+
+
+
+
+### velocity_se {.tabset .tabset-fade .tabset-pills}
+**Стандартная ошибка скорости**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$velocity_se, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$velocity_se))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "velocity_se"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_se, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$velocity_se);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$velocity_se, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = velocity_se)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - velocity_se", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$velocity_se, 1.5)
+outliers <- select(outliers, 1:4, velocity_se, everything())
+outliers[order(outliers$velocity_se, decreasing = T),]
+outliers[order(outliers$velocity_se),]
+```
+
+
+
+
+
+
+### velocity_Q0.25 {.tabset .tabset-fade .tabset-pills}
+**Нижний квартиль скорости**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$velocity_Q0.25, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$velocity_Q0.25))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "velocity_Q0.25"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_Q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$velocity_Q0.25);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$velocity_Q0.25, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = velocity_Q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - velocity_Q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$velocity_Q0.25, 1.5)
+outliers <- select(outliers, 1:4, velocity_Q0.25, everything())
+outliers[order(outliers$velocity_Q0.25, decreasing = T),]
+outliers[order(outliers$velocity_Q0.25),]
+```
+
+
+
+
+
+
+### velocity_Q0.75 {.tabset .tabset-fade .tabset-pills}
+**Верхний квартиль скорости**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$velocity_Q0.75, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$velocity_Q0.75))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "velocity_Q0.75"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_Q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$velocity_Q0.75);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$velocity_Q0.75, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = velocity_Q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - velocity_Q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$velocity_Q0.75, 1.5)
+outliers <- select(outliers, 1:4, velocity_Q0.75, everything())
+outliers[order(outliers$velocity_Q0.75, decreasing = T),]
+outliers[order(outliers$velocity_Q0.75),]
+```
+
+
+
+
+
+
+### velocity_trend {.tabset .tabset-fade .tabset-pills}
+**Линейный тренд скорости**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$velocity_trend, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$velocity_trend))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "velocity_trend"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_trend, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$velocity_trend);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$velocity_trend, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = velocity_trend)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - velocity_trend", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$velocity_trend, 1.5)
+outliers <- select(outliers, 1:4, velocity_trend, everything())
+outliers[order(outliers$velocity_trend, decreasing = T),]
+outliers[order(outliers$velocity_trend),]
+```
+
+
+
+
+
+
+### acc_n {.tabset .tabset-fade .tabset-pills}
+**Количество ускорений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_n, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_n))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_n"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_n, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_n);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_n, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_n)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_n", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_n, 1.5)
+outliers <- select(outliers, 1:4, acc_n, everything())
+outliers[order(outliers$acc_n, decreasing = T),]
+outliers[order(outliers$acc_n),]
+```
+
+
+
+
+
+
+
+
+
+
+
+### acc_sd {.tabset .tabset-fade .tabset-pills}
+**Стандартное отклонение ускорений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_sd, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_sd))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_sd"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_sd, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_sd);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_sd, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_sd)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_sd", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_sd, 1.5)
+outliers <- select(outliers, 1:4, acc_sd, everything())
+outliers[order(outliers$acc_sd, decreasing = T),]
+outliers[order(outliers$acc_sd),]
+```
+
+
+
+
+
+
+### acc_median {.tabset .tabset-fade .tabset-pills}
+**Медианная ускорение**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_median, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_median))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_median"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_median, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_median);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_median, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_median)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_median", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_median, 1.5)
+outliers <- select(outliers, 1:4, acc_median, everything())
+outliers[order(outliers$acc_median, decreasing = T),]
+outliers[order(outliers$acc_median),]
+```
+
+
+
+
+
+
+### acc_trimmed {.tabset .tabset-fade .tabset-pills}
+**Усеченное среднее ускорения**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_trimmed, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_trimmed))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_trimmed"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_trimmed, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_trimmed);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_trimmed, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_trimmed)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_trimmed", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_trimmed, 1.5)
+outliers <- select(outliers, 1:4, acc_trimmed, everything())
+outliers[order(outliers$acc_trimmed, decreasing = T),]
+outliers[order(outliers$acc_trimmed),]
+```
+
+
+
+
+
+
+### acc_mad {.tabset .tabset-fade .tabset-pills}
+**Среднее абсолютное отклонение ускорений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_mad, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_mad))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_mad"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_mad, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_mad);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_mad, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_mad)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_mad", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_mad, 1.5)
+outliers <- select(outliers, 1:4, acc_mad, everything())
+outliers[order(outliers$acc_mad, decreasing = T),]
+outliers[order(outliers$acc_mad),]
+```
+
+
+
+
+
+
+### acc_min {.tabset .tabset-fade .tabset-pills}
+**Минимальное ускорение**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_min, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_min))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_min"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_min, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_min);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_min, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_min)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_min", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_min, 1.5)
+outliers <- select(outliers, 1:4, acc_min, everything())
+outliers[order(outliers$acc_min, decreasing = T),]
+outliers[order(outliers$acc_min),]
+```
+
+
+
+
+
+
+### acc_max {.tabset .tabset-fade .tabset-pills}
+**Максимальное ускорение**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_max, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_max))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_max"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_max, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_max);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_max, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_max)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_max", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_max, 1.5)
+outliers <- select(outliers, 1:4, acc_max, everything())
+outliers[order(outliers$acc_max, decreasing = T),]
+outliers[order(outliers$acc_max),]
+```
+
+
+
+
+
+
+### acc_range {.tabset .tabset-fade .tabset-pills}
+**Размах ускорений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_range, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_range))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_range"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_range, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_range);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_range, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_range)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_range", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_range, 1.5)
+outliers <- select(outliers, 1:4, acc_range, everything())
+outliers[order(outliers$acc_range, decreasing = T),]
+outliers[order(outliers$acc_range),]
+```
+
+
+
+
+
+
+### acc_skew {.tabset .tabset-fade .tabset-pills}
+**Коэффициент асимметрии ускорений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_skew, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_skew))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_skew"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_skew, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_skew);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_skew, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_skew)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_skew", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_skew, 1.5)
+outliers <- select(outliers, 1:4, acc_skew, everything())
+outliers[order(outliers$acc_skew, decreasing = T),]
+outliers[order(outliers$acc_skew),]
+```
+
+
+
+
+
+
+### acc_kurtosis {.tabset .tabset-fade .tabset-pills}
+**Эксцесс ускорений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_kurtosis, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_kurtosis))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_kurtosis"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_kurtosis, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_kurtosis);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_kurtosis, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_kurtosis)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_kurtosis", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_kurtosis, 1.5)
+outliers <- select(outliers, 1:4, acc_kurtosis, everything())
+outliers[order(outliers$acc_kurtosis, decreasing = T),]
+outliers[order(outliers$acc_kurtosis),]
+```
+
+
+
+
+
+
+### acc_se {.tabset .tabset-fade .tabset-pills}
+**Стандартная ошибка ускорений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_se, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_se))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_se"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_se, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_se);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_se, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_se)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_se", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_se, 1.5)
+outliers <- select(outliers, 1:4, acc_se, everything())
+outliers[order(outliers$acc_se, decreasing = T),]
+outliers[order(outliers$acc_se),]
+```
+
+
+
+
+
+
+### acc_Q0.25 {.tabset .tabset-fade .tabset-pills}
+**Нижний квартиль ускорений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_Q0.25, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_Q0.25))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_Q0.25"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_Q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_Q0.25);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_Q0.25, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_Q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_Q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_Q0.25, 1.5)
+outliers <- select(outliers, 1:4, acc_Q0.25, everything())
+outliers[order(outliers$acc_Q0.25, decreasing = T),]
+outliers[order(outliers$acc_Q0.25),]
+```
+
+
+
+
+
+
+### acc_Q0.75 {.tabset .tabset-fade .tabset-pills}
+**Верхний квартиль ускорений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_Q0.75, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_Q0.75))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_Q0.75"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_Q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_Q0.75);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_Q0.75, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_Q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_Q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_Q0.75, 1.5)
+outliers <- select(outliers, 1:4, acc_Q0.75, everything())
+outliers[order(outliers$acc_Q0.75, decreasing = T),]
+outliers[order(outliers$acc_Q0.75),]
+```
+
+
+
+
+
+
+### jerk_line {.tabset .tabset-fade .tabset-pills}
+**Линия рывков**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$jerk_line, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$jerk_line))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "jerk_line"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$jerk_line, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$jerk_line);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$jerk_line, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = jerk_line)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - jerk_line", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$jerk_line, 1.5)
+outliers <- select(outliers, 1:4, jerk_line, everything())
+outliers[order(outliers$jerk_line, decreasing = T),]
+outliers[order(outliers$jerk_line),]
+```
+
+
+
+
+
+
+### n_jerk {.tabset .tabset-fade .tabset-pills}
+**Количество рывков**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$n_jerk, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$n_jerk))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "n_jerk"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$n_jerk, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$n_jerk);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$n_jerk, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = n_jerk)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - n_jerk", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$n_jerk, 1.5)
+outliers <- select(outliers, 1:4, n_jerk, everything())
+outliers[order(outliers$n_jerk, decreasing = T),]
+outliers[order(outliers$n_jerk),]
+```
+
+
+
+
+
+
+### dec_n {.tabset .tabset-fade .tabset-pills}
+**Количество замедлений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$dec_n, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$dec_n))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "dec_n"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_n, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$dec_n);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$dec_n, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = dec_n)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - dec_n", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$dec_n, 1.5)
+outliers <- select(outliers, 1:4, dec_n, everything())
+outliers[order(outliers$dec_n, decreasing = T),]
+outliers[order(outliers$dec_n),]
+```
+
+
+
+
+
+
+### dec_mean {.tabset .tabset-fade .tabset-pills}
+**Среднее замедление**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$dec_mean, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$dec_mean))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "dec_mean"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_mean, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$dec_mean);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$dec_mean, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = dec_mean)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - dec_mean", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$dec_mean, 1.5)
+outliers <- select(outliers, 1:4, dec_mean, everything())
+outliers[order(outliers$dec_mean, decreasing = T),]
+outliers[order(outliers$dec_mean),]
+```
+
+
+
+
+
+
+### dec_sd {.tabset .tabset-fade .tabset-pills}
+**Стандартное отклонение замедлений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$dec_sd, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$dec_sd))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "dec_sd"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_sd, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$dec_sd);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$dec_sd, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = dec_sd)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - dec_sd", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$dec_sd, 1.5)
+outliers <- select(outliers, 1:4, dec_sd, everything())
+outliers[order(outliers$dec_sd, decreasing = T),]
+outliers[order(outliers$dec_sd),]
+```
+
+
+
+
+
+
+### dec_median {.tabset .tabset-fade .tabset-pills}
+**Медианная замедлений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$dec_median, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$dec_median))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "dec_median"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_median, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$dec_median);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$dec_median, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = dec_median)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - dec_median", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$dec_median, 1.5)
+outliers <- select(outliers, 1:4, dec_median, everything())
+outliers[order(outliers$dec_median, decreasing = T),]
+outliers[order(outliers$dec_median),]
+```
+
+
+
+
+
+
+### dec_trimmed {.tabset .tabset-fade .tabset-pills}
+**Усеченное среднее замедлений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$dec_trimmed, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$dec_trimmed))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "dec_trimmed"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_trimmed, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$dec_trimmed);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$dec_trimmed, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = dec_trimmed)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - dec_trimmed", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$dec_trimmed, 1.5)
+outliers <- select(outliers, 1:4, dec_trimmed, everything())
+outliers[order(outliers$dec_trimmed, decreasing = T),]
+outliers[order(outliers$dec_trimmed),]
+```
+
+
+
+
+
+
+### dec_mad {.tabset .tabset-fade .tabset-pills}
+**Среднее абсолютное отклонение замедлений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$dec_mad, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$dec_mad))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "dec_mad"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_mad, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$dec_mad);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$dec_mad, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = dec_mad)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - dec_mad", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$dec_mad, 1.5)
+outliers <- select(outliers, 1:4, dec_mad, everything())
+outliers[order(outliers$dec_mad, decreasing = T),]
+outliers[order(outliers$dec_mad),]
+```
+
+
+
+
+
+
+### dec_min {.tabset .tabset-fade .tabset-pills}
+**Минимальное замедление**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$dec_min, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$dec_min))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "dec_min"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_min, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$dec_min);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$dec_min, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = dec_min)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - dec_min", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$dec_min, 1.5)
+outliers <- select(outliers, 1:4, dec_min, everything())
+outliers[order(outliers$dec_min, decreasing = T),]
+outliers[order(outliers$dec_min),]
+```
+
+
+
+
+
+
+### dec_max {.tabset .tabset-fade .tabset-pills}
+**Максимальное замедление**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$dec_max, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$dec_max))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "dec_max"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_max, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$dec_max);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$dec_max, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = dec_max)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - dec_max", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$dec_max, 1.5)
+outliers <- select(outliers, 1:4, dec_max, everything())
+outliers[order(outliers$dec_max, decreasing = T),]
+outliers[order(outliers$dec_max),]
+```
+
+
+
+
+
+
+### dec_range {.tabset .tabset-fade .tabset-pills}
+**Размах замедлений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$dec_range, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$dec_range))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "dec_range"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_range, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$dec_range);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$dec_range, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = dec_range)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - dec_range", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$dec_range, 1.5)
+outliers <- select(outliers, 1:4, dec_range, everything())
+outliers[order(outliers$dec_range, decreasing = T),]
+outliers[order(outliers$dec_range),]
+```
+
+
+
+
+
+
+### dec_skew {.tabset .tabset-fade .tabset-pills}
+**Коэффициент асимметрии замедлений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$dec_skew, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$dec_skew))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "dec_skew"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_skew, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$dec_skew);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$dec_skew, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = dec_skew)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - dec_skew", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$dec_skew, 1.5)
+outliers <- select(outliers, 1:4, dec_skew, everything())
+outliers[order(outliers$dec_skew, decreasing = T),]
+outliers[order(outliers$dec_skew),]
+```
+
+
+
+
+
+
+### dec_kurtosis {.tabset .tabset-fade .tabset-pills}
+**Эксцесс замедлений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$dec_kurtosis, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$dec_kurtosis))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "dec_kurtosis"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_kurtosis, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$dec_kurtosis);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$dec_kurtosis, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = dec_kurtosis)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - dec_kurtosis", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$dec_kurtosis, 1.5)
+outliers <- select(outliers, 1:4, dec_kurtosis, everything())
+outliers[order(outliers$dec_kurtosis, decreasing = T),]
+outliers[order(outliers$dec_kurtosis),]
+```
+
+
+
+
+
+
+### dec_se {.tabset .tabset-fade .tabset-pills}
+**Стандартная ошибка замедлений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$dec_se, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$dec_se))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "dec_se"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_se, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$dec_se);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$dec_se, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = dec_se)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - dec_se", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$dec_se, 1.5)
+outliers <- select(outliers, 1:4, dec_se, everything())
+outliers[order(outliers$dec_se, decreasing = T),]
+outliers[order(outliers$dec_se),]
+```
+
+
+
+
+
+
+### dec_Q0.25 {.tabset .tabset-fade .tabset-pills}
+**Нижний квартиль замедлений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$dec_Q0.25, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$dec_Q0.25))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "dec_Q0.25"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_Q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$dec_Q0.25);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$dec_Q0.25, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = dec_Q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - dec_Q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$dec_Q0.25, 1.5)
+outliers <- select(outliers, 1:4, dec_Q0.25, everything())
+outliers[order(outliers$dec_Q0.25, decreasing = T),]
+outliers[order(outliers$dec_Q0.25),]
+```
+
+
+
+
+
+
+### dec_Q0.75 {.tabset .tabset-fade .tabset-pills}
+**Верхний квартиль замедлений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$dec_Q0.75, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$dec_Q0.75))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "dec_Q0.75"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_Q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$dec_Q0.75);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$dec_Q0.75, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = dec_Q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - dec_Q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$dec_Q0.75, 1.5)
+outliers <- select(outliers, 1:4, dec_Q0.75, everything())
+outliers[order(outliers$dec_Q0.75, decreasing = T),]
+outliers[order(outliers$dec_Q0.75),]
+```
+
+
+
+
+
+
+### braking_line {.tabset .tabset-fade .tabset-pills}
+**Линия резких торможений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$braking_line, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$braking_line))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "braking_line"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$braking_line, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$braking_line);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$braking_line, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = braking_line)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - braking_line", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$braking_line, 1.5)
+outliers <- select(outliers, 1:4, braking_line, everything())
+outliers[order(outliers$braking_line, decreasing = T),]
+outliers[order(outliers$braking_line),]
+```
+
+
+
+
+
+
+### n_braking {.tabset .tabset-fade .tabset-pills}
+**Количество резких торможений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$n_braking, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$n_braking))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "n_braking"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$n_braking, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$n_braking);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$n_braking, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = n_braking)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - n_braking", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$n_braking, 1.5)
+outliers <- select(outliers, 1:4, n_braking, everything())
+outliers[order(outliers$n_braking, decreasing = T),]
+outliers[order(outliers$n_braking),]
+```
+
+
+
+
+
+
+### acc_per_sec_mean {.tabset .tabset-fade .tabset-pills}
+**Среднее количество ускорений за секунду**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_per_sec_mean, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_per_sec_mean))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_per_sec_mean"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_mean, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_per_sec_mean);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_per_sec_mean, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_per_sec_mean)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_per_sec_mean", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_per_sec_mean, 1.5)
+outliers <- select(outliers, 1:4, acc_per_sec_mean, everything())
+outliers[order(outliers$acc_per_sec_mean, decreasing = T),]
+outliers[order(outliers$acc_per_sec_mean),]
+```
+
+
+
+
+
+
+### acc_per_sec_sd {.tabset .tabset-fade .tabset-pills}
+**Стандартное отклонение количества ускорений за секунду **
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_per_sec_sd, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_per_sec_sd))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_per_sec_sd"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_sd, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_per_sec_sd);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_per_sec_sd, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_per_sec_sd)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_per_sec_sd", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_per_sec_sd, 1.5)
+outliers <- select(outliers, 1:4, acc_per_sec_sd, everything())
+outliers[order(outliers$acc_per_sec_sd, decreasing = T),]
+outliers[order(outliers$acc_per_sec_sd),]
+```
+
+
+
+
+
+
+### acc_per_sec_median {.tabset .tabset-fade .tabset-pills}
+**Медианное количество ускорений за секунду**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_per_sec_median, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_per_sec_median))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_per_sec_median"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_median, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_per_sec_median);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_per_sec_median, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_per_sec_median)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_per_sec_median", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_per_sec_median, 1.5)
+outliers <- select(outliers, 1:4, acc_per_sec_median, everything())
+outliers[order(outliers$acc_per_sec_median, decreasing = T),]
+outliers[order(outliers$acc_per_sec_median),]
+```
+
+
+
+
+
+
+### acc_per_sec_trimmed {.tabset .tabset-fade .tabset-pills}
+**Усеченное среднее количества ускорений за секунду**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_per_sec_trimmed, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_per_sec_trimmed))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_per_sec_trimmed"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_trimmed, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_per_sec_trimmed);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_per_sec_trimmed, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_per_sec_trimmed)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_per_sec_trimmed", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_per_sec_trimmed, 1.5)
+outliers <- select(outliers, 1:4, acc_per_sec_trimmed, everything())
+outliers[order(outliers$acc_per_sec_trimmed, decreasing = T),]
+outliers[order(outliers$acc_per_sec_trimmed),]
+```
+
+
+
+
+
+
+### acc_per_sec_mad {.tabset .tabset-fade .tabset-pills}
+**Среднее абсолютное отклонение количества ускорений за секунду**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_per_sec_mad, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_per_sec_mad))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_per_sec_mad"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_mad, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_per_sec_mad);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_per_sec_mad, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_per_sec_mad)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_per_sec_mad", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_per_sec_mad, 1.5)
+outliers <- select(outliers, 1:4, acc_per_sec_mad, everything())
+outliers[order(outliers$acc_per_sec_mad, decreasing = T),]
+outliers[order(outliers$acc_per_sec_mad),]
+```
+
+
+
+
+
+
+### acc_per_sec_min {.tabset .tabset-fade .tabset-pills}
+**Минимальное количество ускорений за секунду**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_per_sec_min, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_per_sec_min))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_per_sec_min"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_min, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_per_sec_min);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_per_sec_min, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_per_sec_min)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_per_sec_min", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_per_sec_min, 1.5)
+outliers <- select(outliers, 1:4, acc_per_sec_min, everything())
+outliers[order(outliers$acc_per_sec_min, decreasing = T),]
+outliers[order(outliers$acc_per_sec_min),]
+```
+
+
+
+
+
+
+### acc_per_sec_max {.tabset .tabset-fade .tabset-pills}
+**Максимальное количество ускорений за секунду**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_per_sec_max, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_per_sec_max))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_per_sec_max"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_max, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_per_sec_max);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_per_sec_max, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_per_sec_max)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_per_sec_max", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_per_sec_max, 1.5)
+outliers <- select(outliers, 1:4, acc_per_sec_max, everything())
+outliers[order(outliers$acc_per_sec_max, decreasing = T),]
+outliers[order(outliers$acc_per_sec_max),]
+```
+
+
+
+
+
+
+### acc_per_sec_range {.tabset .tabset-fade .tabset-pills}
+**Размах количества ускорений за секунду**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_per_sec_range, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_per_sec_range))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_per_sec_range"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_range, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_per_sec_range);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_per_sec_range, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_per_sec_range)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_per_sec_range", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_per_sec_range, 1.5)
+outliers <- select(outliers, 1:4, acc_per_sec_range, everything())
+outliers[order(outliers$acc_per_sec_range, decreasing = T),]
+outliers[order(outliers$acc_per_sec_range),]
+```
+
+
+
+
+
+
+### acc_per_sec_skew {.tabset .tabset-fade .tabset-pills}
+**Коэффициент асимметрии количества ускорений за секунду**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_per_sec_skew, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_per_sec_skew))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_per_sec_skew"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_skew, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_per_sec_skew);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_per_sec_skew, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_per_sec_skew)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_per_sec_skew", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_per_sec_skew, 1.5)
+outliers <- select(outliers, 1:4, acc_per_sec_skew, everything())
+outliers[order(outliers$acc_per_sec_skew, decreasing = T),]
+outliers[order(outliers$acc_per_sec_skew),]
+```
+
+
+
+
+
+
+### acc_per_sec_kurtosis {.tabset .tabset-fade .tabset-pills}
+**Эксцесс количества ускорений за секунду**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_per_sec_kurtosis, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_per_sec_kurtosis))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_per_sec_kurtosis"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_kurtosis, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_per_sec_kurtosis);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_per_sec_kurtosis, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_per_sec_kurtosis)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_per_sec_kurtosis", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_per_sec_kurtosis, 1.5)
+outliers <- select(outliers, 1:4, acc_per_sec_kurtosis, everything())
+outliers[order(outliers$acc_per_sec_kurtosis, decreasing = T),]
+outliers[order(outliers$acc_per_sec_kurtosis),]
+```
+
+
+
+
+
+
+### acc_per_sec_se {.tabset .tabset-fade .tabset-pills}
+**Стандартная ошибка количества ускорений за секунду**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_per_sec_se, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_per_sec_se))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_per_sec_se"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_se, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_per_sec_se);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_per_sec_se, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_per_sec_se)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_per_sec_se", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_per_sec_se, 1.5)
+outliers <- select(outliers, 1:4, acc_per_sec_se, everything())
+outliers[order(outliers$acc_per_sec_se, decreasing = T),]
+outliers[order(outliers$acc_per_sec_se),]
+```
+
+
+
+
+
+
+### acc_per_sec_Q0.25 {.tabset .tabset-fade .tabset-pills}
+**Нижний квартиль количества ускорений за секунду**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_per_sec_Q0.25, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_per_sec_Q0.25))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_per_sec_Q0.25"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_Q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_per_sec_Q0.25);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_per_sec_Q0.25, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_per_sec_Q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_per_sec_Q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_per_sec_Q0.25, 1.5)
+outliers <- select(outliers, 1:4, acc_per_sec_Q0.25, everything())
+outliers[order(outliers$acc_per_sec_Q0.25, decreasing = T),]
+outliers[order(outliers$acc_per_sec_Q0.25),]
+```
+
+
+
+
+
+
+### acc_per_sec_Q0.75 {.tabset .tabset-fade .tabset-pills}
+**Верхний квартиль количества ускорений за секунду**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_per_sec_Q0.75, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_per_sec_Q0.75))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_per_sec_Q0.75"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_Q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_per_sec_Q0.75);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_per_sec_Q0.75, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_per_sec_Q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_per_sec_Q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_per_sec_Q0.75, 1.5)
+outliers <- select(outliers, 1:4, acc_per_sec_Q0.75, everything())
+outliers[order(outliers$acc_per_sec_Q0.75, decreasing = T),]
+outliers[order(outliers$acc_per_sec_Q0.75),]
+```
+
+
+
+
+
+
+### acc_per_sec_max_pos {.tabset .tabset-fade .tabset-pills}
+**Позиция максимального количества ускорений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_per_sec_max_pos, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_per_sec_max_pos))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_per_sec_max_pos"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_max_pos, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_per_sec_max_pos);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_per_sec_max_pos, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_per_sec_max_pos)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_per_sec_max_pos", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_per_sec_max_pos, 1.5)
+outliers <- select(outliers, 1:4, acc_per_sec_max_pos, everything())
+outliers[order(outliers$acc_per_sec_max_pos, decreasing = T),]
+outliers[order(outliers$acc_per_sec_max_pos),]
+```
+
+
+
+
+
+
+### acc_per_sec_min_pos {.tabset .tabset-fade .tabset-pills}
+**Позиция минимального количества ускорений**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$acc_per_sec_min_pos, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$acc_per_sec_min_pos))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "acc_per_sec_min_pos"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_min_pos, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$acc_per_sec_min_pos);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$acc_per_sec_min_pos, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = acc_per_sec_min_pos)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_per_sec_min_pos", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$acc_per_sec_min_pos, 1.5)
+outliers <- select(outliers, 1:4, acc_per_sec_min_pos, everything())
+outliers[order(outliers$acc_per_sec_min_pos, decreasing = T),]
+outliers[order(outliers$acc_per_sec_min_pos),]
+```
+
+
+
+
+
+
+### missings_distance {.tabset .tabset-fade .tabset-pills}
+**Расстояние промахов от центра мишеней, пикс.**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$missings_distance, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$missings_distance))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "missings_distance"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_distance, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$missings_distance);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$missings_distance, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = missings_distance)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings_distance", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$missings_distance, 1.5)
+outliers <- select(outliers, 1:4, missings_distance, everything())
+outliers[order(outliers$missings_distance, decreasing = T),]
+outliers[order(outliers$missings_distance),]
+```
+
+
+
+
+
+
+### missings_mean {.tabset .tabset-fade .tabset-pills}
+**Среднее расстояние промахов от центра мишеней, пикс.**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$missings_mean, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$missings_mean))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "missings_mean"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_mean, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$missings_mean);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$missings_mean, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = missings_mean)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings_mean", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$missings_mean, 1.5)
+outliers <- select(outliers, 1:4, missings_mean, everything())
+outliers[order(outliers$missings_mean, decreasing = T),]
+outliers[order(outliers$missings_mean),]
+```
+
+
+
+
+
+
+### missings_sd {.tabset .tabset-fade .tabset-pills}
+**Стандартное отклонение расстояний промахов**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$missings_sd, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$missings_sd))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "missings_sd"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_sd, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$missings_sd);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$missings_sd, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = missings_sd)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings_sd", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$missings_sd, 1.5)
+outliers <- select(outliers, 1:4, missings_sd, everything())
+outliers[order(outliers$missings_sd, decreasing = T),]
+outliers[order(outliers$missings_sd),]
+```
+
+
+
+
+
+
+### missings_median {.tabset .tabset-fade .tabset-pills}
+**Медиана расстояний промахов**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$missings_median, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$missings_median))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "missings_median"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_median, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$missings_median);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$missings_median, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = missings_median)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings_median", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$missings_median, 1.5)
+outliers <- select(outliers, 1:4, missings_median, everything())
+outliers[order(outliers$missings_median, decreasing = T),]
+outliers[order(outliers$missings_median),]
+```
+
+
+
+
+
+
+### missings_trimmed {.tabset .tabset-fade .tabset-pills}
+**Усеченное среднее расстояний промахов**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$missings_trimmed, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$missings_trimmed))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "missings_trimmed"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_trimmed, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$missings_trimmed);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$missings_trimmed, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = missings_trimmed)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings_trimmed", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$missings_trimmed, 1.5)
+outliers <- select(outliers, 1:4, missings_trimmed, everything())
+outliers[order(outliers$missings_trimmed, decreasing = T),]
+outliers[order(outliers$missings_trimmed),]
+```
+
+
+
+
+
+
+### missings_mad {.tabset .tabset-fade .tabset-pills}
+**Среднее абсолютное отклонение расстояний промахов**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$missings_mad, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$missings_mad))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "missings_mad"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_mad, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$missings_mad);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$missings_mad, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = missings_mad)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings_mad", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$missings_mad, 1.5)
+outliers <- select(outliers, 1:4, missings_mad, everything())
+outliers[order(outliers$missings_mad, decreasing = T),]
+outliers[order(outliers$missings_mad),]
+```
+
+
+
+
+
+
+### missings_min {.tabset .tabset-fade .tabset-pills}
+**Минимальное расстояние промахов**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$missings_min, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$missings_min))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "missings_min"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_min, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$missings_min);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$missings_min, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = missings_min)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings_min", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$missings_min, 1.5)
+outliers <- select(outliers, 1:4, missings_min, everything())
+outliers[order(outliers$missings_min, decreasing = T),]
+outliers[order(outliers$missings_min),]
+```
+
+
+
+
+
+
+### missings_max {.tabset .tabset-fade .tabset-pills}
+**Максимальное расстояние промахов**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$missings_max, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$missings_max))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "missings_max"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_max, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$missings_max);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$missings_max, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = missings_max)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings_max", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$missings_max, 1.5)
+outliers <- select(outliers, 1:4, missings_max, everything())
+outliers[order(outliers$missings_max, decreasing = T),]
+outliers[order(outliers$missings_max),]
+```
+
+
+
+
+
+
+### missings_range {.tabset .tabset-fade .tabset-pills}
+**Размах расстояния промахов**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$missings_range, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$missings_range))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "missings_range"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_range, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$missings_range);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$missings_range, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = missings_range)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings_range", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$missings_range, 1.5)
+outliers <- select(outliers, 1:4, missings_range, everything())
+outliers[order(outliers$missings_range, decreasing = T),]
+outliers[order(outliers$missings_range),]
+```
+
+
+
+
+
+
+### missings_skew {.tabset .tabset-fade .tabset-pills}
+**Коэффициент асимметрии расстояний промахов**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$missings_skew, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$missings_skew))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "missings_skew"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_skew, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$missings_skew);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$missings_skew, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = missings_skew)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings_skew", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$missings_skew, 1.5)
+outliers <- select(outliers, 1:4, missings_skew, everything())
+outliers[order(outliers$missings_skew, decreasing = T),]
+outliers[order(outliers$missings_skew),]
+```
+
+
+
+
+
+
+### missings_kurtosis {.tabset .tabset-fade .tabset-pills}
+**Эксцесс расстояний промахов**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$missings_kurtosis, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$missings_kurtosis))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "missings_kurtosis"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_kurtosis, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$missings_kurtosis);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$missings_kurtosis, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = missings_kurtosis)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings_kurtosis", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$missings_kurtosis, 1.5)
+outliers <- select(outliers, 1:4, missings_kurtosis, everything())
+outliers[order(outliers$missings_kurtosis, decreasing = T),]
+outliers[order(outliers$missings_kurtosis),]
+```
+
+
+
+
+
+
+### missings_se {.tabset .tabset-fade .tabset-pills}
+**Стандартная ошибка расстояний промахов**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$missings_se, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$missings_se))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "missings_se"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_se, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$missings_se);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$missings_se, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = missings_se)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings_se", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$missings_se, 1.5)
+outliers <- select(outliers, 1:4, missings_se, everything())
+outliers[order(outliers$missings_se, decreasing = T),]
+outliers[order(outliers$missings_se),]
+```
+
+
+
+
+
+
+### missings_Q0.25 {.tabset .tabset-fade .tabset-pills}
+**Нижний квартиль расстояний промахов**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$missings_Q0.25, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$missings_Q0.25))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "missings_Q0.25"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_Q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$missings_Q0.25);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$missings_Q0.25, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = missings_Q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings_Q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$missings_Q0.25, 1.5)
+outliers <- select(outliers, 1:4, missings_Q0.25, everything())
+outliers[order(outliers$missings_Q0.25, decreasing = T),]
+outliers[order(outliers$missings_Q0.25),]
+```
+
+
+
+
+
+
+### missings_Q0.75 {.tabset .tabset-fade .tabset-pills}
+**Верхний квартиль расстояний промахов**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$missings_Q0.75, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$missings_Q0.75))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "missings_Q0.75"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_Q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$missings_Q0.75);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$missings_Q0.75, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = missings_Q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings_Q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$missings_Q0.75, 1.5)
+outliers <- select(outliers, 1:4, missings_Q0.75, everything())
+outliers[order(outliers$missings_Q0.75, decreasing = T),]
+outliers[order(outliers$missings_Q0.75),]
+```
+
+
+
+
+
+
+### missings {.tabset .tabset-fade .tabset-pills}
+**Количество промахов, шт.**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$missings, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$missings))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "missings"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$missings);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$missings, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = missings)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$missings, 1.5)
+outliers <- select(outliers, 1:4, missings, everything())
+outliers[order(outliers$missings, decreasing = T),]
+outliers[order(outliers$missings),]
+```
+
+
+
+
+
+
+### hits {.tabset .tabset-fade .tabset-pills}
+**Количество попаданий, шт.**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$hits, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$hits))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "hits"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$hits, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$hits);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$hits, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = hits)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - hits", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$hits, 1.5)
+outliers <- select(outliers, 1:4, hits, everything())
+outliers[order(outliers$hits, decreasing = T),]
+outliers[order(outliers$hits),]
+```
+
+
+
+
+
+
+### missings_trend {.tabset .tabset-fade .tabset-pills}
+**Линейный тренд расстояния промахов**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$missings_trend, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$missings_trend))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "missings_trend"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_trend, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$missings_trend);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$missings_trend, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = missings_trend)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings_trend", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$missings_trend, 1.5)
+outliers <- select(outliers, 1:4, missings_trend, everything())
+outliers[order(outliers$missings_trend, decreasing = T),]
+outliers[order(outliers$missings_trend),]
+```
+
+
+
+
+
+
+### accuracy_rate {.tabset .tabset-fade .tabset-pills}
+**Точность, %**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$accuracy_rate, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$accuracy_rate))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "accuracy_rate"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$accuracy_rate, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$accuracy_rate);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$accuracy_rate, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = accuracy_rate)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - accuracy_rate", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$accuracy_rate, 1.5)
+outliers <- select(outliers, 1:4, accuracy_rate, everything())
+outliers[order(outliers$accuracy_rate, decreasing = T),]
+outliers[order(outliers$accuracy_rate),]
+```
+
+
+
+
+
+
+### combo_hits {.tabset .tabset-fade .tabset-pills}
+**Комбо попаданий**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$combo_hits, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$combo_hits))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "combo_hits"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$combo_hits, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$combo_hits);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$combo_hits, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = combo_hits)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - combo_hits", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$combo_hits, 1.5)
+outliers <- select(outliers, 1:4, combo_hits, everything())
+outliers[order(outliers$combo_hits, decreasing = T),]
+outliers[order(outliers$combo_hits),]
+```
+
+
+
+
+
+
+### combo_missings {.tabset .tabset-fade .tabset-pills}
+**Комбо пропахов**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$combo_missings, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$combo_missings))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "combo_missings"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$combo_missings, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$combo_missings);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$combo_missings, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = combo_missings)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - combo_missings", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$combo_missings, 1.5)
+outliers <- select(outliers, 1:4, combo_missings, everything())
+outliers[order(outliers$combo_missings, decreasing = T),]
+outliers[order(outliers$combo_missings),]
+```
+
+
+
+
+
+
+### clicked_through_targets {.tabset .tabset-fade .tabset-pills}
+**Количество скликанных мишеней**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$clicked_through_targets, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$clicked_through_targets))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "clicked_through_targets"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$clicked_through_targets, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$clicked_through_targets);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$clicked_through_targets, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = clicked_through_targets)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - clicked_through_targets", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$clicked_through_targets, 1.5)
+outliers <- select(outliers, 1:4, clicked_through_targets, everything())
+outliers[order(outliers$clicked_through_targets, decreasing = T),]
+outliers[order(outliers$clicked_through_targets),]
+```
+
+
+
+
+
+
+### combo_clicked_through_targets {.tabset .tabset-fade .tabset-pills}
+**Комбо скликанных мишеней**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$combo_clicked_through_targets, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$combo_clicked_through_targets))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "combo_clicked_through_targets"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$combo_clicked_through_targets, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$combo_clicked_through_targets);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$combo_clicked_through_targets, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = combo_clicked_through_targets)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - combo_clicked_through_targets", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$combo_clicked_through_targets, 1.5)
+outliers <- select(outliers, 1:4, combo_clicked_through_targets, everything())
+outliers[order(outliers$combo_clicked_through_targets, decreasing = T),]
+outliers[order(outliers$combo_clicked_through_targets),]
+```
+
+
+
+
+
+
+### corr_sat {.tabset .tabset-fade .tabset-pills}
+**Коэффициент корреляции скорости и точности**
+
+#### Descriptive stat
+```{r}
+quantile(df.acc$corr_sat, na.rm = T)
+```
+
+```{r}
+data.frame(describeBy(df.acc$corr_sat))
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "corr_sat"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$corr_sat, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.acc$corr_sat);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.acc$corr_sat, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.acc, aes(sample = corr_sat)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - corr_sat", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Outliers
+```{r echo=FALSE}
+outliers <- get_outliers(df.acc, df.acc$corr_sat, 1.5)
+outliers <- select(outliers, 1:4, corr_sat, everything())
+outliers[order(outliers$corr_sat, decreasing = T),]
+outliers[order(outliers$corr_sat),]
+```
+
+
+
+
+
+
+

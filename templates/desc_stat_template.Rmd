@@ -31,14 +31,53 @@ source("functions.R")
 
 
 ```{r}
-df <- read.csv("./data/accuracy_features.csv")
+df.acc <- read.csv("./data/accuracy_features.csv")
 
-df$acc_max[is.infinite(df$acc_max)] <- NA
-df$acc_range[is.infinite(df$acc_range)] <- NA
-df$X <- NULL
+df.acc$acc_max[is.infinite(df.acc$acc_max)] <- NA
+df.acc$acc_mean[is.infinite(df.acc$acc_mean)] <- NA
+df.acc$acc_range[is.infinite(df.acc$acc_range)] <- NA
+
+df.acc$dec_max[is.infinite(df.acc$dec_max)] <- NA
+df.acc$dec_mean[is.infinite(df.acc$dec_mean)] <- NA
+df.acc$dec_range[is.infinite(df.acc$dec_range)] <- NA
+
+df.acc$X <- NULL
 
 ```
 
+```{r}
+df.spd <- read.csv("./data/speed_features.csv")
+
+df.spd$acc_max[is.infinite(df.spd$acc_max)] <- NA
+df.spd$acc_mean[is.infinite(df.spd$acc_mean)] <- NA
+df.spd$acc_range[is.infinite(df.spd$acc_range)] <- NA
+
+df.spd$dec_max[is.infinite(df.spd$dec_max)] <- NA
+df.spd$dec_mean[is.infinite(df.spd$dec_mean)] <- NA
+df.spd$dec_range[is.infinite(df.spd$dec_range)] <- NA
+df.spd$dec_min[is.infinite(df.spd$dec_min)] <- NA
+
+df.spd$X <- NULL
+```
+
+
+```{r}
+clickers.acc <- df.acc[df.acc$clicked_through_targets > 5 & df.acc$combo_clicked_through_targets > 5, ]
+clickers.spd <- df.spd[df.spd$clicked_through_targets > 5 & df.spd$combo_clicked_through_targets > 5, ]
+clickers <- unique(c(clickers.acc$user_id, clickers.spd$user_id))
+
+df.acc <- df.acc[!df.acc$user_id %in% clickers, ]
+df.spd <- df.spd[!df.spd$user_id %in% clickers, ]
+```
+
+```{r}
+long_stops.acc <- df.acc[df.acc$time_max >= 10, ]
+long_stops.spd <- df.spd[df.spd$time_max >= 10, ]
+long_stops <- unique(c(long_stops.acc$user_id, long_stops.spd$user_id))
+
+df.acc <- df.acc[!df.acc$user_id %in% long_stops, ]
+df.spd <- df.spd[!df.spd$user_id %in% long_stops, ]
+```
 
 # Описательные статистики
 {% for feature in data_dictionary %}
@@ -48,17 +87,17 @@ df$X <- NULL
 
 #### Descriptive stat
 ```{r}
-quantile(df${{feature.short_name}}, na.rm = T)
+quantile(df.{{stage}}${{feature.short_name}}, na.rm = T)
 ```
 
 ```{r}
-data.frame(describeBy(df${{feature.short_name}}))
+data.frame(describeBy(df.{{stage}}${{feature.short_name}}))
 ```
 
 
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "{{feature.short_name}}"
-plot_list <- draw_plots_continuous(df, var = df${{feature.short_name}}, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+plot_list <- draw_plots_continuous(df.{{stage}}, var = df.{{stage}}${{feature.short_name}}, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
 
 create_tabs(plot_list)
 ```
@@ -66,15 +105,15 @@ create_tabs(plot_list)
 
 #### Normal test
 ```{r}
-st <- shapiro.test(df${{feature.short_name}});print(st)
+st <- shapiro.test(df.{{stage}}${{feature.short_name}});print(st)
 check_normal_distribution(st)
 
-ks <- ks.test(df${{feature.short_name}}, "pnorm");print(ks)
+ks <- ks.test(df.{{stage}}${{feature.short_name}}, "pnorm");print(ks)
 check_normal_distribution(ks)
 ```
 
 ```{r results='asis'}
-p1 <- ggplot(df, aes(sample = {{feature.short_name}})) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - {{feature.short_name}}", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+p1 <- ggplot(df.{{stage}}, aes(sample = {{feature.short_name}})) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - {{feature.short_name}}", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
 
 create_tabs(list(p1))
 ```
@@ -82,7 +121,8 @@ create_tabs(list(p1))
 
 #### Outliers
 ```{r echo=FALSE}
-outliers <- get_outliers(df, df${{feature.short_name}}, 1.5)
+outliers <- get_outliers(df.{{stage}}, df.{{stage}}${{feature.short_name}}, 1.5)
+outliers <- select(outliers, 1:4, {{feature.short_name}}, everything())
 outliers[order(outliers${{feature.short_name}}, decreasing = T),]
 outliers[order(outliers${{feature.short_name}}),]
 ```
@@ -93,11 +133,11 @@ outliers[order(outliers${{feature.short_name}}),]
 **{{feature.short_name}} - {{feature.name}}**
 
 ```{r}
-df[, c("id", "{{feature.short_name}}")]
+df.{{stage}}[, c("id", "{{feature.short_name}}")]
 ```
 
 ```{r}
-table(df${{feature.short_name}})
+table(df.{{stage}}${{feature.short_name}})
 ```
 
 {% elif feature.type == "factor" %}
@@ -108,14 +148,17 @@ table(df${{feature.short_name}})
 #### Tables
 
 Распределение по переменной "{{feature.short_name}}"
+
 ```{r}
-table(df${{feature.short_name}})
+tab <- table(df.{{stage}}${{feature.short_name}})
+
+data.frame(
+  level = names(tab),
+  frequency = as.vector(tab),
+  percent = as.vector(round(prop.table(tab) * 100, 2))
+)
 ```
 
-Распределение по переменной "{{feature.short_name}}", %
-```{r}
-round(prop.table(table(df${{feature.short_name}})) * 100, 2)
-```
 
 {% else %}
 
