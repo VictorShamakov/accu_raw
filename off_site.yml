@@ -1,0 +1,20 @@
+name: "SAT Project"
+include: ["img"]
+exclude: ["*.Rmd", "*.py", "requirements.txt", "data", "help", "templates", "reports", "slices"]
+navbar:
+  left:
+    - text: "Главная"
+      href: index.html
+    - text: "DS Accuracy"
+      href: 3.1_desc_stat_accuracy.html
+    - text: "DS Speed"
+      href: 3.2_desc_stat_speed.html
+    - text: "DS by stage"
+      href: 3.3_desc_stat_by_stage.html
+    - text: "Acc_Gender"
+      href: 3.4_desc_stat_acc_by_gender.html
+    - text: "Spd_Gender"
+      href: 3.5_desc_stat_spd_by_gender.html
+    - text: "Stage_by_gender"
+      href: 3.6_desc_stat_by_stage_and_gender.html
+      

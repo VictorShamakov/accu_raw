@@ -1,0 +1,203 @@
+---
+title: "Описательная статистика"
+author: "SVA"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    css: "styles.css"
+    code_folding: hide
+    df_print: paged
+    toc: yes
+    toc_depth: 4
+    toc_float:
+      collapsed: no
+  word_document:
+    toc: yes
+    toc_depth: '4'
+editor_options:
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  include = TRUE,
+  message = FALSE, 
+  warning = FALSE
+)
+
+rm(list=ls())
+source("functions.R")
+library("ARTool")
+```
+<script>
+function addClassToTitle(containerId, className) {
+  // Находим контейнер по id
+  var container = document.getElementById(containerId);
+  if (!container) {
+    console.warn('Контейнер с id "' + containerId + '" не найден.');
+    return;
+  }
+
+  // Добавляем класс к найденному h3
+  container.classList.add(className);
+}
+</script>
+
+
+{{dataset}}
+
+
+# Описательные статистики
+{% for feature in data_dictionary %}
+{% if feature.type == "numeric" %}
+### {{feature.short_name}} {.tabset .tabset-fade .tabset-pills}
+**{{feature.name}}**
+
+#### Descriptive stat
+
+```{r}
+describeBy({{feature.short_name}} ~ {{group}} + {{group2}}, data = df, quant = c(0.25, 0.75), mat = T)
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "{{feature.short_name}}"
+p1 <- ggplot(df, aes({{feature.short_name}}, fill={{group}})) + 
+    geom_histogram() + 
+  facet_wrap("{{group}} ~ {{group2}}") +
+  labs(title=plot_title, tabname="Hist")
+
+p2 <- ggplot(df, aes({{feature.short_name}}, fill={{group}})) + 
+    geom_density() + 
+  facet_wrap("{{group}} ~ {{group2}}") +
+  labs(title=plot_title, tabname="Density")
+
+p3 <- ggplot(df, aes({{group2}}, {{feature.short_name}}, fill={{group}})) + 
+    geom_boxplot() +
+  labs(title=plot_title, tabname="Boxplot")
+
+
+create_tabs(list(p1, p2, p3))
+```
+
+
+
+#### CI ~ {{group}}
+
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x={{group2}}, y={{feature.short_name}}, color={{group}}, group={{group}})) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.2, lwd=0.8, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=2.5, position = pd, pch = 15)
+
+```
+
+
+#### ANOVA
+
+```{r}
+df <- df[!df$user_id %in% unique(df$user_id[is.na(df${{feature.short_name}})]), ]
+```
+
+```{r}
+aov_model <- aov({{feature.short_name}} ~ {{group}} * {{group2}}, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ {{group2}} + {{group}})
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Различия
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### ART
+
+```{r}
+model <- art({{feature.short_name}} ~ {{group2}} * {{group}} + Error(user_id/{{group2}}), data = df)
+```
+
+```{r}
+anova_model <- anova(model)
+anova_model
+```
+
+#### Post-hoc
+```{r}
+art.con(model, formula = ~ {{group2}} * {{group}})
+```
+
+```{r results='asis'}
+if (sum(anova_model$`Pr(>F)` <= 0.05) >= 1) {
+  sign_differences <- c(sign_differences, "{{feature.short_name}}")
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('{{feature.short_name}}', 'highlight');});</script>")
+}
+
+```
+
+
+
+{% elif feature.type == "character" %}
+### {{feature.short_name}} {.tabset .tabset-fade .tabset-pills}
+**{{feature.short_name}} - {{feature.name}}**
+
+```{r}
+df[, c("id", "{{feature.short_name}}")]
+```
+
+```{r}
+table(df${{feature.short_name}})
+```
+
+{% elif feature.type == "factor" %}
+
+### {{feature.short_name}} {.tabset .tabset-fade .tabset-pills}
+**{{feature.name}}**
+
+#### Tables
+
+Распределение по переменной "{{feature.short_name}}"
+
+```{r}
+tab <- table(df${{feature.short_name}})
+
+data.frame(
+  level = names(tab),
+  frequency = as.vector(tab),
+  percent = as.vector(round(prop.table(tab) * 100, 2))
+)
+```
+
+
+{% else %}
+
+{% endif %}
+
+{% endfor %}
+
+
+### Значимые различия
+```{r results='asis'}
+cat(paste0('<a href="#', sign_differences, '">', sign_differences, "</a><br>"))
+```
+

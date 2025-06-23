@@ -12,6 +12,7 @@ suppressMessages(library("plotly"))
 suppressMessages(library("psych"))
 suppressMessages(library("scales")) # для задания формата подписей на осях координат
 suppressMessages(library("readxl")) 
+suppressMessages(library("writexl")) 
 suppressMessages(library("gridExtra")) 
 
 logger <- logger("DEBUG", 

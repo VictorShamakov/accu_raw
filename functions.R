@@ -180,7 +180,7 @@ draw_plots_ordinal <- function(data, var, group = NULL, group_lab = NULL, x_lab 
 
 
 
-draw_plots_continuous <- function(data, var, group = NULL, group_lab = NULL, x_lab = NULL, title = NULL, legend_title = NULL, filename = NULL, binwidth = NULL, bins = NULL, alpha = 0.5, angle = 0) {
+draw_plots_continuous <- function(data, var, x_lab = NULL, title = NULL, legend_title = NULL, filename = NULL, binwidth = NULL, bins = NULL, alpha = 0.5, angle = 0) {
   
   if (!is.null(title)) {
     filename <- title
@@ -190,6 +190,7 @@ draw_plots_continuous <- function(data, var, group = NULL, group_lab = NULL, x_l
     geom_histogram(binwidth = binwidth, bins = bins, fill = main_color, alpha = alpha) + 
     labs(title = ifelse(!is.null(title), title, ""), filename = paste0(filename, ", Histogram"), x = x_lab, y = "Частота", tabname = "Histogram") + 
     theme(axis.text.x = element_text(angle = angle))
+  
   p2 <- ggplot(data, aes({{var}})) + 
     geom_density(fill = main_color, alpha = alpha) + 
     labs(title = ifelse(!is.null(title), title, ""), filename = paste0(filename, ", Density"), x = x_lab, y = "Плотность", tabname = "Density") + 
@@ -200,36 +201,33 @@ draw_plots_continuous <- function(data, var, group = NULL, group_lab = NULL, x_l
     labs(title = ifelse(!is.null(title), title, ""), filename = paste0(filename, ", Boxplot"), x = x_lab, tabname = "Boxplot") + 
     coord_flip() + 
     theme(axis.text.x = element_text(angle = angle))
-  
-  
-  if (!is.null(group)) {
-    group_lab <- paste0(" ~ ", group_lab)
-    
-    p4 <- ggplot(data, aes({{var}}, fill={{group}})) + 
-      geom_histogram(binwidth=binwidth, bins = bins,  alpha=alpha, position = "identity") + 
-      labs(title=ifelse(!is.null(title), paste0(title, group_lab), ""), 
-           filename = paste0(filename, group_lab, ", Histogram"), x = x_lab, y = "Частота", tabname=paste0("Histogram", group_lab)) + 
-       facet_wrap(. ~ faculty, ncol = 6, strip.position = "bottom") +
-       guides(fill = "none") +
-       theme(axis.text.x = element_text(angle = angle))
 
-    p5 <- ggplot(data, aes({{var}}, fill={{group}})) + 
-      geom_density(alpha=alpha) + 
-      labs(title=ifelse(!is.null(title), paste0(title, group_lab), ""), 
-           filename = paste(title, group_lab, "Density"), x = x_lab, y = "Плотность", tabname=paste0("Density", group_lab)) +
-      facet_wrap(. ~ faculty, ncol = 6, strip.position = "bottom") +
-      guides(fill = "none") +
-      theme(axis.text.x = element_text(angle = angle))
-    
-    p6 <- ggplot(data, aes({{group}}, {{var}}, fill={{group}})) + 
-      geom_boxplot(alpha=alpha) + 
-      labs(title=ifelse(!is.null(title), paste0(title, group_lab), ""), 
-           filename = paste(title, group_lab, "Boxplot"), y = x_lab, tabname=paste0("Boxplot", group_lab)) + 
-      guides(fill="none") +
-      theme(axis.text.x = element_text(angle = angle))
-    
-    return(list(p1, p2, p3, p4, p5, p6))
-  }
+  return(list(p1, p2, p3))
+}
+
+draw_plots_continuous_by_group <- function(data, var, group, group_lab, x_lab = NULL, title = NULL, legend_title = NULL, binwidth = NULL, bins = NULL, alpha = 0.5, angle = 0) {
+  var <- enquo(var)
+  group <- enquo(group)
+  
+  p1 <- ggplot(data, aes({{var}}, fill={{group}})) + 
+    geom_histogram(binwidth=binwidth, bins = bins,  alpha=alpha, position = "identity") + 
+    labs(title=ifelse(!is.null(title), paste0(title, " ~ ", group_lab), ""), x = x_lab, y = "Частота", tabname=paste0("Histogram", " ~ ",group_lab)) + 
+    facet_wrap(vars(!!group), ncol = 6, strip.position = "bottom") +
+    guides(fill = "none") +
+    theme(axis.text.x = element_text(angle = angle))
+  
+  p2 <- ggplot(data, aes({{var}}, fill={{group}})) + 
+    geom_density(alpha=alpha) + 
+    labs(title=ifelse(!is.null(title), paste0(title, " ~ ", group_lab), ""), x = x_lab, y = "Плотность", tabname=paste0("Density", " ~ ",group_lab)) +
+    facet_wrap(vars(!!group), ncol = 6, strip.position = "bottom") +
+    guides(fill = "none") +
+    theme(axis.text.x = element_text(angle = angle))
+  
+  p3 <- ggplot(data, aes({{group}}, {{var}}, fill={{group}})) + 
+    geom_boxplot(alpha=alpha) + 
+    labs(title=ifelse(!is.null(title), paste0(title, " ~ ", group_lab), ""), x = group_lab, y = x_lab, tabname=paste0("Boxplot", " ~ ",group_lab)) + 
+    guides(fill="none") +
+    theme(axis.text.x = element_text(angle = angle))
   
   return(list(p1, p2, p3))
 }
@@ -272,19 +270,17 @@ draw_plots_continuous_by_cluster <- function(data, var, group = NULL, group_lab 
   if (!is.null(group)) {
     group_lab <- paste0(" ~ ", group_lab)
     
-    p4 <- ggplot(data, aes({{var}}, fill={{group}})) + 
-      geom_histogram(binwidth=binwidth, bins = bins,  alpha=alpha, position = "identity") + 
-      labs(title=ifelse(!is.null(title), paste0(title, group_lab), ""), 
-           filename = paste0(filename, group_lab, ", Histogram"), x = x_lab, y = "Частота", tabname=paste0("Histogram", group_lab)) + 
-      facet_wrap(. ~ AST_cluster, ncol = 6, strip.position = "bottom") +
+    p4 <- ggplot(data, aes({{var}}, fill={{group}})) +
+      geom_histogram(binwidth=binwidth, bins = bins,  alpha=alpha, position = "identity") +
+      labs(title=ifelse(!is.null(title), paste0(title, group_lab), ""),
+           filename = paste0(filename, group_lab, ", Histogram"), x = x_lab, y = "Частота", tabname=paste0("Histogram", group_lab)) +
       guides(fill = "none") +
       theme(axis.text.x = element_text(angle = angle))
     
-    p5 <- ggplot(data, aes({{var}}, fill={{group}})) + 
-      geom_density(alpha=alpha) + 
-      labs(title=ifelse(!is.null(title), paste0(title, group_lab), ""), 
+    p5 <- ggplot(data, aes({{var}}, fill={{group}})) +
+      geom_density(alpha=alpha) +
+      labs(title=ifelse(!is.null(title), paste0(title, group_lab), ""),
            filename = paste(title, group_lab, "Density"), x = x_lab, y = "Плотность", tabname=paste0("Density", group_lab)) +
-      facet_wrap(. ~ AST_cluster, ncol = 6, strip.position = "bottom") +
       guides(fill = "none") +
       theme(axis.text.x = element_text(angle = angle))
     
@@ -303,7 +299,7 @@ draw_plots_continuous_by_cluster <- function(data, var, group = NULL, group_lab 
 
 
 draw_corrplots <- function(df, method, tl.cex = 1, number.cex = 1) {
-  corr_matrix <- cor(df, method = method)
+  corr_matrix <- cor(df, method = method, use = "pairwise.complete.obs")
   
   corr_col <- colorRampPalette(c("deepskyblue2", "white", "darkorange"))
   

@@ -1,0 +1,100 @@
+
+```{r}
+# Набор данных: Точность
+df.acc <- read.csv("./data/accuracy_features.csv")
+
+df.acc$acc_max[is.infinite(df.acc$acc_max)] <- NA
+df.acc$acc_mean[is.infinite(df.acc$acc_mean)] <- NA
+df.acc$acc_range[is.infinite(df.acc$acc_range)] <- NA
+
+df.acc$dec_max[is.infinite(df.acc$dec_max)] <- NA
+df.acc$dec_mean[is.infinite(df.acc$dec_mean)] <- NA
+df.acc$dec_range[is.infinite(df.acc$dec_range)] <- NA
+
+df.acc$X <- NULL
+df.acc$stage <- "accuracy"
+
+names(df.acc) <- tolower(names(df.acc))
+```
+
+```{r}
+# Набор данных: Скорость
+df.spd <- read.csv("./data/speed_features.csv")
+
+df.spd$acc_max[is.infinite(df.spd$acc_max)] <- NA
+df.spd$acc_mean[is.infinite(df.spd$acc_mean)] <- NA
+df.spd$acc_range[is.infinite(df.spd$acc_range)] <- NA
+
+df.spd$dec_max[is.infinite(df.spd$dec_max)] <- NA
+df.spd$dec_mean[is.infinite(df.spd$dec_mean)] <- NA
+df.spd$dec_range[is.infinite(df.spd$dec_range)] <- NA
+df.spd$dec_min[is.infinite(df.spd$dec_min)] <- NA
+
+df.spd$X <- NULL
+df.spd$stage <- "speed"
+
+names(df.spd) <- tolower(names(df.spd))
+```
+
+```{r}
+## Кликеры
+clickers.acc <- df.acc[df.acc$clicked_through_targets > 5 & df.acc$combo_clicked_through_targets > 5, ]
+clickers.spd <- df.spd[df.spd$clicked_through_targets > 5 & df.spd$combo_clicked_through_targets > 5, ]
+clickers <- unique(c(clickers.acc$user_id, clickers.spd$user_id))
+
+df.acc <- df.acc[!df.acc$user_id %in% clickers, ]
+df.spd <- df.spd[!df.spd$user_id %in% clickers, ]
+```
+
+
+```{r}
+## Остановки во время выполнения теста (можно попробовать восстановить)
+long_stops.acc <- df.acc[df.acc$time_max >= 10, ]
+long_stops.spd <- df.spd[df.spd$time_max >= 10, ]
+long_stops <- unique(c(long_stops.acc$user_id, long_stops.spd$user_id))
+
+df.acc <- df.acc[!df.acc$user_id %in% long_stops, ]
+df.spd <- df.spd[!df.spd$user_id %in% long_stops, ]
+```
+
+```{r}
+## Данные тестов психодиагностики
+sp_results <- read_xlsx("../../Все тесты/data/results/sp_results_impersonal.xlsx")
+science_types <- read.csv("../../Все тесты/data/results/science_types.csv")
+
+sp_results$science_type[sp_results$direction %in% science_types$direction[science_types$knowledge_field == "Natural Sciences"]] <- "Natural Sciences"
+sp_results$science_type[sp_results$direction %in% science_types$direction[science_types$knowledge_field == "Social and Humanitarian Sciences"]] <- "Social and Humanitarian Sciences"
+sp_results$science_type[sp_results$direction %in% science_types$direction[science_types$knowledge_field == "Technical Sciences"]] <- "Technical Sciences"
+
+df.acc <- merge(df.acc, select(sp_results, userid, gender, science_type, direction), by.x = "user_id", by.y = "userid", all.x = T)
+df.acc <- select(df.acc, 1:4, gender, science_type, direction, everything())
+df.acc <- df.acc[!is.na(df.acc$gender),]
+
+df.spd <- merge(df.spd, select(sp_results, userid, gender, science_type, direction), by.x = "user_id", by.y = "userid", all.x = T)
+df.spd <- select(df.spd, 1:4, gender, science_type, direction, everything())
+df.spd <- df.spd[!is.na(df.spd$gender),]
+```
+
+```{r}
+## Длинный формат данных
+df <- rbind(df.acc, df.spd)
+
+df$gender <- factor(df$gender, labels = c("F", "M"))
+df$direction <- factor(df$direction)
+df$stage <- factor(df$stage, levels = c("accuracy", "speed"))
+df$user_id <- factor(df$user_id)
+```
+
+```{r}
+save(df, file = "./data/envs/1_desc_stat/df.RData")
+save(df.acc, file = "./data/envs/1_desc_stat/df.acc.RData")
+save(df.spd, file = "./data/envs/1_desc_stat/df.spd.RData")
+save(sp_results, file = "./data/envs/1_desc_stat/sp_results.RData")
+save(clickers, file = "./data/envs/1_desc_stat/clickers.RData")
+
+```
+
+
+```{r}
+sign_differences <- vector()
+```

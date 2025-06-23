@@ -4,6 +4,7 @@ author: "SVA"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
+    css: "styles.css"
     code_folding: hide
     df_print: paged
     toc: yes
@@ -17,6 +18,7 @@ editor_options:
   chunk_output_type: inline
 ---
 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   echo = FALSE,
@@ -27,10 +29,26 @@ knitr::opts_chunk$set(
 
 rm(list=ls())
 source("functions.R")
+library("ARTool")
 ```
+<script>
+function addClassToTitle(containerId, className) {
+  // Находим контейнер по id
+  var container = document.getElementById(containerId);
+  if (!container) {
+    console.warn('Контейнер с id "' + containerId + '" не найден.');
+    return;
+  }
+
+  // Добавляем класс к найденному h3
+  container.classList.add(className);
+}
+</script>
+
 
 
 ```{r}
+# Набор данных: Точность
 df.acc <- read.csv("./data/accuracy_features.csv")
 
 df.acc$acc_max[is.infinite(df.acc$acc_max)] <- NA
@@ -42,10 +60,13 @@ df.acc$dec_mean[is.infinite(df.acc$dec_mean)] <- NA
 df.acc$dec_range[is.infinite(df.acc$dec_range)] <- NA
 
 df.acc$X <- NULL
+df.acc$stage <- "accuracy"
 
+names(df.acc) <- tolower(names(df.acc))
 ```
 
 ```{r}
+# Набор данных: Скорость
 df.spd <- read.csv("./data/speed_features.csv")
 
 df.spd$acc_max[is.infinite(df.spd$acc_max)] <- NA
@@ -58,10 +79,13 @@ df.spd$dec_range[is.infinite(df.spd$dec_range)] <- NA
 df.spd$dec_min[is.infinite(df.spd$dec_min)] <- NA
 
 df.spd$X <- NULL
+df.spd$stage <- "speed"
+
+names(df.spd) <- tolower(names(df.spd))
 ```
 
-
 ```{r}
+## Кликеры
 clickers.acc <- df.acc[df.acc$clicked_through_targets > 5 & df.acc$combo_clicked_through_targets > 5, ]
 clickers.spd <- df.spd[df.spd$clicked_through_targets > 5 & df.spd$combo_clicked_through_targets > 5, ]
 clickers <- unique(c(clickers.acc$user_id, clickers.spd$user_id))
@@ -70,7 +94,9 @@ df.acc <- df.acc[!df.acc$user_id %in% clickers, ]
 df.spd <- df.spd[!df.spd$user_id %in% clickers, ]
 ```
 
+
 ```{r}
+## Остановки во время выполнения теста (можно попробовать восстановить)
 long_stops.acc <- df.acc[df.acc$time_max >= 10, ]
 long_stops.spd <- df.spd[df.spd$time_max >= 10, ]
 long_stops <- unique(c(long_stops.acc$user_id, long_stops.spd$user_id))
@@ -78,6 +104,49 @@ long_stops <- unique(c(long_stops.acc$user_id, long_stops.spd$user_id))
 df.acc <- df.acc[!df.acc$user_id %in% long_stops, ]
 df.spd <- df.spd[!df.spd$user_id %in% long_stops, ]
 ```
+
+```{r}
+## Данные тестов психодиагностики
+sp_results <- read_xlsx("../../Все тесты/data/results/sp_results_impersonal.xlsx")
+science_types <- read.csv("../../Все тесты/data/results/science_types.csv")
+
+sp_results$science_type[sp_results$direction %in% science_types$direction[science_types$knowledge_field == "Natural Sciences"]] <- "Natural Sciences"
+sp_results$science_type[sp_results$direction %in% science_types$direction[science_types$knowledge_field == "Social and Humanitarian Sciences"]] <- "Social and Humanitarian Sciences"
+sp_results$science_type[sp_results$direction %in% science_types$direction[science_types$knowledge_field == "Technical Sciences"]] <- "Technical Sciences"
+
+df.acc <- merge(df.acc, select(sp_results, userid, gender, science_type, direction), by.x = "user_id", by.y = "userid", all.x = T)
+df.acc <- select(df.acc, 1:4, gender, science_type, direction, everything())
+df.acc <- df.acc[!is.na(df.acc$gender),]
+
+df.spd <- merge(df.spd, select(sp_results, userid, gender, science_type, direction), by.x = "user_id", by.y = "userid", all.x = T)
+df.spd <- select(df.spd, 1:4, gender, science_type, direction, everything())
+df.spd <- df.spd[!is.na(df.spd$gender),]
+```
+
+```{r}
+## Длинный формат данных
+df <- rbind(df.acc, df.spd)
+
+df$gender <- factor(df$gender, labels = c("F", "M"))
+df$direction <- factor(df$direction)
+df$stage <- factor(df$stage, levels = c("accuracy", "speed"))
+df$user_id <- factor(df$user_id)
+```
+
+```{r}
+save(df, file = "./data/envs/1_desc_stat/df.RData")
+save(df.acc, file = "./data/envs/1_desc_stat/df.acc.RData")
+save(df.spd, file = "./data/envs/1_desc_stat/df.spd.RData")
+save(sp_results, file = "./data/envs/1_desc_stat/sp_results.RData")
+save(clickers, file = "./data/envs/1_desc_stat/clickers.RData")
+
+```
+
+
+```{r}
+sign_differences <- vector()
+```
+
 
 # Описательные статистики
 
@@ -120,16 +189,36 @@ data.frame(
 
 
 
+
+### gender {.tabset .tabset-fade .tabset-pills}
+**Пол респондента**
+
+#### Tables
+
+Распределение по переменной "gender"
+
+```{r}
+tab <- table(df.spd$gender)
+
+data.frame(
+  level = names(tab),
+  frequency = as.vector(tab),
+  percent = as.vector(round(prop.table(tab) * 100, 2))
+)
+```
+
+
+
+
+
+
 ### time_total {.tabset .tabset-fade .tabset-pills}
 **Общее время выполнения**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$time_total, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$time_total))
+data.frame(describe(df.spd$time_total, quant = c(0.25, 0.75)))
 ```
 
 
@@ -174,12 +263,9 @@ outliers[order(outliers$time_total),]
 **Среднее время на клик**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$time_mean, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$time_mean))
+data.frame(describe(df.spd$time_mean, quant = c(0.25, 0.75)))
 ```
 
 
@@ -224,12 +310,9 @@ outliers[order(outliers$time_mean),]
 **Стандартное отклонение времени на клик**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$time_sd, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$time_sd))
+data.frame(describe(df.spd$time_sd, quant = c(0.25, 0.75)))
 ```
 
 
@@ -274,12 +357,9 @@ outliers[order(outliers$time_sd),]
 **Медианное время на клик**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$time_median, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$time_median))
+data.frame(describe(df.spd$time_median, quant = c(0.25, 0.75)))
 ```
 
 
@@ -324,12 +404,9 @@ outliers[order(outliers$time_median),]
 **Усеченное среднее времени на клик**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$time_trimmed, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$time_trimmed))
+data.frame(describe(df.spd$time_trimmed, quant = c(0.25, 0.75)))
 ```
 
 
@@ -374,12 +451,9 @@ outliers[order(outliers$time_trimmed),]
 **Среднее Абсолютное Отклонение времени на клик**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$time_mad, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$time_mad))
+data.frame(describe(df.spd$time_mad, quant = c(0.25, 0.75)))
 ```
 
 
@@ -424,12 +498,9 @@ outliers[order(outliers$time_mad),]
 **Минимальное время клика**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$time_min, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$time_min))
+data.frame(describe(df.spd$time_min, quant = c(0.25, 0.75)))
 ```
 
 
@@ -474,12 +545,9 @@ outliers[order(outliers$time_min),]
 **Максимальное время клика**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$time_max, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$time_max))
+data.frame(describe(df.spd$time_max, quant = c(0.25, 0.75)))
 ```
 
 
@@ -524,12 +592,9 @@ outliers[order(outliers$time_max),]
 **Размах времени на клик**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$time_range, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$time_range))
+data.frame(describe(df.spd$time_range, quant = c(0.25, 0.75)))
 ```
 
 
@@ -574,12 +639,9 @@ outliers[order(outliers$time_range),]
 **Коэффициент асимметрии времени выполнения**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$time_skew, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$time_skew))
+data.frame(describe(df.spd$time_skew, quant = c(0.25, 0.75)))
 ```
 
 
@@ -624,12 +686,9 @@ outliers[order(outliers$time_skew),]
 **Эксцесс времени выполнения**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$time_kurtosis, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$time_kurtosis))
+data.frame(describe(df.spd$time_kurtosis, quant = c(0.25, 0.75)))
 ```
 
 
@@ -674,12 +733,9 @@ outliers[order(outliers$time_kurtosis),]
 **Стандартная ошибка среднего времени выполнения**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$time_se, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$time_se))
+data.frame(describe(df.spd$time_se, quant = c(0.25, 0.75)))
 ```
 
 
@@ -720,22 +776,19 @@ outliers[order(outliers$time_se),]
 
 
 
-### time_Q0.25 {.tabset .tabset-fade .tabset-pills}
+### time_q0.25 {.tabset .tabset-fade .tabset-pills}
 **Нижний квартиль времени выполнения**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$time_Q0.25, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$time_Q0.25))
+data.frame(describe(df.spd$time_q0.25, quant = c(0.25, 0.75)))
 ```
 
 
 ```{r fig.width=7, fig.height=4, results='asis'}
-plot_title <- "time_Q0.25"
-plot_list <- draw_plots_continuous(df.spd, var = df.spd$time_Q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+plot_title <- "time_q0.25"
+plot_list <- draw_plots_continuous(df.spd, var = df.spd$time_q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
 
 create_tabs(plot_list)
 ```
@@ -743,15 +796,15 @@ create_tabs(plot_list)
 
 #### Normal test
 ```{r}
-st <- shapiro.test(df.spd$time_Q0.25);print(st)
+st <- shapiro.test(df.spd$time_q0.25);print(st)
 check_normal_distribution(st)
 
-ks <- ks.test(df.spd$time_Q0.25, "pnorm");print(ks)
+ks <- ks.test(df.spd$time_q0.25, "pnorm");print(ks)
 check_normal_distribution(ks)
 ```
 
 ```{r results='asis'}
-p1 <- ggplot(df.spd, aes(sample = time_Q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - time_Q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+p1 <- ggplot(df.spd, aes(sample = time_q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - time_q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
 
 create_tabs(list(p1))
 ```
@@ -759,10 +812,10 @@ create_tabs(list(p1))
 
 #### Outliers
 ```{r echo=FALSE}
-outliers <- get_outliers(df.spd, df.spd$time_Q0.25, 1.5)
-outliers <- select(outliers, 1:4, time_Q0.25, everything())
-outliers[order(outliers$time_Q0.25, decreasing = T),]
-outliers[order(outliers$time_Q0.25),]
+outliers <- get_outliers(df.spd, df.spd$time_q0.25, 1.5)
+outliers <- select(outliers, 1:4, time_q0.25, everything())
+outliers[order(outliers$time_q0.25, decreasing = T),]
+outliers[order(outliers$time_q0.25),]
 ```
 
 
@@ -770,22 +823,19 @@ outliers[order(outliers$time_Q0.25),]
 
 
 
-### time_Q0.75 {.tabset .tabset-fade .tabset-pills}
+### time_q0.75 {.tabset .tabset-fade .tabset-pills}
 **Верхний квартиль времени выполнения**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$time_Q0.75, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$time_Q0.75))
+data.frame(describe(df.spd$time_q0.75, quant = c(0.25, 0.75)))
 ```
 
 
 ```{r fig.width=7, fig.height=4, results='asis'}
-plot_title <- "time_Q0.75"
-plot_list <- draw_plots_continuous(df.spd, var = df.spd$time_Q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+plot_title <- "time_q0.75"
+plot_list <- draw_plots_continuous(df.spd, var = df.spd$time_q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
 
 create_tabs(plot_list)
 ```
@@ -793,15 +843,15 @@ create_tabs(plot_list)
 
 #### Normal test
 ```{r}
-st <- shapiro.test(df.spd$time_Q0.75);print(st)
+st <- shapiro.test(df.spd$time_q0.75);print(st)
 check_normal_distribution(st)
 
-ks <- ks.test(df.spd$time_Q0.75, "pnorm");print(ks)
+ks <- ks.test(df.spd$time_q0.75, "pnorm");print(ks)
 check_normal_distribution(ks)
 ```
 
 ```{r results='asis'}
-p1 <- ggplot(df.spd, aes(sample = time_Q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - time_Q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+p1 <- ggplot(df.spd, aes(sample = time_q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - time_q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
 
 create_tabs(list(p1))
 ```
@@ -809,10 +859,10 @@ create_tabs(list(p1))
 
 #### Outliers
 ```{r echo=FALSE}
-outliers <- get_outliers(df.spd, df.spd$time_Q0.75, 1.5)
-outliers <- select(outliers, 1:4, time_Q0.75, everything())
-outliers[order(outliers$time_Q0.75, decreasing = T),]
-outliers[order(outliers$time_Q0.75),]
+outliers <- get_outliers(df.spd, df.spd$time_q0.75, 1.5)
+outliers <- select(outliers, 1:4, time_q0.75, everything())
+outliers[order(outliers$time_q0.75, decreasing = T),]
+outliers[order(outliers$time_q0.75),]
 ```
 
 
@@ -824,12 +874,9 @@ outliers[order(outliers$time_Q0.75),]
 **Линейный тренд времени выполнения**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$time_trend, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$time_trend))
+data.frame(describe(df.spd$time_trend, quant = c(0.25, 0.75)))
 ```
 
 
@@ -874,12 +921,9 @@ outliers[order(outliers$time_trend),]
 **Коэффициент a в формуле Фиттса**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$fitts_a, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$fitts_a))
+data.frame(describe(df.spd$fitts_a, quant = c(0.25, 0.75)))
 ```
 
 
@@ -924,12 +968,9 @@ outliers[order(outliers$fitts_a),]
 **Коэффициент b в формуле Фиттса**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$fitts_b, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$fitts_b))
+data.frame(describe(df.spd$fitts_b, quant = c(0.25, 0.75)))
 ```
 
 
@@ -974,12 +1015,9 @@ outliers[order(outliers$fitts_b),]
 **Общая амплитуда**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$distance_total, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$distance_total))
+data.frame(describe(df.spd$distance_total, quant = c(0.25, 0.75)))
 ```
 
 
@@ -1024,12 +1062,9 @@ outliers[order(outliers$distance_total),]
 **Средняя амплитуда на клик**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$distance_mean, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$distance_mean))
+data.frame(describe(df.spd$distance_mean, quant = c(0.25, 0.75)))
 ```
 
 
@@ -1074,12 +1109,9 @@ outliers[order(outliers$distance_mean),]
 **Стандартное отклонение амплитуда на клик**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$distance_sd, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$distance_sd))
+data.frame(describe(df.spd$distance_sd, quant = c(0.25, 0.75)))
 ```
 
 
@@ -1124,12 +1156,9 @@ outliers[order(outliers$distance_sd),]
 **Медианная амплитуда на клик**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$distance_median, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$distance_median))
+data.frame(describe(df.spd$distance_median, quant = c(0.25, 0.75)))
 ```
 
 
@@ -1174,12 +1203,9 @@ outliers[order(outliers$distance_median),]
 **Усеченное среднее амплитуды на клик**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$distance_trimmed, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$distance_trimmed))
+data.frame(describe(df.spd$distance_trimmed, quant = c(0.25, 0.75)))
 ```
 
 
@@ -1224,12 +1250,9 @@ outliers[order(outliers$distance_trimmed),]
 **Среднее Абсолютное Отклонение амплитуды на клик**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$distance_mad, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$distance_mad))
+data.frame(describe(df.spd$distance_mad, quant = c(0.25, 0.75)))
 ```
 
 
@@ -1274,12 +1297,9 @@ outliers[order(outliers$distance_mad),]
 **Минимальная амплитуда клика**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$distance_min, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$distance_min))
+data.frame(describe(df.spd$distance_min, quant = c(0.25, 0.75)))
 ```
 
 
@@ -1324,12 +1344,9 @@ outliers[order(outliers$distance_min),]
 **Максимальная амплитуда клика**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$distance_max, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$distance_max))
+data.frame(describe(df.spd$distance_max, quant = c(0.25, 0.75)))
 ```
 
 
@@ -1374,12 +1391,9 @@ outliers[order(outliers$distance_max),]
 **Размах амплитуды на клик**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$distance_range, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$distance_range))
+data.frame(describe(df.spd$distance_range, quant = c(0.25, 0.75)))
 ```
 
 
@@ -1424,12 +1438,9 @@ outliers[order(outliers$distance_range),]
 **Коэффициент асимметрии амплитуды**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$distance_skew, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$distance_skew))
+data.frame(describe(df.spd$distance_skew, quant = c(0.25, 0.75)))
 ```
 
 
@@ -1474,12 +1485,9 @@ outliers[order(outliers$distance_skew),]
 **Эксцесс амплитуды**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$distance_kurtosis, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$distance_kurtosis))
+data.frame(describe(df.spd$distance_kurtosis, quant = c(0.25, 0.75)))
 ```
 
 
@@ -1524,12 +1532,9 @@ outliers[order(outliers$distance_kurtosis),]
 **Стандартная ошибка среднего амплитуды**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$distance_se, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$distance_se))
+data.frame(describe(df.spd$distance_se, quant = c(0.25, 0.75)))
 ```
 
 
@@ -1570,22 +1575,19 @@ outliers[order(outliers$distance_se),]
 
 
 
-### distance_Q0.25 {.tabset .tabset-fade .tabset-pills}
+### distance_q0.25 {.tabset .tabset-fade .tabset-pills}
 **Нижний квартиль амплитуды**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$distance_Q0.25, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$distance_Q0.25))
+data.frame(describe(df.spd$distance_q0.25, quant = c(0.25, 0.75)))
 ```
 
 
 ```{r fig.width=7, fig.height=4, results='asis'}
-plot_title <- "distance_Q0.25"
-plot_list <- draw_plots_continuous(df.spd, var = df.spd$distance_Q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+plot_title <- "distance_q0.25"
+plot_list <- draw_plots_continuous(df.spd, var = df.spd$distance_q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
 
 create_tabs(plot_list)
 ```
@@ -1593,15 +1595,15 @@ create_tabs(plot_list)
 
 #### Normal test
 ```{r}
-st <- shapiro.test(df.spd$distance_Q0.25);print(st)
+st <- shapiro.test(df.spd$distance_q0.25);print(st)
 check_normal_distribution(st)
 
-ks <- ks.test(df.spd$distance_Q0.25, "pnorm");print(ks)
+ks <- ks.test(df.spd$distance_q0.25, "pnorm");print(ks)
 check_normal_distribution(ks)
 ```
 
 ```{r results='asis'}
-p1 <- ggplot(df.spd, aes(sample = distance_Q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - distance_Q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+p1 <- ggplot(df.spd, aes(sample = distance_q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - distance_q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
 
 create_tabs(list(p1))
 ```
@@ -1609,10 +1611,10 @@ create_tabs(list(p1))
 
 #### Outliers
 ```{r echo=FALSE}
-outliers <- get_outliers(df.spd, df.spd$distance_Q0.25, 1.5)
-outliers <- select(outliers, 1:4, distance_Q0.25, everything())
-outliers[order(outliers$distance_Q0.25, decreasing = T),]
-outliers[order(outliers$distance_Q0.25),]
+outliers <- get_outliers(df.spd, df.spd$distance_q0.25, 1.5)
+outliers <- select(outliers, 1:4, distance_q0.25, everything())
+outliers[order(outliers$distance_q0.25, decreasing = T),]
+outliers[order(outliers$distance_q0.25),]
 ```
 
 
@@ -1620,22 +1622,19 @@ outliers[order(outliers$distance_Q0.25),]
 
 
 
-### distance_Q0.75 {.tabset .tabset-fade .tabset-pills}
+### distance_q0.75 {.tabset .tabset-fade .tabset-pills}
 **Верхний квартиль амплитуды**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$distance_Q0.75, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$distance_Q0.75))
+data.frame(describe(df.spd$distance_q0.75, quant = c(0.25, 0.75)))
 ```
 
 
 ```{r fig.width=7, fig.height=4, results='asis'}
-plot_title <- "distance_Q0.75"
-plot_list <- draw_plots_continuous(df.spd, var = df.spd$distance_Q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+plot_title <- "distance_q0.75"
+plot_list <- draw_plots_continuous(df.spd, var = df.spd$distance_q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
 
 create_tabs(plot_list)
 ```
@@ -1643,15 +1642,15 @@ create_tabs(plot_list)
 
 #### Normal test
 ```{r}
-st <- shapiro.test(df.spd$distance_Q0.75);print(st)
+st <- shapiro.test(df.spd$distance_q0.75);print(st)
 check_normal_distribution(st)
 
-ks <- ks.test(df.spd$distance_Q0.75, "pnorm");print(ks)
+ks <- ks.test(df.spd$distance_q0.75, "pnorm");print(ks)
 check_normal_distribution(ks)
 ```
 
 ```{r results='asis'}
-p1 <- ggplot(df.spd, aes(sample = distance_Q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - distance_Q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+p1 <- ggplot(df.spd, aes(sample = distance_q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - distance_q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
 
 create_tabs(list(p1))
 ```
@@ -1659,10 +1658,10 @@ create_tabs(list(p1))
 
 #### Outliers
 ```{r echo=FALSE}
-outliers <- get_outliers(df.spd, df.spd$distance_Q0.75, 1.5)
-outliers <- select(outliers, 1:4, distance_Q0.75, everything())
-outliers[order(outliers$distance_Q0.75, decreasing = T),]
-outliers[order(outliers$distance_Q0.75),]
+outliers <- get_outliers(df.spd, df.spd$distance_q0.75, 1.5)
+outliers <- select(outliers, 1:4, distance_q0.75, everything())
+outliers[order(outliers$distance_q0.75, decreasing = T),]
+outliers[order(outliers$distance_q0.75),]
 ```
 
 
@@ -1674,12 +1673,9 @@ outliers[order(outliers$distance_Q0.75),]
 **Линейный тренд амплитуды**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$distance_trend, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$distance_trend))
+data.frame(describe(df.spd$distance_trend, quant = c(0.25, 0.75)))
 ```
 
 
@@ -1724,12 +1720,9 @@ outliers[order(outliers$distance_trend),]
 **Общее время пауз**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$pause_total, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$pause_total))
+data.frame(describe(df.spd$pause_total, quant = c(0.25, 0.75)))
 ```
 
 
@@ -1774,12 +1767,9 @@ outliers[order(outliers$pause_total),]
 **Количество пауз**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$pause_number, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$pause_number))
+data.frame(describe(df.spd$pause_number, quant = c(0.25, 0.75)))
 ```
 
 
@@ -1824,12 +1814,9 @@ outliers[order(outliers$pause_number),]
 **Среднее пауза**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$pause_mean, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$pause_mean))
+data.frame(describe(df.spd$pause_mean, quant = c(0.25, 0.75)))
 ```
 
 
@@ -1874,12 +1861,9 @@ outliers[order(outliers$pause_mean),]
 **Стандартное отклонение пауз**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$pause_sd, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$pause_sd))
+data.frame(describe(df.spd$pause_sd, quant = c(0.25, 0.75)))
 ```
 
 
@@ -1924,12 +1908,9 @@ outliers[order(outliers$pause_sd),]
 **Медианная пауза**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$pause_median, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$pause_median))
+data.frame(describe(df.spd$pause_median, quant = c(0.25, 0.75)))
 ```
 
 
@@ -1974,12 +1955,9 @@ outliers[order(outliers$pause_median),]
 **Усеченное среднее пауз**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$pause_trimmed, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$pause_trimmed))
+data.frame(describe(df.spd$pause_trimmed, quant = c(0.25, 0.75)))
 ```
 
 
@@ -2024,12 +2002,9 @@ outliers[order(outliers$pause_trimmed),]
 **Среднее Абсолютное Отклонение пауз**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$pause_mad, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$pause_mad))
+data.frame(describe(df.spd$pause_mad, quant = c(0.25, 0.75)))
 ```
 
 
@@ -2074,12 +2049,9 @@ outliers[order(outliers$pause_mad),]
 **Минимальное время паузы**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$pause_min, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$pause_min))
+data.frame(describe(df.spd$pause_min, quant = c(0.25, 0.75)))
 ```
 
 
@@ -2124,12 +2096,9 @@ outliers[order(outliers$pause_min),]
 **Максимальное время паузы**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$pause_max, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$pause_max))
+data.frame(describe(df.spd$pause_max, quant = c(0.25, 0.75)))
 ```
 
 
@@ -2174,12 +2143,9 @@ outliers[order(outliers$pause_max),]
 **Размах пауз**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$pause_range, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$pause_range))
+data.frame(describe(df.spd$pause_range, quant = c(0.25, 0.75)))
 ```
 
 
@@ -2224,12 +2190,9 @@ outliers[order(outliers$pause_range),]
 **Коэффициент асимметрии пауз**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$pause_skew, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$pause_skew))
+data.frame(describe(df.spd$pause_skew, quant = c(0.25, 0.75)))
 ```
 
 
@@ -2274,12 +2237,9 @@ outliers[order(outliers$pause_skew),]
 **Эксцесс пауз**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$pause_kurtosis, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$pause_kurtosis))
+data.frame(describe(df.spd$pause_kurtosis, quant = c(0.25, 0.75)))
 ```
 
 
@@ -2324,12 +2284,9 @@ outliers[order(outliers$pause_kurtosis),]
 **Стандартная ошибка пауз**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$pause_se, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$pause_se))
+data.frame(describe(df.spd$pause_se, quant = c(0.25, 0.75)))
 ```
 
 
@@ -2370,22 +2327,19 @@ outliers[order(outliers$pause_se),]
 
 
 
-### pause_Q0.25 {.tabset .tabset-fade .tabset-pills}
+### pause_q0.25 {.tabset .tabset-fade .tabset-pills}
 **Нижний квартиль пауз**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$pause_Q0.25, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$pause_Q0.25))
+data.frame(describe(df.spd$pause_q0.25, quant = c(0.25, 0.75)))
 ```
 
 
 ```{r fig.width=7, fig.height=4, results='asis'}
-plot_title <- "pause_Q0.25"
-plot_list <- draw_plots_continuous(df.spd, var = df.spd$pause_Q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+plot_title <- "pause_q0.25"
+plot_list <- draw_plots_continuous(df.spd, var = df.spd$pause_q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
 
 create_tabs(plot_list)
 ```
@@ -2393,15 +2347,15 @@ create_tabs(plot_list)
 
 #### Normal test
 ```{r}
-st <- shapiro.test(df.spd$pause_Q0.25);print(st)
+st <- shapiro.test(df.spd$pause_q0.25);print(st)
 check_normal_distribution(st)
 
-ks <- ks.test(df.spd$pause_Q0.25, "pnorm");print(ks)
+ks <- ks.test(df.spd$pause_q0.25, "pnorm");print(ks)
 check_normal_distribution(ks)
 ```
 
 ```{r results='asis'}
-p1 <- ggplot(df.spd, aes(sample = pause_Q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_Q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+p1 <- ggplot(df.spd, aes(sample = pause_q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
 
 create_tabs(list(p1))
 ```
@@ -2409,10 +2363,10 @@ create_tabs(list(p1))
 
 #### Outliers
 ```{r echo=FALSE}
-outliers <- get_outliers(df.spd, df.spd$pause_Q0.25, 1.5)
-outliers <- select(outliers, 1:4, pause_Q0.25, everything())
-outliers[order(outliers$pause_Q0.25, decreasing = T),]
-outliers[order(outliers$pause_Q0.25),]
+outliers <- get_outliers(df.spd, df.spd$pause_q0.25, 1.5)
+outliers <- select(outliers, 1:4, pause_q0.25, everything())
+outliers[order(outliers$pause_q0.25, decreasing = T),]
+outliers[order(outliers$pause_q0.25),]
 ```
 
 
@@ -2420,22 +2374,19 @@ outliers[order(outliers$pause_Q0.25),]
 
 
 
-### pause_Q0.75 {.tabset .tabset-fade .tabset-pills}
+### pause_q0.75 {.tabset .tabset-fade .tabset-pills}
 **Верхний квартиль пауз**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$pause_Q0.75, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$pause_Q0.75))
+data.frame(describe(df.spd$pause_q0.75, quant = c(0.25, 0.75)))
 ```
 
 
 ```{r fig.width=7, fig.height=4, results='asis'}
-plot_title <- "pause_Q0.75"
-plot_list <- draw_plots_continuous(df.spd, var = df.spd$pause_Q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+plot_title <- "pause_q0.75"
+plot_list <- draw_plots_continuous(df.spd, var = df.spd$pause_q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
 
 create_tabs(plot_list)
 ```
@@ -2443,15 +2394,15 @@ create_tabs(plot_list)
 
 #### Normal test
 ```{r}
-st <- shapiro.test(df.spd$pause_Q0.75);print(st)
+st <- shapiro.test(df.spd$pause_q0.75);print(st)
 check_normal_distribution(st)
 
-ks <- ks.test(df.spd$pause_Q0.75, "pnorm");print(ks)
+ks <- ks.test(df.spd$pause_q0.75, "pnorm");print(ks)
 check_normal_distribution(ks)
 ```
 
 ```{r results='asis'}
-p1 <- ggplot(df.spd, aes(sample = pause_Q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_Q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+p1 <- ggplot(df.spd, aes(sample = pause_q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
 
 create_tabs(list(p1))
 ```
@@ -2459,10 +2410,10 @@ create_tabs(list(p1))
 
 #### Outliers
 ```{r echo=FALSE}
-outliers <- get_outliers(df.spd, df.spd$pause_Q0.75, 1.5)
-outliers <- select(outliers, 1:4, pause_Q0.75, everything())
-outliers[order(outliers$pause_Q0.75, decreasing = T),]
-outliers[order(outliers$pause_Q0.75),]
+outliers <- get_outliers(df.spd, df.spd$pause_q0.75, 1.5)
+outliers <- select(outliers, 1:4, pause_q0.75, everything())
+outliers[order(outliers$pause_q0.75, decreasing = T),]
+outliers[order(outliers$pause_q0.75),]
 ```
 
 
@@ -2474,12 +2425,9 @@ outliers[order(outliers$pause_Q0.75),]
 **Линейный тренд пауз**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$pause_trend, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$pause_trend))
+data.frame(describe(df.spd$pause_trend, quant = c(0.25, 0.75)))
 ```
 
 
@@ -2524,12 +2472,9 @@ outliers[order(outliers$pause_trend),]
 **Количество остановок**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$stops, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$stops))
+data.frame(describe(df.spd$stops, quant = c(0.25, 0.75)))
 ```
 
 
@@ -2574,12 +2519,9 @@ outliers[order(outliers$stops),]
 **Средняя гармоническая скорость**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$velocity_mean, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$velocity_mean))
+data.frame(describe(df.spd$velocity_mean, quant = c(0.25, 0.75)))
 ```
 
 
@@ -2624,12 +2566,9 @@ outliers[order(outliers$velocity_mean),]
 **Стандартное отклонение скорости**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$velocity_sd, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$velocity_sd))
+data.frame(describe(df.spd$velocity_sd, quant = c(0.25, 0.75)))
 ```
 
 
@@ -2674,12 +2613,9 @@ outliers[order(outliers$velocity_sd),]
 **Среднее абсолютное отклонение скорости**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$velocity_mad, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$velocity_mad))
+data.frame(describe(df.spd$velocity_mad, quant = c(0.25, 0.75)))
 ```
 
 
@@ -2724,12 +2660,9 @@ outliers[order(outliers$velocity_mad),]
 **Минимальная скорость**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$velocity_min, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$velocity_min))
+data.frame(describe(df.spd$velocity_min, quant = c(0.25, 0.75)))
 ```
 
 
@@ -2774,12 +2707,9 @@ outliers[order(outliers$velocity_min),]
 **Максимальная скорость**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$velocity_max, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$velocity_max))
+data.frame(describe(df.spd$velocity_max, quant = c(0.25, 0.75)))
 ```
 
 
@@ -2824,12 +2754,9 @@ outliers[order(outliers$velocity_max),]
 **Размах скорости**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$velocity_range, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$velocity_range))
+data.frame(describe(df.spd$velocity_range, quant = c(0.25, 0.75)))
 ```
 
 
@@ -2874,12 +2801,9 @@ outliers[order(outliers$velocity_range),]
 **Коэффициент асимметрии скорости**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$velocity_skew, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$velocity_skew))
+data.frame(describe(df.spd$velocity_skew, quant = c(0.25, 0.75)))
 ```
 
 
@@ -2924,12 +2848,9 @@ outliers[order(outliers$velocity_skew),]
 **Эксцесс скорости**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$velocity_kurtosis, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$velocity_kurtosis))
+data.frame(describe(df.spd$velocity_kurtosis, quant = c(0.25, 0.75)))
 ```
 
 
@@ -2974,12 +2895,9 @@ outliers[order(outliers$velocity_kurtosis),]
 **Стандартная ошибка скорости**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$velocity_se, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$velocity_se))
+data.frame(describe(df.spd$velocity_se, quant = c(0.25, 0.75)))
 ```
 
 
@@ -3020,22 +2938,19 @@ outliers[order(outliers$velocity_se),]
 
 
 
-### velocity_Q0.25 {.tabset .tabset-fade .tabset-pills}
+### velocity_q0.25 {.tabset .tabset-fade .tabset-pills}
 **Нижний квартиль скорости**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$velocity_Q0.25, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$velocity_Q0.25))
+data.frame(describe(df.spd$velocity_q0.25, quant = c(0.25, 0.75)))
 ```
 
 
 ```{r fig.width=7, fig.height=4, results='asis'}
-plot_title <- "velocity_Q0.25"
-plot_list <- draw_plots_continuous(df.spd, var = df.spd$velocity_Q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+plot_title <- "velocity_q0.25"
+plot_list <- draw_plots_continuous(df.spd, var = df.spd$velocity_q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
 
 create_tabs(plot_list)
 ```
@@ -3043,15 +2958,15 @@ create_tabs(plot_list)
 
 #### Normal test
 ```{r}
-st <- shapiro.test(df.spd$velocity_Q0.25);print(st)
+st <- shapiro.test(df.spd$velocity_q0.25);print(st)
 check_normal_distribution(st)
 
-ks <- ks.test(df.spd$velocity_Q0.25, "pnorm");print(ks)
+ks <- ks.test(df.spd$velocity_q0.25, "pnorm");print(ks)
 check_normal_distribution(ks)
 ```
 
 ```{r results='asis'}
-p1 <- ggplot(df.spd, aes(sample = velocity_Q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - velocity_Q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+p1 <- ggplot(df.spd, aes(sample = velocity_q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - velocity_q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
 
 create_tabs(list(p1))
 ```
@@ -3059,10 +2974,10 @@ create_tabs(list(p1))
 
 #### Outliers
 ```{r echo=FALSE}
-outliers <- get_outliers(df.spd, df.spd$velocity_Q0.25, 1.5)
-outliers <- select(outliers, 1:4, velocity_Q0.25, everything())
-outliers[order(outliers$velocity_Q0.25, decreasing = T),]
-outliers[order(outliers$velocity_Q0.25),]
+outliers <- get_outliers(df.spd, df.spd$velocity_q0.25, 1.5)
+outliers <- select(outliers, 1:4, velocity_q0.25, everything())
+outliers[order(outliers$velocity_q0.25, decreasing = T),]
+outliers[order(outliers$velocity_q0.25),]
 ```
 
 
@@ -3070,22 +2985,19 @@ outliers[order(outliers$velocity_Q0.25),]
 
 
 
-### velocity_Q0.75 {.tabset .tabset-fade .tabset-pills}
+### velocity_q0.75 {.tabset .tabset-fade .tabset-pills}
 **Верхний квартиль скорости**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$velocity_Q0.75, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$velocity_Q0.75))
+data.frame(describe(df.spd$velocity_q0.75, quant = c(0.25, 0.75)))
 ```
 
 
 ```{r fig.width=7, fig.height=4, results='asis'}
-plot_title <- "velocity_Q0.75"
-plot_list <- draw_plots_continuous(df.spd, var = df.spd$velocity_Q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+plot_title <- "velocity_q0.75"
+plot_list <- draw_plots_continuous(df.spd, var = df.spd$velocity_q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
 
 create_tabs(plot_list)
 ```
@@ -3093,15 +3005,15 @@ create_tabs(plot_list)
 
 #### Normal test
 ```{r}
-st <- shapiro.test(df.spd$velocity_Q0.75);print(st)
+st <- shapiro.test(df.spd$velocity_q0.75);print(st)
 check_normal_distribution(st)
 
-ks <- ks.test(df.spd$velocity_Q0.75, "pnorm");print(ks)
+ks <- ks.test(df.spd$velocity_q0.75, "pnorm");print(ks)
 check_normal_distribution(ks)
 ```
 
 ```{r results='asis'}
-p1 <- ggplot(df.spd, aes(sample = velocity_Q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - velocity_Q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+p1 <- ggplot(df.spd, aes(sample = velocity_q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - velocity_q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
 
 create_tabs(list(p1))
 ```
@@ -3109,10 +3021,10 @@ create_tabs(list(p1))
 
 #### Outliers
 ```{r echo=FALSE}
-outliers <- get_outliers(df.spd, df.spd$velocity_Q0.75, 1.5)
-outliers <- select(outliers, 1:4, velocity_Q0.75, everything())
-outliers[order(outliers$velocity_Q0.75, decreasing = T),]
-outliers[order(outliers$velocity_Q0.75),]
+outliers <- get_outliers(df.spd, df.spd$velocity_q0.75, 1.5)
+outliers <- select(outliers, 1:4, velocity_q0.75, everything())
+outliers[order(outliers$velocity_q0.75, decreasing = T),]
+outliers[order(outliers$velocity_q0.75),]
 ```
 
 
@@ -3124,12 +3036,9 @@ outliers[order(outliers$velocity_Q0.75),]
 **Линейный тренд скорости**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$velocity_trend, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$velocity_trend))
+data.frame(describe(df.spd$velocity_trend, quant = c(0.25, 0.75)))
 ```
 
 
@@ -3174,12 +3083,9 @@ outliers[order(outliers$velocity_trend),]
 **Количество ускорений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_n, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_n))
+data.frame(describe(df.spd$acc_n, quant = c(0.25, 0.75)))
 ```
 
 
@@ -3229,12 +3135,9 @@ outliers[order(outliers$acc_n),]
 **Стандартное отклонение ускорений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_sd, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_sd))
+data.frame(describe(df.spd$acc_sd, quant = c(0.25, 0.75)))
 ```
 
 
@@ -3279,12 +3182,9 @@ outliers[order(outliers$acc_sd),]
 **Медианная ускорение**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_median, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_median))
+data.frame(describe(df.spd$acc_median, quant = c(0.25, 0.75)))
 ```
 
 
@@ -3329,12 +3229,9 @@ outliers[order(outliers$acc_median),]
 **Усеченное среднее ускорения**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_trimmed, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_trimmed))
+data.frame(describe(df.spd$acc_trimmed, quant = c(0.25, 0.75)))
 ```
 
 
@@ -3379,12 +3276,9 @@ outliers[order(outliers$acc_trimmed),]
 **Среднее абсолютное отклонение ускорений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_mad, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_mad))
+data.frame(describe(df.spd$acc_mad, quant = c(0.25, 0.75)))
 ```
 
 
@@ -3429,12 +3323,9 @@ outliers[order(outliers$acc_mad),]
 **Минимальное ускорение**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_min, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_min))
+data.frame(describe(df.spd$acc_min, quant = c(0.25, 0.75)))
 ```
 
 
@@ -3479,12 +3370,9 @@ outliers[order(outliers$acc_min),]
 **Максимальное ускорение**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_max, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_max))
+data.frame(describe(df.spd$acc_max, quant = c(0.25, 0.75)))
 ```
 
 
@@ -3529,12 +3417,9 @@ outliers[order(outliers$acc_max),]
 **Размах ускорений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_range, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_range))
+data.frame(describe(df.spd$acc_range, quant = c(0.25, 0.75)))
 ```
 
 
@@ -3579,12 +3464,9 @@ outliers[order(outliers$acc_range),]
 **Коэффициент асимметрии ускорений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_skew, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_skew))
+data.frame(describe(df.spd$acc_skew, quant = c(0.25, 0.75)))
 ```
 
 
@@ -3629,12 +3511,9 @@ outliers[order(outliers$acc_skew),]
 **Эксцесс ускорений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_kurtosis, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_kurtosis))
+data.frame(describe(df.spd$acc_kurtosis, quant = c(0.25, 0.75)))
 ```
 
 
@@ -3679,12 +3558,9 @@ outliers[order(outliers$acc_kurtosis),]
 **Стандартная ошибка ускорений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_se, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_se))
+data.frame(describe(df.spd$acc_se, quant = c(0.25, 0.75)))
 ```
 
 
@@ -3725,22 +3601,19 @@ outliers[order(outliers$acc_se),]
 
 
 
-### acc_Q0.25 {.tabset .tabset-fade .tabset-pills}
+### acc_q0.25 {.tabset .tabset-fade .tabset-pills}
 **Нижний квартиль ускорений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_Q0.25, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_Q0.25))
+data.frame(describe(df.spd$acc_q0.25, quant = c(0.25, 0.75)))
 ```
 
 
 ```{r fig.width=7, fig.height=4, results='asis'}
-plot_title <- "acc_Q0.25"
-plot_list <- draw_plots_continuous(df.spd, var = df.spd$acc_Q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+plot_title <- "acc_q0.25"
+plot_list <- draw_plots_continuous(df.spd, var = df.spd$acc_q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
 
 create_tabs(plot_list)
 ```
@@ -3748,15 +3621,15 @@ create_tabs(plot_list)
 
 #### Normal test
 ```{r}
-st <- shapiro.test(df.spd$acc_Q0.25);print(st)
+st <- shapiro.test(df.spd$acc_q0.25);print(st)
 check_normal_distribution(st)
 
-ks <- ks.test(df.spd$acc_Q0.25, "pnorm");print(ks)
+ks <- ks.test(df.spd$acc_q0.25, "pnorm");print(ks)
 check_normal_distribution(ks)
 ```
 
 ```{r results='asis'}
-p1 <- ggplot(df.spd, aes(sample = acc_Q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_Q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+p1 <- ggplot(df.spd, aes(sample = acc_q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
 
 create_tabs(list(p1))
 ```
@@ -3764,10 +3637,10 @@ create_tabs(list(p1))
 
 #### Outliers
 ```{r echo=FALSE}
-outliers <- get_outliers(df.spd, df.spd$acc_Q0.25, 1.5)
-outliers <- select(outliers, 1:4, acc_Q0.25, everything())
-outliers[order(outliers$acc_Q0.25, decreasing = T),]
-outliers[order(outliers$acc_Q0.25),]
+outliers <- get_outliers(df.spd, df.spd$acc_q0.25, 1.5)
+outliers <- select(outliers, 1:4, acc_q0.25, everything())
+outliers[order(outliers$acc_q0.25, decreasing = T),]
+outliers[order(outliers$acc_q0.25),]
 ```
 
 
@@ -3775,22 +3648,19 @@ outliers[order(outliers$acc_Q0.25),]
 
 
 
-### acc_Q0.75 {.tabset .tabset-fade .tabset-pills}
+### acc_q0.75 {.tabset .tabset-fade .tabset-pills}
 **Верхний квартиль ускорений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_Q0.75, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_Q0.75))
+data.frame(describe(df.spd$acc_q0.75, quant = c(0.25, 0.75)))
 ```
 
 
 ```{r fig.width=7, fig.height=4, results='asis'}
-plot_title <- "acc_Q0.75"
-plot_list <- draw_plots_continuous(df.spd, var = df.spd$acc_Q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+plot_title <- "acc_q0.75"
+plot_list <- draw_plots_continuous(df.spd, var = df.spd$acc_q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
 
 create_tabs(plot_list)
 ```
@@ -3798,15 +3668,15 @@ create_tabs(plot_list)
 
 #### Normal test
 ```{r}
-st <- shapiro.test(df.spd$acc_Q0.75);print(st)
+st <- shapiro.test(df.spd$acc_q0.75);print(st)
 check_normal_distribution(st)
 
-ks <- ks.test(df.spd$acc_Q0.75, "pnorm");print(ks)
+ks <- ks.test(df.spd$acc_q0.75, "pnorm");print(ks)
 check_normal_distribution(ks)
 ```
 
 ```{r results='asis'}
-p1 <- ggplot(df.spd, aes(sample = acc_Q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_Q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+p1 <- ggplot(df.spd, aes(sample = acc_q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
 
 create_tabs(list(p1))
 ```
@@ -3814,10 +3684,10 @@ create_tabs(list(p1))
 
 #### Outliers
 ```{r echo=FALSE}
-outliers <- get_outliers(df.spd, df.spd$acc_Q0.75, 1.5)
-outliers <- select(outliers, 1:4, acc_Q0.75, everything())
-outliers[order(outliers$acc_Q0.75, decreasing = T),]
-outliers[order(outliers$acc_Q0.75),]
+outliers <- get_outliers(df.spd, df.spd$acc_q0.75, 1.5)
+outliers <- select(outliers, 1:4, acc_q0.75, everything())
+outliers[order(outliers$acc_q0.75, decreasing = T),]
+outliers[order(outliers$acc_q0.75),]
 ```
 
 
@@ -3829,12 +3699,9 @@ outliers[order(outliers$acc_Q0.75),]
 **Линия рывков**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$jerk_line, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$jerk_line))
+data.frame(describe(df.spd$jerk_line, quant = c(0.25, 0.75)))
 ```
 
 
@@ -3879,12 +3746,9 @@ outliers[order(outliers$jerk_line),]
 **Количество рывков**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$n_jerk, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$n_jerk))
+data.frame(describe(df.spd$n_jerk, quant = c(0.25, 0.75)))
 ```
 
 
@@ -3929,12 +3793,9 @@ outliers[order(outliers$n_jerk),]
 **Количество замедлений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$dec_n, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$dec_n))
+data.frame(describe(df.spd$dec_n, quant = c(0.25, 0.75)))
 ```
 
 
@@ -3979,12 +3840,9 @@ outliers[order(outliers$dec_n),]
 **Среднее замедление**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$dec_mean, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$dec_mean))
+data.frame(describe(df.spd$dec_mean, quant = c(0.25, 0.75)))
 ```
 
 
@@ -4029,12 +3887,9 @@ outliers[order(outliers$dec_mean),]
 **Стандартное отклонение замедлений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$dec_sd, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$dec_sd))
+data.frame(describe(df.spd$dec_sd, quant = c(0.25, 0.75)))
 ```
 
 
@@ -4079,12 +3934,9 @@ outliers[order(outliers$dec_sd),]
 **Медианная замедлений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$dec_median, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$dec_median))
+data.frame(describe(df.spd$dec_median, quant = c(0.25, 0.75)))
 ```
 
 
@@ -4129,12 +3981,9 @@ outliers[order(outliers$dec_median),]
 **Усеченное среднее замедлений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$dec_trimmed, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$dec_trimmed))
+data.frame(describe(df.spd$dec_trimmed, quant = c(0.25, 0.75)))
 ```
 
 
@@ -4179,12 +4028,9 @@ outliers[order(outliers$dec_trimmed),]
 **Среднее абсолютное отклонение замедлений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$dec_mad, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$dec_mad))
+data.frame(describe(df.spd$dec_mad, quant = c(0.25, 0.75)))
 ```
 
 
@@ -4229,12 +4075,9 @@ outliers[order(outliers$dec_mad),]
 **Минимальное замедление**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$dec_min, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$dec_min))
+data.frame(describe(df.spd$dec_min, quant = c(0.25, 0.75)))
 ```
 
 
@@ -4279,12 +4122,9 @@ outliers[order(outliers$dec_min),]
 **Максимальное замедление**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$dec_max, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$dec_max))
+data.frame(describe(df.spd$dec_max, quant = c(0.25, 0.75)))
 ```
 
 
@@ -4329,12 +4169,9 @@ outliers[order(outliers$dec_max),]
 **Размах замедлений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$dec_range, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$dec_range))
+data.frame(describe(df.spd$dec_range, quant = c(0.25, 0.75)))
 ```
 
 
@@ -4379,12 +4216,9 @@ outliers[order(outliers$dec_range),]
 **Коэффициент асимметрии замедлений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$dec_skew, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$dec_skew))
+data.frame(describe(df.spd$dec_skew, quant = c(0.25, 0.75)))
 ```
 
 
@@ -4429,12 +4263,9 @@ outliers[order(outliers$dec_skew),]
 **Эксцесс замедлений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$dec_kurtosis, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$dec_kurtosis))
+data.frame(describe(df.spd$dec_kurtosis, quant = c(0.25, 0.75)))
 ```
 
 
@@ -4479,12 +4310,9 @@ outliers[order(outliers$dec_kurtosis),]
 **Стандартная ошибка замедлений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$dec_se, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$dec_se))
+data.frame(describe(df.spd$dec_se, quant = c(0.25, 0.75)))
 ```
 
 
@@ -4525,22 +4353,19 @@ outliers[order(outliers$dec_se),]
 
 
 
-### dec_Q0.25 {.tabset .tabset-fade .tabset-pills}
+### dec_q0.25 {.tabset .tabset-fade .tabset-pills}
 **Нижний квартиль замедлений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$dec_Q0.25, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$dec_Q0.25))
+data.frame(describe(df.spd$dec_q0.25, quant = c(0.25, 0.75)))
 ```
 
 
 ```{r fig.width=7, fig.height=4, results='asis'}
-plot_title <- "dec_Q0.25"
-plot_list <- draw_plots_continuous(df.spd, var = df.spd$dec_Q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+plot_title <- "dec_q0.25"
+plot_list <- draw_plots_continuous(df.spd, var = df.spd$dec_q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
 
 create_tabs(plot_list)
 ```
@@ -4548,15 +4373,15 @@ create_tabs(plot_list)
 
 #### Normal test
 ```{r}
-st <- shapiro.test(df.spd$dec_Q0.25);print(st)
+st <- shapiro.test(df.spd$dec_q0.25);print(st)
 check_normal_distribution(st)
 
-ks <- ks.test(df.spd$dec_Q0.25, "pnorm");print(ks)
+ks <- ks.test(df.spd$dec_q0.25, "pnorm");print(ks)
 check_normal_distribution(ks)
 ```
 
 ```{r results='asis'}
-p1 <- ggplot(df.spd, aes(sample = dec_Q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - dec_Q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+p1 <- ggplot(df.spd, aes(sample = dec_q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - dec_q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
 
 create_tabs(list(p1))
 ```
@@ -4564,10 +4389,10 @@ create_tabs(list(p1))
 
 #### Outliers
 ```{r echo=FALSE}
-outliers <- get_outliers(df.spd, df.spd$dec_Q0.25, 1.5)
-outliers <- select(outliers, 1:4, dec_Q0.25, everything())
-outliers[order(outliers$dec_Q0.25, decreasing = T),]
-outliers[order(outliers$dec_Q0.25),]
+outliers <- get_outliers(df.spd, df.spd$dec_q0.25, 1.5)
+outliers <- select(outliers, 1:4, dec_q0.25, everything())
+outliers[order(outliers$dec_q0.25, decreasing = T),]
+outliers[order(outliers$dec_q0.25),]
 ```
 
 
@@ -4575,22 +4400,19 @@ outliers[order(outliers$dec_Q0.25),]
 
 
 
-### dec_Q0.75 {.tabset .tabset-fade .tabset-pills}
+### dec_q0.75 {.tabset .tabset-fade .tabset-pills}
 **Верхний квартиль замедлений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$dec_Q0.75, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$dec_Q0.75))
+data.frame(describe(df.spd$dec_q0.75, quant = c(0.25, 0.75)))
 ```
 
 
 ```{r fig.width=7, fig.height=4, results='asis'}
-plot_title <- "dec_Q0.75"
-plot_list <- draw_plots_continuous(df.spd, var = df.spd$dec_Q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+plot_title <- "dec_q0.75"
+plot_list <- draw_plots_continuous(df.spd, var = df.spd$dec_q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
 
 create_tabs(plot_list)
 ```
@@ -4598,15 +4420,15 @@ create_tabs(plot_list)
 
 #### Normal test
 ```{r}
-st <- shapiro.test(df.spd$dec_Q0.75);print(st)
+st <- shapiro.test(df.spd$dec_q0.75);print(st)
 check_normal_distribution(st)
 
-ks <- ks.test(df.spd$dec_Q0.75, "pnorm");print(ks)
+ks <- ks.test(df.spd$dec_q0.75, "pnorm");print(ks)
 check_normal_distribution(ks)
 ```
 
 ```{r results='asis'}
-p1 <- ggplot(df.spd, aes(sample = dec_Q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - dec_Q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+p1 <- ggplot(df.spd, aes(sample = dec_q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - dec_q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
 
 create_tabs(list(p1))
 ```
@@ -4614,10 +4436,10 @@ create_tabs(list(p1))
 
 #### Outliers
 ```{r echo=FALSE}
-outliers <- get_outliers(df.spd, df.spd$dec_Q0.75, 1.5)
-outliers <- select(outliers, 1:4, dec_Q0.75, everything())
-outliers[order(outliers$dec_Q0.75, decreasing = T),]
-outliers[order(outliers$dec_Q0.75),]
+outliers <- get_outliers(df.spd, df.spd$dec_q0.75, 1.5)
+outliers <- select(outliers, 1:4, dec_q0.75, everything())
+outliers[order(outliers$dec_q0.75, decreasing = T),]
+outliers[order(outliers$dec_q0.75),]
 ```
 
 
@@ -4629,12 +4451,9 @@ outliers[order(outliers$dec_Q0.75),]
 **Линия резких торможений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$braking_line, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$braking_line))
+data.frame(describe(df.spd$braking_line, quant = c(0.25, 0.75)))
 ```
 
 
@@ -4679,12 +4498,9 @@ outliers[order(outliers$braking_line),]
 **Количество резких торможений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$n_braking, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$n_braking))
+data.frame(describe(df.spd$n_braking, quant = c(0.25, 0.75)))
 ```
 
 
@@ -4729,12 +4545,9 @@ outliers[order(outliers$n_braking),]
 **Среднее количество ускорений за секунду**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_per_sec_mean, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_per_sec_mean))
+data.frame(describe(df.spd$acc_per_sec_mean, quant = c(0.25, 0.75)))
 ```
 
 
@@ -4779,12 +4592,9 @@ outliers[order(outliers$acc_per_sec_mean),]
 **Стандартное отклонение количества ускорений за секунду **
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_per_sec_sd, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_per_sec_sd))
+data.frame(describe(df.spd$acc_per_sec_sd, quant = c(0.25, 0.75)))
 ```
 
 
@@ -4829,12 +4639,9 @@ outliers[order(outliers$acc_per_sec_sd),]
 **Медианное количество ускорений за секунду**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_per_sec_median, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_per_sec_median))
+data.frame(describe(df.spd$acc_per_sec_median, quant = c(0.25, 0.75)))
 ```
 
 
@@ -4879,12 +4686,9 @@ outliers[order(outliers$acc_per_sec_median),]
 **Усеченное среднее количества ускорений за секунду**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_per_sec_trimmed, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_per_sec_trimmed))
+data.frame(describe(df.spd$acc_per_sec_trimmed, quant = c(0.25, 0.75)))
 ```
 
 
@@ -4929,12 +4733,9 @@ outliers[order(outliers$acc_per_sec_trimmed),]
 **Среднее абсолютное отклонение количества ускорений за секунду**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_per_sec_mad, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_per_sec_mad))
+data.frame(describe(df.spd$acc_per_sec_mad, quant = c(0.25, 0.75)))
 ```
 
 
@@ -4979,12 +4780,9 @@ outliers[order(outliers$acc_per_sec_mad),]
 **Минимальное количество ускорений за секунду**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_per_sec_min, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_per_sec_min))
+data.frame(describe(df.spd$acc_per_sec_min, quant = c(0.25, 0.75)))
 ```
 
 
@@ -5029,12 +4827,9 @@ outliers[order(outliers$acc_per_sec_min),]
 **Максимальное количество ускорений за секунду**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_per_sec_max, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_per_sec_max))
+data.frame(describe(df.spd$acc_per_sec_max, quant = c(0.25, 0.75)))
 ```
 
 
@@ -5079,12 +4874,9 @@ outliers[order(outliers$acc_per_sec_max),]
 **Размах количества ускорений за секунду**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_per_sec_range, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_per_sec_range))
+data.frame(describe(df.spd$acc_per_sec_range, quant = c(0.25, 0.75)))
 ```
 
 
@@ -5129,12 +4921,9 @@ outliers[order(outliers$acc_per_sec_range),]
 **Коэффициент асимметрии количества ускорений за секунду**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_per_sec_skew, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_per_sec_skew))
+data.frame(describe(df.spd$acc_per_sec_skew, quant = c(0.25, 0.75)))
 ```
 
 
@@ -5179,12 +4968,9 @@ outliers[order(outliers$acc_per_sec_skew),]
 **Эксцесс количества ускорений за секунду**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_per_sec_kurtosis, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_per_sec_kurtosis))
+data.frame(describe(df.spd$acc_per_sec_kurtosis, quant = c(0.25, 0.75)))
 ```
 
 
@@ -5229,12 +5015,9 @@ outliers[order(outliers$acc_per_sec_kurtosis),]
 **Стандартная ошибка количества ускорений за секунду**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_per_sec_se, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_per_sec_se))
+data.frame(describe(df.spd$acc_per_sec_se, quant = c(0.25, 0.75)))
 ```
 
 
@@ -5275,22 +5058,19 @@ outliers[order(outliers$acc_per_sec_se),]
 
 
 
-### acc_per_sec_Q0.25 {.tabset .tabset-fade .tabset-pills}
+### acc_per_sec_q0.25 {.tabset .tabset-fade .tabset-pills}
 **Нижний квартиль количества ускорений за секунду**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_per_sec_Q0.25, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_per_sec_Q0.25))
+data.frame(describe(df.spd$acc_per_sec_q0.25, quant = c(0.25, 0.75)))
 ```
 
 
 ```{r fig.width=7, fig.height=4, results='asis'}
-plot_title <- "acc_per_sec_Q0.25"
-plot_list <- draw_plots_continuous(df.spd, var = df.spd$acc_per_sec_Q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+plot_title <- "acc_per_sec_q0.25"
+plot_list <- draw_plots_continuous(df.spd, var = df.spd$acc_per_sec_q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
 
 create_tabs(plot_list)
 ```
@@ -5298,15 +5078,15 @@ create_tabs(plot_list)
 
 #### Normal test
 ```{r}
-st <- shapiro.test(df.spd$acc_per_sec_Q0.25);print(st)
+st <- shapiro.test(df.spd$acc_per_sec_q0.25);print(st)
 check_normal_distribution(st)
 
-ks <- ks.test(df.spd$acc_per_sec_Q0.25, "pnorm");print(ks)
+ks <- ks.test(df.spd$acc_per_sec_q0.25, "pnorm");print(ks)
 check_normal_distribution(ks)
 ```
 
 ```{r results='asis'}
-p1 <- ggplot(df.spd, aes(sample = acc_per_sec_Q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_per_sec_Q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+p1 <- ggplot(df.spd, aes(sample = acc_per_sec_q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_per_sec_q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
 
 create_tabs(list(p1))
 ```
@@ -5314,10 +5094,10 @@ create_tabs(list(p1))
 
 #### Outliers
 ```{r echo=FALSE}
-outliers <- get_outliers(df.spd, df.spd$acc_per_sec_Q0.25, 1.5)
-outliers <- select(outliers, 1:4, acc_per_sec_Q0.25, everything())
-outliers[order(outliers$acc_per_sec_Q0.25, decreasing = T),]
-outliers[order(outliers$acc_per_sec_Q0.25),]
+outliers <- get_outliers(df.spd, df.spd$acc_per_sec_q0.25, 1.5)
+outliers <- select(outliers, 1:4, acc_per_sec_q0.25, everything())
+outliers[order(outliers$acc_per_sec_q0.25, decreasing = T),]
+outliers[order(outliers$acc_per_sec_q0.25),]
 ```
 
 
@@ -5325,22 +5105,19 @@ outliers[order(outliers$acc_per_sec_Q0.25),]
 
 
 
-### acc_per_sec_Q0.75 {.tabset .tabset-fade .tabset-pills}
+### acc_per_sec_q0.75 {.tabset .tabset-fade .tabset-pills}
 **Верхний квартиль количества ускорений за секунду**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_per_sec_Q0.75, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_per_sec_Q0.75))
+data.frame(describe(df.spd$acc_per_sec_q0.75, quant = c(0.25, 0.75)))
 ```
 
 
 ```{r fig.width=7, fig.height=4, results='asis'}
-plot_title <- "acc_per_sec_Q0.75"
-plot_list <- draw_plots_continuous(df.spd, var = df.spd$acc_per_sec_Q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+plot_title <- "acc_per_sec_q0.75"
+plot_list <- draw_plots_continuous(df.spd, var = df.spd$acc_per_sec_q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
 
 create_tabs(plot_list)
 ```
@@ -5348,15 +5125,15 @@ create_tabs(plot_list)
 
 #### Normal test
 ```{r}
-st <- shapiro.test(df.spd$acc_per_sec_Q0.75);print(st)
+st <- shapiro.test(df.spd$acc_per_sec_q0.75);print(st)
 check_normal_distribution(st)
 
-ks <- ks.test(df.spd$acc_per_sec_Q0.75, "pnorm");print(ks)
+ks <- ks.test(df.spd$acc_per_sec_q0.75, "pnorm");print(ks)
 check_normal_distribution(ks)
 ```
 
 ```{r results='asis'}
-p1 <- ggplot(df.spd, aes(sample = acc_per_sec_Q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_per_sec_Q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+p1 <- ggplot(df.spd, aes(sample = acc_per_sec_q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - acc_per_sec_q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
 
 create_tabs(list(p1))
 ```
@@ -5364,10 +5141,10 @@ create_tabs(list(p1))
 
 #### Outliers
 ```{r echo=FALSE}
-outliers <- get_outliers(df.spd, df.spd$acc_per_sec_Q0.75, 1.5)
-outliers <- select(outliers, 1:4, acc_per_sec_Q0.75, everything())
-outliers[order(outliers$acc_per_sec_Q0.75, decreasing = T),]
-outliers[order(outliers$acc_per_sec_Q0.75),]
+outliers <- get_outliers(df.spd, df.spd$acc_per_sec_q0.75, 1.5)
+outliers <- select(outliers, 1:4, acc_per_sec_q0.75, everything())
+outliers[order(outliers$acc_per_sec_q0.75, decreasing = T),]
+outliers[order(outliers$acc_per_sec_q0.75),]
 ```
 
 
@@ -5379,12 +5156,9 @@ outliers[order(outliers$acc_per_sec_Q0.75),]
 **Позиция максимального количества ускорений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_per_sec_max_pos, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_per_sec_max_pos))
+data.frame(describe(df.spd$acc_per_sec_max_pos, quant = c(0.25, 0.75)))
 ```
 
 
@@ -5429,12 +5203,9 @@ outliers[order(outliers$acc_per_sec_max_pos),]
 **Позиция минимального количества ускорений**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$acc_per_sec_min_pos, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$acc_per_sec_min_pos))
+data.frame(describe(df.spd$acc_per_sec_min_pos, quant = c(0.25, 0.75)))
 ```
 
 
@@ -5479,12 +5250,9 @@ outliers[order(outliers$acc_per_sec_min_pos),]
 **Расстояние промахов от центра мишеней, пикс.**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$missings_distance, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$missings_distance))
+data.frame(describe(df.spd$missings_distance, quant = c(0.25, 0.75)))
 ```
 
 
@@ -5529,12 +5297,9 @@ outliers[order(outliers$missings_distance),]
 **Среднее расстояние промахов от центра мишеней, пикс.**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$missings_mean, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$missings_mean))
+data.frame(describe(df.spd$missings_mean, quant = c(0.25, 0.75)))
 ```
 
 
@@ -5579,12 +5344,9 @@ outliers[order(outliers$missings_mean),]
 **Стандартное отклонение расстояний промахов**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$missings_sd, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$missings_sd))
+data.frame(describe(df.spd$missings_sd, quant = c(0.25, 0.75)))
 ```
 
 
@@ -5629,12 +5391,9 @@ outliers[order(outliers$missings_sd),]
 **Медиана расстояний промахов**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$missings_median, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$missings_median))
+data.frame(describe(df.spd$missings_median, quant = c(0.25, 0.75)))
 ```
 
 
@@ -5679,12 +5438,9 @@ outliers[order(outliers$missings_median),]
 **Усеченное среднее расстояний промахов**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$missings_trimmed, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$missings_trimmed))
+data.frame(describe(df.spd$missings_trimmed, quant = c(0.25, 0.75)))
 ```
 
 
@@ -5729,12 +5485,9 @@ outliers[order(outliers$missings_trimmed),]
 **Среднее абсолютное отклонение расстояний промахов**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$missings_mad, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$missings_mad))
+data.frame(describe(df.spd$missings_mad, quant = c(0.25, 0.75)))
 ```
 
 
@@ -5779,12 +5532,9 @@ outliers[order(outliers$missings_mad),]
 **Минимальное расстояние промахов**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$missings_min, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$missings_min))
+data.frame(describe(df.spd$missings_min, quant = c(0.25, 0.75)))
 ```
 
 
@@ -5829,12 +5579,9 @@ outliers[order(outliers$missings_min),]
 **Максимальное расстояние промахов**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$missings_max, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$missings_max))
+data.frame(describe(df.spd$missings_max, quant = c(0.25, 0.75)))
 ```
 
 
@@ -5879,12 +5626,9 @@ outliers[order(outliers$missings_max),]
 **Размах расстояния промахов**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$missings_range, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$missings_range))
+data.frame(describe(df.spd$missings_range, quant = c(0.25, 0.75)))
 ```
 
 
@@ -5929,12 +5673,9 @@ outliers[order(outliers$missings_range),]
 **Коэффициент асимметрии расстояний промахов**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$missings_skew, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$missings_skew))
+data.frame(describe(df.spd$missings_skew, quant = c(0.25, 0.75)))
 ```
 
 
@@ -5979,12 +5720,9 @@ outliers[order(outliers$missings_skew),]
 **Эксцесс расстояний промахов**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$missings_kurtosis, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$missings_kurtosis))
+data.frame(describe(df.spd$missings_kurtosis, quant = c(0.25, 0.75)))
 ```
 
 
@@ -6029,12 +5767,9 @@ outliers[order(outliers$missings_kurtosis),]
 **Стандартная ошибка расстояний промахов**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$missings_se, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$missings_se))
+data.frame(describe(df.spd$missings_se, quant = c(0.25, 0.75)))
 ```
 
 
@@ -6075,22 +5810,19 @@ outliers[order(outliers$missings_se),]
 
 
 
-### missings_Q0.25 {.tabset .tabset-fade .tabset-pills}
+### missings_q0.25 {.tabset .tabset-fade .tabset-pills}
 **Нижний квартиль расстояний промахов**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$missings_Q0.25, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$missings_Q0.25))
+data.frame(describe(df.spd$missings_q0.25, quant = c(0.25, 0.75)))
 ```
 
 
 ```{r fig.width=7, fig.height=4, results='asis'}
-plot_title <- "missings_Q0.25"
-plot_list <- draw_plots_continuous(df.spd, var = df.spd$missings_Q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+plot_title <- "missings_q0.25"
+plot_list <- draw_plots_continuous(df.spd, var = df.spd$missings_q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
 
 create_tabs(plot_list)
 ```
@@ -6098,15 +5830,15 @@ create_tabs(plot_list)
 
 #### Normal test
 ```{r}
-st <- shapiro.test(df.spd$missings_Q0.25);print(st)
+st <- shapiro.test(df.spd$missings_q0.25);print(st)
 check_normal_distribution(st)
 
-ks <- ks.test(df.spd$missings_Q0.25, "pnorm");print(ks)
+ks <- ks.test(df.spd$missings_q0.25, "pnorm");print(ks)
 check_normal_distribution(ks)
 ```
 
 ```{r results='asis'}
-p1 <- ggplot(df.spd, aes(sample = missings_Q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings_Q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+p1 <- ggplot(df.spd, aes(sample = missings_q0.25)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings_q0.25", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
 
 create_tabs(list(p1))
 ```
@@ -6114,10 +5846,10 @@ create_tabs(list(p1))
 
 #### Outliers
 ```{r echo=FALSE}
-outliers <- get_outliers(df.spd, df.spd$missings_Q0.25, 1.5)
-outliers <- select(outliers, 1:4, missings_Q0.25, everything())
-outliers[order(outliers$missings_Q0.25, decreasing = T),]
-outliers[order(outliers$missings_Q0.25),]
+outliers <- get_outliers(df.spd, df.spd$missings_q0.25, 1.5)
+outliers <- select(outliers, 1:4, missings_q0.25, everything())
+outliers[order(outliers$missings_q0.25, decreasing = T),]
+outliers[order(outliers$missings_q0.25),]
 ```
 
 
@@ -6125,22 +5857,19 @@ outliers[order(outliers$missings_Q0.25),]
 
 
 
-### missings_Q0.75 {.tabset .tabset-fade .tabset-pills}
+### missings_q0.75 {.tabset .tabset-fade .tabset-pills}
 **Верхний квартиль расстояний промахов**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$missings_Q0.75, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$missings_Q0.75))
+data.frame(describe(df.spd$missings_q0.75, quant = c(0.25, 0.75)))
 ```
 
 
 ```{r fig.width=7, fig.height=4, results='asis'}
-plot_title <- "missings_Q0.75"
-plot_list <- draw_plots_continuous(df.spd, var = df.spd$missings_Q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+plot_title <- "missings_q0.75"
+plot_list <- draw_plots_continuous(df.spd, var = df.spd$missings_q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
 
 create_tabs(plot_list)
 ```
@@ -6148,15 +5877,15 @@ create_tabs(plot_list)
 
 #### Normal test
 ```{r}
-st <- shapiro.test(df.spd$missings_Q0.75);print(st)
+st <- shapiro.test(df.spd$missings_q0.75);print(st)
 check_normal_distribution(st)
 
-ks <- ks.test(df.spd$missings_Q0.75, "pnorm");print(ks)
+ks <- ks.test(df.spd$missings_q0.75, "pnorm");print(ks)
 check_normal_distribution(ks)
 ```
 
 ```{r results='asis'}
-p1 <- ggplot(df.spd, aes(sample = missings_Q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings_Q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+p1 <- ggplot(df.spd, aes(sample = missings_q0.75)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings_q0.75", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
 
 create_tabs(list(p1))
 ```
@@ -6164,10 +5893,10 @@ create_tabs(list(p1))
 
 #### Outliers
 ```{r echo=FALSE}
-outliers <- get_outliers(df.spd, df.spd$missings_Q0.75, 1.5)
-outliers <- select(outliers, 1:4, missings_Q0.75, everything())
-outliers[order(outliers$missings_Q0.75, decreasing = T),]
-outliers[order(outliers$missings_Q0.75),]
+outliers <- get_outliers(df.spd, df.spd$missings_q0.75, 1.5)
+outliers <- select(outliers, 1:4, missings_q0.75, everything())
+outliers[order(outliers$missings_q0.75, decreasing = T),]
+outliers[order(outliers$missings_q0.75),]
 ```
 
 
@@ -6179,12 +5908,9 @@ outliers[order(outliers$missings_Q0.75),]
 **Количество промахов, шт.**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$missings, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$missings))
+data.frame(describe(df.spd$missings, quant = c(0.25, 0.75)))
 ```
 
 
@@ -6229,12 +5955,9 @@ outliers[order(outliers$missings),]
 **Количество попаданий, шт.**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$hits, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$hits))
+data.frame(describe(df.spd$hits, quant = c(0.25, 0.75)))
 ```
 
 
@@ -6279,12 +6002,9 @@ outliers[order(outliers$hits),]
 **Линейный тренд расстояния промахов**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$missings_trend, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$missings_trend))
+data.frame(describe(df.spd$missings_trend, quant = c(0.25, 0.75)))
 ```
 
 
@@ -6329,12 +6049,9 @@ outliers[order(outliers$missings_trend),]
 **Точность, %**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$accuracy_rate, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$accuracy_rate))
+data.frame(describe(df.spd$accuracy_rate, quant = c(0.25, 0.75)))
 ```
 
 
@@ -6379,12 +6096,9 @@ outliers[order(outliers$accuracy_rate),]
 **Комбо попаданий**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$combo_hits, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$combo_hits))
+data.frame(describe(df.spd$combo_hits, quant = c(0.25, 0.75)))
 ```
 
 
@@ -6429,12 +6143,9 @@ outliers[order(outliers$combo_hits),]
 **Комбо пропахов**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$combo_missings, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$combo_missings))
+data.frame(describe(df.spd$combo_missings, quant = c(0.25, 0.75)))
 ```
 
 
@@ -6475,100 +6186,10 @@ outliers[order(outliers$combo_missings),]
 
 
 
-### clicked_through_targets {.tabset .tabset-fade .tabset-pills}
-**Количество скликанных мишеней**
-
-#### Descriptive stat
-```{r}
-quantile(df.spd$clicked_through_targets, na.rm = T)
-```
-
-```{r}
-data.frame(describeBy(df.spd$clicked_through_targets))
-```
-
-
-```{r fig.width=7, fig.height=4, results='asis'}
-plot_title <- "clicked_through_targets"
-plot_list <- draw_plots_continuous(df.spd, var = df.spd$clicked_through_targets, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
-
-create_tabs(plot_list)
-```
-
-
-#### Normal test
-```{r}
-st <- shapiro.test(df.spd$clicked_through_targets);print(st)
-check_normal_distribution(st)
-
-ks <- ks.test(df.spd$clicked_through_targets, "pnorm");print(ks)
-check_normal_distribution(ks)
-```
-
-```{r results='asis'}
-p1 <- ggplot(df.spd, aes(sample = clicked_through_targets)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - clicked_through_targets", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
-
-create_tabs(list(p1))
-```
-
-
-#### Outliers
-```{r echo=FALSE}
-outliers <- get_outliers(df.spd, df.spd$clicked_through_targets, 1.5)
-outliers <- select(outliers, 1:4, clicked_through_targets, everything())
-outliers[order(outliers$clicked_through_targets, decreasing = T),]
-outliers[order(outliers$clicked_through_targets),]
-```
 
 
 
 
-
-
-### combo_clicked_through_targets {.tabset .tabset-fade .tabset-pills}
-**Комбо скликанных мишеней**
-
-#### Descriptive stat
-```{r}
-quantile(df.spd$combo_clicked_through_targets, na.rm = T)
-```
-
-```{r}
-data.frame(describeBy(df.spd$combo_clicked_through_targets))
-```
-
-
-```{r fig.width=7, fig.height=4, results='asis'}
-plot_title <- "combo_clicked_through_targets"
-plot_list <- draw_plots_continuous(df.spd, var = df.spd$combo_clicked_through_targets, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
-
-create_tabs(plot_list)
-```
-
-
-#### Normal test
-```{r}
-st <- shapiro.test(df.spd$combo_clicked_through_targets);print(st)
-check_normal_distribution(st)
-
-ks <- ks.test(df.spd$combo_clicked_through_targets, "pnorm");print(ks)
-check_normal_distribution(ks)
-```
-
-```{r results='asis'}
-p1 <- ggplot(df.spd, aes(sample = combo_clicked_through_targets)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - combo_clicked_through_targets", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
-
-create_tabs(list(p1))
-```
-
-
-#### Outliers
-```{r echo=FALSE}
-outliers <- get_outliers(df.spd, df.spd$combo_clicked_through_targets, 1.5)
-outliers <- select(outliers, 1:4, combo_clicked_through_targets, everything())
-outliers[order(outliers$combo_clicked_through_targets, decreasing = T),]
-outliers[order(outliers$combo_clicked_through_targets),]
-```
 
 
 
@@ -6579,12 +6200,9 @@ outliers[order(outliers$combo_clicked_through_targets),]
 **Коэффициент корреляции скорости и точности**
 
 #### Descriptive stat
-```{r}
-quantile(df.spd$corr_sat, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.spd$corr_sat))
+data.frame(describe(df.spd$corr_sat, quant = c(0.25, 0.75)))
 ```
 
 
@@ -6625,4 +6243,105 @@ outliers[order(outliers$corr_sat),]
 
 
 
+### Корреляционный анализ {.tabset .tabset-fade .tabset-pills}
 
+```{r}
+corr_vars <- c("distance_trimmed", 
+"dec_trimmed", 
+"acc_q0.75", 
+"pause_q0.25", 
+"missings_range", 
+"time_q0.75", 
+"missings_se", 
+"missings_max", 
+"acc_q0.25", 
+"dec_q0.25", 
+"acc_per_sec_q0.25", 
+"pause_se", 
+"acc_per_sec_q0.75", 
+"pause_kurtosis", 
+"missings_q0.25", 
+"pause_trimmed", 
+"missings_q0.75", 
+"acc_kurtosis", 
+"missings_kurtosis", 
+"dec_mad", 
+"acc_mad", 
+"pause_q0.75", 
+"missings_median", 
+"acc_per_sec_median", 
+"time_median", 
+"time_q0.25", 
+"time_trend", 
+"time_trimmed", 
+"acc_per_sec_trimmed", 
+"missings_trimmed", 
+"time_mean", 
+"distance_se", 
+"velocity_se", 
+"missings_mean", 
+"distance_mean", 
+"acc_range", 
+"dec_range", 
+"time_range", 
+"dec_median", 
+"time_max", 
+"dec_kurtosis", 
+"acc_trimmed", 
+"pause_median", 
+"velocity_q0.75", 
+"distance_kurtosis", 
+"distance_range", 
+"pause_mad", 
+"dec_q0.75", 
+"velocity_q0.25", 
+"acc_se", 
+"acc_max", 
+"acc_per_sec_mad", 
+"time_mad", 
+"dec_se", 
+"time_kurtosis", 
+"distance_max", 
+"time_se", 
+"missings_mad", 
+"dec_min", 
+"distance_median", 
+"dec_sd", 
+"distance_sd", 
+"distance_q0.75", 
+"acc_median", 
+"velocity_mad", 
+"velocity_range", 
+"dec_mean", 
+"time_sd", 
+"pause_mean", 
+"distance_q0.25", 
+"acc_per_sec_se", 
+"velocity_max", 
+"missings_skew", 
+"missings_min", 
+"accuracy_rate", 
+"time_min", 
+"distance_min", 
+"jerk_line", 
+"velocity_mean", 
+"missings_sd")
+```
+
+```{r}
+df.spd.num <- df.spd[, sapply(df.spd, typeof) == "double"]
+
+df.spd.num <- select(df.spd.num, -corr_vars)
+
+cor_matrix <- cor(df.spd.num, method = "spearman", use = "pairwise.complete.obs")
+
+cor_matrix[lower.tri(cor_matrix, diag = TRUE)] <- NA
+
+cor_df <- as.data.frame(as.table(cor_matrix)) %>%
+  filter(!is.na(Freq)) %>%
+  arrange(desc(abs(Freq)))  # сортируем по абсолютному значению корреляции по убыванию
+```
+
+```{r fig.height=30, fig.width=30, results='asis'}
+draw_corrplots(df.spd.num, method = "spearman", number.cex = 2, tl.cex = 3)
+```

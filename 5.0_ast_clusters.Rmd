@@ -1,0 +1,6323 @@
+---
+title: "AST clusters"
+author: "SVA"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    css: "styles.css"
+    code_folding: hide
+    df_print: paged
+    toc: yes
+    toc_depth: 4
+    toc_float:
+      collapsed: no
+  word_document:
+    toc: yes
+    toc_depth: '4'
+editor_options:
+  chunk_output_type: inline
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  include = TRUE,
+  message = FALSE, 
+  warning = FALSE
+)
+
+rm(list=ls())
+load("./data/envs/4_cluster_analysis/df.acc.RData")
+load("./data/envs/1_desc_stat/sp_results.RData")
+source("functions.R")
+```
+
+```{r}
+sp_results <- select(sp_results, userid, starts_with("BFST"), starts_with("MROT"), starts_with("KOT"), starts_with("VIT"), starts_with("LC"), starts_with("SOA"))
+```
+
+```{r}
+df <- merge(df.acc, sp_results, by.x = "user_id", by.y = "userid")
+```
+
+
+
+
+
+
+
+### BFST_extraversion {.tabset .tabset-fade .tabset-pills}
+**Экстраверсия**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$BFST_extraversion, df$all_hclust3, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "BFST_extraversion"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$BFST_extraversion, group = df$all_hclust3, group_lab = "all_hclust3", title = plot_title, legend_title = "all_hclust3", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+```
+
+#### Normal test
+```{r}
+st <- shapiro.test(df$BFST_extraversion);print(st)
+check_normal_distribution(st)
+ks <- ks.test(df$BFST_extraversion, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r}
+df %>%
+  group_by(all_hclust3) %>%
+  summarise(
+    W = shapiro.test(BFST_extraversion)$statistic,
+    p.value = shapiro.test(BFST_extraversion)$p.value,
+    message = ifelse(p.value < 0.05, "Проверка на нормальность не пройдена", "Проверка на нормальность пройдена")
+  )
+```
+
+```{r results='asis'}
+p1 <- ggplot(df, aes(sample = BFST_extraversion)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - BFST_extraversion", tabname="QQPlot", filename=paste0(plot_title, "_QQplot")) + facet_wrap(". ~ all_hclust2")
+
+create_tabs(list(p1))
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(BFST_extraversion ~ all_hclust3, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ all_hclust3)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(BFST_extraversion ~ all_hclust3, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, BFST_extraversion ~ all_hclust3)
+```
+
+#### Сравнение групп
+
+```{r}
+users_with_na <- df$user_id[is.na(df$BFST_extraversion)]
+df.test <- df[!df$user_id %in% users_with_na,]
+df.test$user_id <- factor(df.test$user_id)
+
+t_test_results <- pairwise.t.test(df$BFST_extraversion, df$all_hclust3, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df$BFST_extraversion, df$all_hclust3, p.adjust.method = "bonferroni");wilcox_test_results
+```
+
+```{r results='asis'}
+if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
+  sign_differences <- c(sign_differences, "BFST_extraversion")
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('BFST_extraversion', 'highlight');});</script>")
+}
+```
+
+#### CI ~ all_hclust3
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=all_hclust3, y=BFST_extraversion, color=all_hclust3)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### BFST_benevolence {.tabset .tabset-fade .tabset-pills}
+**Доброжелательность**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$BFST_benevolence, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "BFST_benevolence"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$BFST_benevolence, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(BFST_benevolence ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(BFST_benevolence ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, BFST_benevolence ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$BFST_benevolence),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, BFST_benevolence ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=BFST_benevolence, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### BFST_conscientiousness {.tabset .tabset-fade .tabset-pills}
+**Добросовестность**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$BFST_conscientiousness, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "BFST_conscientiousness"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$BFST_conscientiousness, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(BFST_conscientiousness ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(BFST_conscientiousness ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, BFST_conscientiousness ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$BFST_conscientiousness),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, BFST_conscientiousness ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=BFST_conscientiousness, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### BFST_neuroticism {.tabset .tabset-fade .tabset-pills}
+**Нейротизм**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$BFST_neuroticism, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "BFST_neuroticism"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$BFST_neuroticism, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(BFST_neuroticism ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(BFST_neuroticism ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, BFST_neuroticism ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$BFST_neuroticism),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, BFST_neuroticism ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=BFST_neuroticism, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### BFST_openness {.tabset .tabset-fade .tabset-pills}
+**Открытость**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$BFST_openness, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "BFST_openness"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$BFST_openness, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(BFST_openness ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(BFST_openness ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, BFST_openness ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$BFST_openness),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, BFST_openness ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=BFST_openness, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### BFST_sociability {.tabset .tabset-fade .tabset-pills}
+**Общительность**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$BFST_sociability, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "BFST_sociability"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$BFST_sociability, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(BFST_sociability ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(BFST_sociability ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, BFST_sociability ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$BFST_sociability),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, BFST_sociability ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=BFST_sociability, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### BFST_persistence {.tabset .tabset-fade .tabset-pills}
+**Настойчивость**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$BFST_persistence, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "BFST_persistence"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$BFST_persistence, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(BFST_persistence ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(BFST_persistence ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, BFST_persistence ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$BFST_persistence),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, BFST_persistence ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=BFST_persistence, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### BFST_energy {.tabset .tabset-fade .tabset-pills}
+**Энергичность**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$BFST_energy, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "BFST_energy"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$BFST_energy, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(BFST_energy ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(BFST_energy ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, BFST_energy ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$BFST_energy),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, BFST_energy ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=BFST_energy, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### BFST_empathy {.tabset .tabset-fade .tabset-pills}
+**Сочувствие**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$BFST_empathy, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "BFST_empathy"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$BFST_empathy, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(BFST_empathy ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(BFST_empathy ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, BFST_empathy ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$BFST_empathy),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, BFST_empathy ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=BFST_empathy, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### BFST_respect {.tabset .tabset-fade .tabset-pills}
+**Уважительность**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$BFST_respect, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "BFST_respect"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$BFST_respect, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(BFST_respect ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(BFST_respect ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, BFST_respect ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$BFST_respect),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, BFST_respect ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=BFST_respect, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### BFST_confidence {.tabset .tabset-fade .tabset-pills}
+**Доверие**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$BFST_confidence, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "BFST_confidence"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$BFST_confidence, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(BFST_confidence ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(BFST_confidence ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, BFST_confidence ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$BFST_confidence),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, BFST_confidence ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=BFST_confidence, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### BFST_organization {.tabset .tabset-fade .tabset-pills}
+**Организованность**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$BFST_organization, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "BFST_organization"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$BFST_organization, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(BFST_organization ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(BFST_organization ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, BFST_organization ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$BFST_organization),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, BFST_organization ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=BFST_organization, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### BFST_productivity {.tabset .tabset-fade .tabset-pills}
+**Продуктивность**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$BFST_productivity, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "BFST_productivity"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$BFST_productivity, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(BFST_productivity ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(BFST_productivity ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, BFST_productivity ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$BFST_productivity),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, BFST_productivity ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=BFST_productivity, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### BFST_responsibility {.tabset .tabset-fade .tabset-pills}
+**Ответственность**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$BFST_responsibility, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "BFST_responsibility"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$BFST_responsibility, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(BFST_responsibility ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(BFST_responsibility ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, BFST_responsibility ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$BFST_responsibility),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, BFST_responsibility ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=BFST_responsibility, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### BFST_anxiety {.tabset .tabset-fade .tabset-pills}
+**Тревожность**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$BFST_anxiety, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "BFST_anxiety"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$BFST_anxiety, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(BFST_anxiety ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(BFST_anxiety ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, BFST_anxiety ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$BFST_anxiety),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, BFST_anxiety ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=BFST_anxiety, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### BFST_depression {.tabset .tabset-fade .tabset-pills}
+**Депрессивность**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$BFST_depression, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "BFST_depression"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$BFST_depression, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(BFST_depression ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(BFST_depression ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, BFST_depression ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$BFST_depression),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, BFST_depression ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=BFST_depression, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### BFST_emotional_volatility {.tabset .tabset-fade .tabset-pills}
+**Эмоциональная изменчивость**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$BFST_emotional_volatility, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "BFST_emotional_volatility"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$BFST_emotional_volatility, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(BFST_emotional_volatility ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(BFST_emotional_volatility ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, BFST_emotional_volatility ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$BFST_emotional_volatility),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, BFST_emotional_volatility ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=BFST_emotional_volatility, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### BFST_aesthetics {.tabset .tabset-fade .tabset-pills}
+**Эстетичность**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$BFST_aesthetics, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "BFST_aesthetics"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$BFST_aesthetics, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(BFST_aesthetics ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(BFST_aesthetics ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, BFST_aesthetics ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$BFST_aesthetics),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, BFST_aesthetics ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=BFST_aesthetics, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### BFST_curiosity {.tabset .tabset-fade .tabset-pills}
+**Любознательность**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$BFST_curiosity, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "BFST_curiosity"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$BFST_curiosity, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(BFST_curiosity ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(BFST_curiosity ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, BFST_curiosity ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$BFST_curiosity),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, BFST_curiosity ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=BFST_curiosity, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### BFST_personal_creativity {.tabset .tabset-fade .tabset-pills}
+**Творческое воображение**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$BFST_personal_creativity, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "BFST_personal_creativity"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$BFST_personal_creativity, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(BFST_personal_creativity ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(BFST_personal_creativity ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, BFST_personal_creativity ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$BFST_personal_creativity),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, BFST_personal_creativity ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=BFST_personal_creativity, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+
+
+### MROT_time_all {.tabset .tabset-fade .tabset-pills}
+**Общее затраченное время на выполнение теста, сек**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$MROT_time_all, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "MROT_time_all"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$MROT_time_all, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(MROT_time_all ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(MROT_time_all ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, MROT_time_all ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$MROT_time_all),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, MROT_time_all ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=MROT_time_all, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### MROT_time_all_mean {.tabset .tabset-fade .tabset-pills}
+**Среднее время на выполнение 1 задания всего теста, сек**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$MROT_time_all_mean, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "MROT_time_all_mean"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$MROT_time_all_mean, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(MROT_time_all_mean ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(MROT_time_all_mean ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, MROT_time_all_mean ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$MROT_time_all_mean),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, MROT_time_all_mean ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=MROT_time_all_mean, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### MROT_time_all_sd {.tabset .tabset-fade .tabset-pills}
+**Стандартное отклонение времени на 1 задание всего теста, сек**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$MROT_time_all_sd, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "MROT_time_all_sd"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$MROT_time_all_sd, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(MROT_time_all_sd ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(MROT_time_all_sd ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, MROT_time_all_sd ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$MROT_time_all_sd),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, MROT_time_all_sd ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=MROT_time_all_sd, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### MROT_time_static {.tabset .tabset-fade .tabset-pills}
+**Время на выполнение статической части теста, сек**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$MROT_time_static, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "MROT_time_static"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$MROT_time_static, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(MROT_time_static ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(MROT_time_static ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, MROT_time_static ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$MROT_time_static),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, MROT_time_static ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=MROT_time_static, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### MROT_time_static_mean {.tabset .tabset-fade .tabset-pills}
+**Среднее время на выполнение 1 задания cтатичной части теста, сек**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$MROT_time_static_mean, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "MROT_time_static_mean"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$MROT_time_static_mean, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(MROT_time_static_mean ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(MROT_time_static_mean ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, MROT_time_static_mean ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$MROT_time_static_mean),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, MROT_time_static_mean ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=MROT_time_static_mean, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### MROT_time_static_sd {.tabset .tabset-fade .tabset-pills}
+**Стандартное отклонение времени на 1 задание статичной части теста, сек**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$MROT_time_static_sd, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "MROT_time_static_sd"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$MROT_time_static_sd, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(MROT_time_static_sd ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(MROT_time_static_sd ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, MROT_time_static_sd ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$MROT_time_static_sd),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, MROT_time_static_sd ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=MROT_time_static_sd, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### MROT_time_animation {.tabset .tabset-fade .tabset-pills}
+**Время на выполнение анимированной части теста, сек**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$MROT_time_animation, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "MROT_time_animation"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$MROT_time_animation, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(MROT_time_animation ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(MROT_time_animation ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, MROT_time_animation ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$MROT_time_animation),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, MROT_time_animation ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=MROT_time_animation, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### MROT_time_animation_mean {.tabset .tabset-fade .tabset-pills}
+**Среднее время на выполнение 1 задания анимированной части теста, сек**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$MROT_time_animation_mean, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "MROT_time_animation_mean"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$MROT_time_animation_mean, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(MROT_time_animation_mean ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(MROT_time_animation_mean ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, MROT_time_animation_mean ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$MROT_time_animation_mean),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, MROT_time_animation_mean ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=MROT_time_animation_mean, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### MROT_time_animation_sd {.tabset .tabset-fade .tabset-pills}
+**Стандартное отклонение времени на 1 задание анимированной части теста, сек**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$MROT_time_animation_sd, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "MROT_time_animation_sd"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$MROT_time_animation_sd, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(MROT_time_animation_sd ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(MROT_time_animation_sd ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, MROT_time_animation_sd ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$MROT_time_animation_sd),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, MROT_time_animation_sd ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=MROT_time_animation_sd, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### MROT_right_all {.tabset .tabset-fade .tabset-pills}
+**Общее количество верных ответов в тесте**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$MROT_right_all, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "MROT_right_all"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$MROT_right_all, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(MROT_right_all ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(MROT_right_all ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, MROT_right_all ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$MROT_right_all),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, MROT_right_all ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=MROT_right_all, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### MROT_right_static {.tabset .tabset-fade .tabset-pills}
+**Количество верных ответов в статической части теста**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$MROT_right_static, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "MROT_right_static"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$MROT_right_static, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(MROT_right_static ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(MROT_right_static ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, MROT_right_static ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$MROT_right_static),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, MROT_right_static ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=MROT_right_static, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### MROT_right_animation {.tabset .tabset-fade .tabset-pills}
+**Количество верных ответов в анимированной части теста**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$MROT_right_animation, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "MROT_right_animation"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$MROT_right_animation, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(MROT_right_animation ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(MROT_right_animation ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, MROT_right_animation ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$MROT_right_animation),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, MROT_right_animation ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=MROT_right_animation, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### MROT_error_all {.tabset .tabset-fade .tabset-pills}
+**Общее количество ошибок в тесте**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$MROT_error_all, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "MROT_error_all"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$MROT_error_all, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(MROT_error_all ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(MROT_error_all ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, MROT_error_all ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$MROT_error_all),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, MROT_error_all ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=MROT_error_all, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### MROT_error_static {.tabset .tabset-fade .tabset-pills}
+**Количество ошибок в статической части теста**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$MROT_error_static, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "MROT_error_static"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$MROT_error_static, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(MROT_error_static ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(MROT_error_static ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, MROT_error_static ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$MROT_error_static),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, MROT_error_static ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=MROT_error_static, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### MROT_error_animation {.tabset .tabset-fade .tabset-pills}
+**Количество ошибок в анимированной части теста**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$MROT_error_animation, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "MROT_error_animation"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$MROT_error_animation, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(MROT_error_animation ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(MROT_error_animation ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, MROT_error_animation ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$MROT_error_animation),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, MROT_error_animation ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=MROT_error_animation, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+
+
+### VIT_total {.tabset .tabset-fade .tabset-pills}
+**общий результат по тесту Жизнестойкость**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$VIT_total, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "VIT_total"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$VIT_total, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(VIT_total ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(VIT_total ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, VIT_total ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$VIT_total),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, VIT_total ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=VIT_total, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### VIT_involvement {.tabset .tabset-fade .tabset-pills}
+**Вовлеченность**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$VIT_involvement, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "VIT_involvement"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$VIT_involvement, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(VIT_involvement ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(VIT_involvement ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, VIT_involvement ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$VIT_involvement),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, VIT_involvement ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=VIT_involvement, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### VIT_control {.tabset .tabset-fade .tabset-pills}
+**Контроль**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$VIT_control, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "VIT_control"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$VIT_control, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(VIT_control ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(VIT_control ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, VIT_control ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$VIT_control),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, VIT_control ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=VIT_control, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### VIT_risk {.tabset .tabset-fade .tabset-pills}
+**Принятие риска**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$VIT_risk, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "VIT_risk"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$VIT_risk, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(VIT_risk ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(VIT_risk ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, VIT_risk ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$VIT_risk),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, VIT_risk ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=VIT_risk, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### LC {.tabset .tabset-fade .tabset-pills}
+**Общий результат по тесту Локус-контроль**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$LC, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "LC"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$LC, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(LC ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(LC ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, LC ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$LC),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, LC ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=LC, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### SOA_planfulness {.tabset .tabset-fade .tabset-pills}
+**Планомерность**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$SOA_planfulness, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "SOA_planfulness"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$SOA_planfulness, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(SOA_planfulness ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(SOA_planfulness ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, SOA_planfulness ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$SOA_planfulness),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, SOA_planfulness ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=SOA_planfulness, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### SOA_purposefulness {.tabset .tabset-fade .tabset-pills}
+**Целеустремленность**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$SOA_purposefulness, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "SOA_purposefulness"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$SOA_purposefulness, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(SOA_purposefulness ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(SOA_purposefulness ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, SOA_purposefulness ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$SOA_purposefulness),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, SOA_purposefulness ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=SOA_purposefulness, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### SOA_persistence {.tabset .tabset-fade .tabset-pills}
+**Настойчивость**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$SOA_persistence, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "SOA_persistence"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$SOA_persistence, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(SOA_persistence ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(SOA_persistence ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, SOA_persistence ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$SOA_persistence),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, SOA_persistence ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=SOA_persistence, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### SOA_fixation {.tabset .tabset-fade .tabset-pills}
+**Фиксация**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$SOA_fixation, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "SOA_fixation"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$SOA_fixation, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(SOA_fixation ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(SOA_fixation ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, SOA_fixation ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$SOA_fixation),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, SOA_fixation ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=SOA_fixation, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### SOA_organization {.tabset .tabset-fade .tabset-pills}
+**Самоорганизация**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$SOA_organization, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "SOA_organization"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$SOA_organization, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(SOA_organization ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(SOA_organization ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, SOA_organization ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$SOA_organization),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, SOA_organization ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=SOA_organization, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### SOA_present {.tabset .tabset-fade .tabset-pills}
+**Ориентация на настоящее**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$SOA_present, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "SOA_present"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$SOA_present, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(SOA_present ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(SOA_present ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, SOA_present ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$SOA_present),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, SOA_present ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=SOA_present, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+
+
+### KOT_total {.tabset .tabset-fade .tabset-pills}
+**Общий результат**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$KOT_total, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "KOT_total"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$KOT_total, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(KOT_total ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(KOT_total ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, KOT_total ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$KOT_total),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, KOT_total ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=KOT_total, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### KOT_verbal {.tabset .tabset-fade .tabset-pills}
+**Анализ вербальной информации**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$KOT_verbal, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "KOT_verbal"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$KOT_verbal, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(KOT_verbal ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(KOT_verbal ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, KOT_verbal ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$KOT_verbal),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, KOT_verbal ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=KOT_verbal, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### KOT_number {.tabset .tabset-fade .tabset-pills}
+**Анализ числовой информации**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$KOT_number, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "KOT_number"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$KOT_number, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(KOT_number ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(KOT_number ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, KOT_number ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$KOT_number),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, KOT_number ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=KOT_number, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### KOT_attention {.tabset .tabset-fade .tabset-pills}
+**Концентрация и распределение внимания**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$KOT_attention, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "KOT_attention"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$KOT_attention, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(KOT_attention ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(KOT_attention ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, KOT_attention ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$KOT_attention),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, KOT_attention ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=KOT_attention, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### KOT_spatial {.tabset .tabset-fade .tabset-pills}
+**Пространственное мышление**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$KOT_spatial, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "KOT_spatial"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$KOT_spatial, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(KOT_spatial ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(KOT_spatial ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, KOT_spatial ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$KOT_spatial),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, KOT_spatial ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=KOT_spatial, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### KOT_general {.tabset .tabset-fade .tabset-pills}
+**Общая осведомленность**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$KOT_general, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "KOT_general"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$KOT_general, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(KOT_general ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(KOT_general ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, KOT_general ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$KOT_general),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, KOT_general ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=KOT_general, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### KOT_logic {.tabset .tabset-fade .tabset-pills}
+**Логика, дедуктивное мышление**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$KOT_logic, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "KOT_logic"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$KOT_logic, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(KOT_logic ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(KOT_logic ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, KOT_logic ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$KOT_logic),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, KOT_logic ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=KOT_logic, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+
+
+
+
+### AST_acc_time {.tabset .tabset-fade .tabset-pills}
+**Общее время выполнения, сек. (задание на точность)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_acc_time, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_acc_time"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_acc_time, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_acc_time ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_acc_time ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_acc_time ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_acc_time),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_acc_time ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_acc_time, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### AST_acc_time_mean {.tabset .tabset-fade .tabset-pills}
+**Среднее время на 1 клик, сек. (задание на точность)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_acc_time_mean, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_acc_time_mean"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_acc_time_mean, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_acc_time_mean ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_acc_time_mean ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_acc_time_mean ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_acc_time_mean),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_acc_time_mean ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_acc_time_mean, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### AST_acc_time_sd {.tabset .tabset-fade .tabset-pills}
+**Стандартное отклонение времени на клик, сек. (задание на точность)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_acc_time_sd, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_acc_time_sd"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_acc_time_sd, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_acc_time_sd ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_acc_time_sd ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_acc_time_sd ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_acc_time_sd),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_acc_time_sd ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_acc_time_sd, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### AST_acc_distance {.tabset .tabset-fade .tabset-pills}
+**Общая пройденная дистанция, пикс. (задание на точность)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_acc_distance, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_acc_distance"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_acc_distance, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_acc_distance ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_acc_distance ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_acc_distance ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_acc_distance),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_acc_distance ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_acc_distance, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### AST_acc_distance_mean {.tabset .tabset-fade .tabset-pills}
+**Средняя дистанция на 1 клик, пикс. (задание на точность)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_acc_distance_mean, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_acc_distance_mean"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_acc_distance_mean, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_acc_distance_mean ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_acc_distance_mean ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_acc_distance_mean ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_acc_distance_mean),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_acc_distance_mean ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_acc_distance_mean, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### AST_acc_distance_sd {.tabset .tabset-fade .tabset-pills}
+**Стандартное отклонение дистанции на 1 клик, пикс. (задание на точность)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_acc_distance_sd, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_acc_distance_sd"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_acc_distance_sd, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_acc_distance_sd ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_acc_distance_sd ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_acc_distance_sd ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_acc_distance_sd),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_acc_distance_sd ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_acc_distance_sd, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### AST_acc_pause {.tabset .tabset-fade .tabset-pills}
+**Продолжительность паузы, сек. (задание на точность)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_acc_pause, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_acc_pause"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_acc_pause, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_acc_pause ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_acc_pause ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_acc_pause ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_acc_pause),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_acc_pause ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_acc_pause, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### AST_acc_velocity_mean {.tabset .tabset-fade .tabset-pills}
+**Средняя скорость движения, пикс/сек. (задание на точность)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_acc_velocity_mean, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_acc_velocity_mean"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_acc_velocity_mean, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_acc_velocity_mean ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_acc_velocity_mean ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_acc_velocity_mean ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_acc_velocity_mean),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_acc_velocity_mean ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_acc_velocity_mean, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+
+
+### AST_acc_missings_distance {.tabset .tabset-fade .tabset-pills}
+**Расстояние промахов от центра окружности, пикс. (задание на точность)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_acc_missings_distance, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_acc_missings_distance"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_acc_missings_distance, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_acc_missings_distance ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_acc_missings_distance ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_acc_missings_distance ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_acc_missings_distance),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_acc_missings_distance ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_acc_missings_distance, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### AST_acc_missings_distance_mean {.tabset .tabset-fade .tabset-pills}
+**Средний промах от центра окружности, пикс. (задание на точность)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_acc_missings_distance_mean, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_acc_missings_distance_mean"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_acc_missings_distance_mean, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_acc_missings_distance_mean ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_acc_missings_distance_mean ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_acc_missings_distance_mean ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_acc_missings_distance_mean),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_acc_missings_distance_mean ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_acc_missings_distance_mean, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### AST_acc_missings_distance_sd {.tabset .tabset-fade .tabset-pills}
+**Стандартное отклонение промахов от центра окружености, пикс. (задание на точность)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_acc_missings_distance_sd, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_acc_missings_distance_sd"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_acc_missings_distance_sd, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_acc_missings_distance_sd ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_acc_missings_distance_sd ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_acc_missings_distance_sd ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_acc_missings_distance_sd),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_acc_missings_distance_sd ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_acc_missings_distance_sd, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+
+
+### AST_spd_time {.tabset .tabset-fade .tabset-pills}
+**Общее время выполнения, сек. (задание на скорость)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_spd_time, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_spd_time"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_spd_time, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_spd_time ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_spd_time ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_spd_time ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_spd_time),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_spd_time ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_spd_time, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### AST_spd_time_mean {.tabset .tabset-fade .tabset-pills}
+**Среднее время на 1 клик, сек. (задание на скорость)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_spd_time_mean, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_spd_time_mean"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_spd_time_mean, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_spd_time_mean ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_spd_time_mean ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_spd_time_mean ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_spd_time_mean),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_spd_time_mean ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_spd_time_mean, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### AST_spd_time_sd {.tabset .tabset-fade .tabset-pills}
+**Стандартное отклонение времени на клик, сек. (задание на скорость)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_spd_time_sd, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_spd_time_sd"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_spd_time_sd, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_spd_time_sd ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_spd_time_sd ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_spd_time_sd ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_spd_time_sd),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_spd_time_sd ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_spd_time_sd, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### AST_spd_distance {.tabset .tabset-fade .tabset-pills}
+**Общая пройденная дистанция, пикс. (задание на скорость)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_spd_distance, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_spd_distance"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_spd_distance, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_spd_distance ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_spd_distance ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_spd_distance ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_spd_distance),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_spd_distance ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_spd_distance, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### AST_spd_distance_mean {.tabset .tabset-fade .tabset-pills}
+**Средняя дистанция на 1 клик, пикс. (задание на скорость)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_spd_distance_mean, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_spd_distance_mean"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_spd_distance_mean, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_spd_distance_mean ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_spd_distance_mean ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_spd_distance_mean ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_spd_distance_mean),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_spd_distance_mean ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_spd_distance_mean, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### AST_spd_distance_sd {.tabset .tabset-fade .tabset-pills}
+**Стандартное отклонение дистанции на 1 клик, пикс. (задание на скорость)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_spd_distance_sd, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_spd_distance_sd"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_spd_distance_sd, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_spd_distance_sd ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_spd_distance_sd ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_spd_distance_sd ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_spd_distance_sd),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_spd_distance_sd ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_spd_distance_sd, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### AST_spd_pause {.tabset .tabset-fade .tabset-pills}
+**Продолжительность паузы, сек. (задание на скорость)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_spd_pause, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_spd_pause"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_spd_pause, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_spd_pause ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_spd_pause ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_spd_pause ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_spd_pause),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_spd_pause ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_spd_pause, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### AST_spd_velocity_mean {.tabset .tabset-fade .tabset-pills}
+**Средняя скорость движения, пикс/сек. (задание на скорость)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_spd_velocity_mean, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_spd_velocity_mean"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_spd_velocity_mean, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_spd_velocity_mean ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_spd_velocity_mean ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_spd_velocity_mean ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_spd_velocity_mean),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_spd_velocity_mean ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_spd_velocity_mean, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+
+
+### AST_spd_missings_distance {.tabset .tabset-fade .tabset-pills}
+**Расстояние промахов от центра окружности, пикс. (задание на скорость)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_spd_missings_distance, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_spd_missings_distance"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_spd_missings_distance, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_spd_missings_distance ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_spd_missings_distance ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_spd_missings_distance ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_spd_missings_distance),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_spd_missings_distance ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_spd_missings_distance, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### AST_spd_missings_distance_mean {.tabset .tabset-fade .tabset-pills}
+**Средний промах от центра окружности, пикс. (задание на скорость)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_spd_missings_distance_mean, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_spd_missings_distance_mean"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_spd_missings_distance_mean, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_spd_missings_distance_mean ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_spd_missings_distance_mean ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_spd_missings_distance_mean ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_spd_missings_distance_mean),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_spd_missings_distance_mean ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_spd_missings_distance_mean, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### AST_spd_missings_distance_sd {.tabset .tabset-fade .tabset-pills}
+**Стандартное отклонение промахов от центра окружености, пикс. (задание на скорость)**
+
+#### Descriptive stat by AST_cluster
+```{r}
+desc_by_group <- describeBy(df$AST_spd_missings_distance_sd, df$AST_cluster, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r}
+plot_title <- "AST_spd_missings_distance_sd"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$AST_spd_missings_distance_sd, group = df$AST_cluster, group_lab = "AST_cluster", title = plot_title, legend_title = "AST_cluster", x_lab = "Экстраверсия", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+save_ggplot(plot_list, path = "./img/6_ast/", isNumbered = T)
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(AST_spd_missings_distance_sd ~ AST_cluster, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ AST_cluster)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test(AST_spd_missings_distance_sd ~ AST_cluster, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, AST_spd_missings_distance_sd ~ AST_cluster)
+```
+
+#### Pairwise comparison
+```{r}
+df.wilcox <- df[!is.na(df$AST_spd_missings_distance_sd),]
+df.wilcox$AST_cluster <- ordered(df.wilcox$AST_cluster)
+
+wilcox_table <- wilcox_test(df.wilcox, AST_spd_missings_distance_sd ~ AST_cluster, p.adjust.method = "bonferroni")
+wilcox_table[order(wilcox_table$p.adj),]
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=AST_cluster, y=AST_spd_missings_distance_sd, color=AST_cluster)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+
+

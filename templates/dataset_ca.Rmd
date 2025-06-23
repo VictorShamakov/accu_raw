@@ -1,0 +1,12 @@
+
+```{r}
+# Набор данных: Точность
+load("./data/envs/4_cluster_analysis/df.acc.RData")
+
+df <- df.acc
+```
+
+
+```{r}
+sign_differences <- vector()
+```

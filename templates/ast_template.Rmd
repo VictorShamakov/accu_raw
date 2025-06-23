@@ -1,0 +1,197 @@
+---
+title: "AST {{group}}"
+author: "SVA"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    css: "styles.css"
+    code_folding: hide
+    df_print: paged
+    toc: yes
+    toc_depth: 4
+    toc_float:
+      collapsed: no
+  word_document:
+    toc: yes
+    toc_depth: '4'
+editor_options:
+  chunk_output_type: inline
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  include = TRUE,
+  message = FALSE, 
+  warning = FALSE
+)
+
+rm(list=ls())
+load("./data/envs/1_desc_stat/sp_results.RData")
+source("functions.R")
+```
+
+<script>
+function addClassToTitle(containerId, className) {
+  // Находим контейнер по id
+  var container = document.getElementById(containerId);
+  if (!container) {
+    console.warn('Контейнер с id "' + containerId + '" не найден.');
+    return;
+  }
+
+  // Добавляем класс к найденному h3
+  container.classList.add(className);
+}
+</script>
+
+{{dataset}}
+
+
+
+
+## Описательная статистика 
+
+### {{group}} {.tabset .tabset-fade .tabset-pills}
+
+#### Table
+```{r}
+table(df${{group}})
+```
+
+#### Barplot
+```{r}
+ggplot(df, aes({{group}}, fill={{group}})) + geom_bar()
+```
+
+
+{% for feature in data_dictionary %}
+{% if feature.type == "numeric" %}
+### {{feature.short_name}} {.tabset .tabset-fade .tabset-pills}
+**{{feature.name}}**
+
+#### Descriptive stat by {{group}}
+```{r}
+desc_by_group <- describeBy(df${{feature.short_name}}, df${{group}}, mat = T)
+desc_by_group[order(desc_by_group$mean, decreasing = T),]
+```
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "{{feature.short_name}}"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df${{feature.short_name}}, group = df${{group}}, group_lab = "{{group}}", title = plot_title, legend_title = "{{group}}", x_lab = "{{feature.name}}", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+```
+
+#### Normal test
+```{r}
+st <- shapiro.test(df${{feature.short_name}});print(st)
+check_normal_distribution(st)
+ks <- ks.test(df${{feature.short_name}}, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r}
+tryCatch(
+    expr = {
+      df %>%
+        group_by({{group}}) %>%
+        summarise(
+          W = shapiro.test({{feature.short_name}})$statistic,
+          p.value = shapiro.test({{feature.short_name}})$p.value,
+          message = ifelse(p.value < 0.05, "Проверка на нормальность не пройдена", "Проверка на нормальность пройдена")
+        )
+    },
+    error = function(e){
+      print(e)
+    }
+)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df, aes(sample = {{feature.short_name}})) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - {{feature.short_name}}", tabname="QQPlot", filename=paste0(plot_title, "_QQplot")) + facet_wrap(". ~ {{group}}")
+
+create_tabs(list(p1))
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov({{feature.short_name}} ~ {{group}}, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ {{group}})
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal.test({{feature.short_name}} ~ {{group}}, df)
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, {{feature.short_name}} ~ {{group}})
+```
+
+#### Pairwise comparison
+
+```{r}
+users_with_na <- df$user_id[is.na(df${{feature.short_name}})]
+df.test <- df[!df$user_id %in% users_with_na,]
+df.test$user_id <- factor(df.test$user_id)
+
+t_test_results <- pairwise.t.test(df.test${{feature.short_name}}, df.test${{group}}, p.adjust.method = "BH");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test${{feature.short_name}}, df.test${{group}}, p.adjust.method = "BH");wilcox_test_results
+```
+
+```{r results='asis'}
+if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
+  sign_differences <- c(sign_differences, "{{feature.short_name}}")
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('{{feature.short_name}}', 'highlight');});</script>")
+}
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x={{group}}, y={{feature.short_name}}, color={{group}})) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+{% endif %}
+{% endfor %}
+
+
+### Значимые различия
+```{r results='asis'}
+cat(paste0('<a href="#', sign_differences, '">', sign_differences, "</a><br>"))
+```

@@ -1,0 +1,21 @@
+
+```{r}
+load("./data/envs/4_cluster_analysis/df.acc.female.RData")
+df.acc$gender <- factor(df.acc$gender, labels = "F")
+
+# df.acc <- df.acc[df.acc$gender == "F", ]
+```
+
+
+```{r}
+sp_results <- select(sp_results, userid, starts_with("BFST"), starts_with("MROT"), starts_with("KOT"), starts_with("VIT"), starts_with("LC"), starts_with("SOA"))
+names(sp_results) <- tolower(names(sp_results))
+```
+
+```{r}
+df <- merge(df.acc, sp_results, by.x = "user_id", by.y = "userid")
+```
+
+```{r}
+sign_differences <- vector()
+```

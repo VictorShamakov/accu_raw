@@ -1,0 +1,155 @@
+---
+title: "Описательная статистика"
+author: "SVA"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    css: "styles.css"
+    code_folding: hide
+    df_print: paged
+    toc: yes
+    toc_depth: 4
+    toc_float:
+      collapsed: no
+  word_document:
+    toc: yes
+    toc_depth: '4'
+editor_options:
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  include = TRUE,
+  message = FALSE, 
+  warning = FALSE
+)
+
+rm(list=ls())
+source("functions.R")
+library("ARTool")
+```
+<script>
+function addClassToTitle(containerId, className) {
+  // Находим контейнер по id
+  var container = document.getElementById(containerId);
+  if (!container) {
+    console.warn('Контейнер с id "' + containerId + '" не найден.');
+    return;
+  }
+
+  // Добавляем класс к найденному h3
+  container.classList.add(className);
+}
+</script>
+
+{{dataset}}
+
+
+# Описательные статистики
+{% for feature in data_dictionary %}
+{% if feature.type == "numeric" %}
+### {{feature.short_name}} {.tabset .tabset-fade .tabset-pills}
+**{{feature.name}}**
+
+#### Descriptive stat
+
+```{r}
+describeBy({{feature.short_name}} ~ {{group}}, data = df.{{stage}}, quant = c(0.25, 0.75), mat = T)
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "{{feature.short_name}}"
+plot_list <- draw_plots_continuous_by_group(df.{{stage}}, var = {{feature.short_name}},  df.{{stage}}${{group}}, group_lab = "{{group}}", x_lab = "{{feature.name}}", title = plot_title)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.{{stage}}${{feature.short_name}});print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.{{stage}}${{feature.short_name}}, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.{{stage}}, aes(sample = {{feature.short_name}})) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - {{feature.short_name}}", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Сравнение групп
+
+```{r}
+t_test_results <- t.test(df.{{stage}}${{feature.short_name}}[df.{{stage}}$gender == "Мужской"], df.{{stage}}${{feature.short_name}}[df.{{stage}}$gender == "Женский"]);t_test_results
+
+wilcox_test_results <- wilcox.test(df.{{stage}}${{feature.short_name}}[df.{{stage}}$gender == "Мужской"], df.{{stage}}${{feature.short_name}}[df.{{stage}}$gender == "Женский"]);wilcox_test_results
+```
+
+
+```{r results='asis'}
+if (wilcox_test_results$p.value <= 0.05) {
+  sign_differences <- c(sign_differences, "{{feature.short_name}}")
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('{{feature.short_name}}', 'highlight');});</script>")
+}
+```
+
+
+#### CI ~ {{group}}
+
+```{r}
+pd = position_dodge(0.1)
+ggplot(df.acc, aes(x={{group}}, y={{feature.short_name}}, color={{group}}, group={{group}})) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.2, lwd=0.8, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=2.5, position = pd, pch = 15)
+
+```
+
+
+{% elif feature.type == "character" %}
+### {{feature.short_name}} {.tabset .tabset-fade .tabset-pills}
+**{{feature.short_name}} - {{feature.name}}**
+
+```{r}
+df.{{stage}}[, c("id", "{{feature.short_name}}")]
+```
+
+```{r}
+table(df.{{stage}}${{feature.short_name}})
+```
+
+{% elif feature.type == "factor" %}
+
+### {{feature.short_name}} {.tabset .tabset-fade .tabset-pills}
+**{{feature.name}}**
+
+#### Tables
+
+Распределение по переменной "{{feature.short_name}}"
+
+```{r}
+tab <- table(df.{{stage}}${{feature.short_name}})
+
+data.frame(
+  level = names(tab),
+  frequency = as.vector(tab),
+  percent = as.vector(round(prop.table(tab) * 100, 2))
+)
+```
+
+
+{% else %}
+
+{% endif %}
+
+{% endfor %}
+
+
+

@@ -15,8 +15,8 @@ output:
 editor_options:
   chunk_output_type: inline
 params:
-  user_id: 2153
-  test_id: 66
+  user_id: 3438
+  test_id: 84
   data_from_db: TRUE
 ---
 
@@ -38,7 +38,7 @@ ideal_coords <- read.csv2("./data/IdealCoords.csv", stringsAsFactors = F, col.na
 features.accuracy <- read.csv("./data/accuracy_features.csv")
 features.speed <- read.csv("./data/speed_features.csv")
 options(scipen = 10)
-DATA_FROM_DB <- params$data_from_db #TRUE - from DB, FALSE - from files
+DATA_FROM_DB <- params$data_from_db #TRUE - from server, FALSE - from files
 
 ```
 
@@ -137,6 +137,7 @@ if (DATA_FROM_DB) {
 ```{r include=FALSE}
 if (DATA_FROM_DB) {
   ast <- create_ast(ast_raw)
+  print(ast_raw$data)
   ast_data <- form_ast_data(ast_raw$data)
   ast <- get_session(db, ast, ast_data)
   
@@ -180,10 +181,10 @@ accuracy_datasets$ast_long
 
 
 ```{r}
-write_xlsx(accuracy_datasets$features, "./data/users/" %+% user_id %+% "/features.acc.xlsx")
-write_xlsx(accuracy_datasets$ast_mt, "./data/users/" %+% user_id %+% "/ast_mt.acc.xlsx")
-write_xlsx(accuracy_datasets$ast_long, "./data/users/" %+% user_id %+% "/ast_long.acc.xlsx")
-write_xlsx(accuracy_datasets$ast_merged, "./data/users/" %+% user_id %+% "/ast_merged.acc.xlsx")
+write_xlsx(accuracy_datasets$features, file.path("data", "users", user_id, test_id, "features.acc.xlsx"))
+write_xlsx(accuracy_datasets$ast_mt, file.path("data", "users", user_id, test_id, "ast_mt.acc.xlsx"))
+write_xlsx(accuracy_datasets$ast_long, file.path("data", "users", user_id, test_id, "ast_long.acc.xlsx"))
+write_xlsx(accuracy_datasets$ast_merged, file.path("data", "users", user_id, test_id, "ast_merged.acc.xlsx"))
 ```
 
 ### Скорость  {.tabset .tabset-fade .tabset-pills}
@@ -202,10 +203,10 @@ speed_datasets$ast_long
 
 
 ```{r}
-write_xlsx(speed_datasets$features, "./data/users/" %+% user_id %+% "/features.spd.xlsx")
-write_xlsx(speed_datasets$ast_mt, "./data/users/" %+% user_id %+% "/ast_mt.spd.xlsx")
-write_xlsx(speed_datasets$ast_long, "./data/users/" %+% user_id %+% "/ast_long.spd.xlsx")
-write_xlsx(speed_datasets$ast_merged, "./data/users/" %+% user_id %+% "/ast_merged.spd.xlsx")
+write_xlsx(speed_datasets$features, file.path("data", "users", user_id, test_id, "features.spd.xlsx"))
+write_xlsx(speed_datasets$ast_mt, file.path("data", "users", user_id, test_id, "ast_mt.spd.xlsx"))
+write_xlsx(speed_datasets$ast_long, file.path("data", "users", user_id, test_id, "ast_long.spd.xlsx"))
+write_xlsx(speed_datasets$ast_merged, file.path("data", "users", user_id, test_id, "ast_merged.spd.xlsx"))
 ```
 
 
@@ -551,7 +552,7 @@ ggplot(ast_long[-1, ], aes(velocity, col=stage)) + geom_boxplot() + coord_flip()
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js"></script>
 
 ### Задание на точность
-```{r accuracy-alphabet, fig.height=4.5, fig.path='data/users/'%+% user_id %+% '/figures/', fig.show='hide', fig.width=9, out.width=830}
+```{r accuracy-alphabet, fig.height=4.5, fig.path=file.path("data", "users", user_id, test_id, "figures/"), fig.show='hide', fig.width=9, out.width=830}
 draw_action(accuracy_datasets$ast_long, accuracy_datasets$ast_mt, ast, ideal_coords)
 ```
 
@@ -562,7 +563,7 @@ cat('<swiper-container class="mySwiper" keyboard="true" effect="fade" loop="true
 ```
 
 ### Задание на скорость
-```{r speed-alphabet, fig.height=4.5, fig.path='data/users/'%+% user_id %+% '/figures/', fig.show='hide', fig.width=9, out.width=830}
+```{r speed-alphabet, fig.height=4.5, fig.path=file.path("data", "users", user_id, test_id, "figures/"), fig.show='hide', fig.width=9, out.width=830}
 draw_action(speed_datasets$ast_long, speed_datasets$ast_mt, ast, ideal_coords)
 ```
 
@@ -628,7 +629,8 @@ ggplot(pauses, aes(n, pauses, fill = stage)) +
   scale_x_continuous(breaks = seq(0, max(pauses$n), 5)) + scale_y_continuous(breaks = seq(0, max(pauses$pauses), interval_scale_y)) + 
   facet_grid(. ~ stage) +
   xlab("Количество пауз") + ylab("Продолжительность пауз, ms") +
-  ggtitle("Распределение микропауз во время движения")
+  ggtitle("Распределение микропауз во время движения") +
+  theme(axis.text.x = element_text(angle = 45, hjust = .5, vjust = .5))
 
 ```
 
@@ -998,10 +1000,10 @@ grid.arrange(p1, p2, nrow = 1, ncol = 2)
 
 
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 # Получение списка всех открытых соединений
-# all_connections <- dbListConnections(MySQL())
-# lapply(all_connections, dbDisconnect)
+all_connections <- dbListConnections(MySQL())
+lapply(all_connections, dbDisconnect)
 ```
 
 

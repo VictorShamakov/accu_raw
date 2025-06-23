@@ -4,6 +4,7 @@ author: "SVA"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
+    css: "styles.css"
     code_folding: hide
     df_print: paged
     toc: yes
@@ -17,6 +18,7 @@ editor_options:
   chunk_output_type: inline
 ---
 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   echo = FALSE,
@@ -27,57 +29,25 @@ knitr::opts_chunk$set(
 
 rm(list=ls())
 source("functions.R")
+library("ARTool")
 ```
+<script>
+function addClassToTitle(containerId, className) {
+  // Находим контейнер по id
+  var container = document.getElementById(containerId);
+  if (!container) {
+    console.warn('Контейнер с id "' + containerId + '" не найден.');
+    return;
+  }
+
+  // Добавляем класс к найденному h3
+  container.classList.add(className);
+}
+</script>
 
 
-```{r}
-df.acc <- read.csv("./data/accuracy_features.csv")
+{{dataset}}
 
-df.acc$acc_max[is.infinite(df.acc$acc_max)] <- NA
-df.acc$acc_mean[is.infinite(df.acc$acc_mean)] <- NA
-df.acc$acc_range[is.infinite(df.acc$acc_range)] <- NA
-
-df.acc$dec_max[is.infinite(df.acc$dec_max)] <- NA
-df.acc$dec_mean[is.infinite(df.acc$dec_mean)] <- NA
-df.acc$dec_range[is.infinite(df.acc$dec_range)] <- NA
-
-df.acc$X <- NULL
-
-```
-
-```{r}
-df.spd <- read.csv("./data/speed_features.csv")
-
-df.spd$acc_max[is.infinite(df.spd$acc_max)] <- NA
-df.spd$acc_mean[is.infinite(df.spd$acc_mean)] <- NA
-df.spd$acc_range[is.infinite(df.spd$acc_range)] <- NA
-
-df.spd$dec_max[is.infinite(df.spd$dec_max)] <- NA
-df.spd$dec_mean[is.infinite(df.spd$dec_mean)] <- NA
-df.spd$dec_range[is.infinite(df.spd$dec_range)] <- NA
-df.spd$dec_min[is.infinite(df.spd$dec_min)] <- NA
-
-df.spd$X <- NULL
-```
-
-
-```{r}
-clickers.acc <- df.acc[df.acc$clicked_through_targets > 5 & df.acc$combo_clicked_through_targets > 5, ]
-clickers.spd <- df.spd[df.spd$clicked_through_targets > 5 & df.spd$combo_clicked_through_targets > 5, ]
-clickers <- unique(c(clickers.acc$user_id, clickers.spd$user_id))
-
-df.acc <- df.acc[!df.acc$user_id %in% clickers, ]
-df.spd <- df.spd[!df.spd$user_id %in% clickers, ]
-```
-
-```{r}
-long_stops.acc <- df.acc[df.acc$time_max >= 10, ]
-long_stops.spd <- df.spd[df.spd$time_max >= 10, ]
-long_stops <- unique(c(long_stops.acc$user_id, long_stops.spd$user_id))
-
-df.acc <- df.acc[!df.acc$user_id %in% long_stops, ]
-df.spd <- df.spd[!df.spd$user_id %in% long_stops, ]
-```
 
 # Описательные статистики
 {% for feature in data_dictionary %}
@@ -86,12 +56,9 @@ df.spd <- df.spd[!df.spd$user_id %in% long_stops, ]
 **{{feature.name}}**
 
 #### Descriptive stat
-```{r}
-quantile(df.{{stage}}${{feature.short_name}}, na.rm = T)
-```
 
 ```{r}
-data.frame(describeBy(df.{{stage}}${{feature.short_name}}))
+data.frame(describe(df.{{stage}}${{feature.short_name}}, quant = c(0.25, 0.75)))
 ```
 
 
@@ -166,5 +133,105 @@ data.frame(
 
 {% endfor %}
 
+### Корреляционный анализ {.tabset .tabset-fade .tabset-pills}
 
+```{r}
+corr_vars <- c("distance_trimmed", 
+"dec_trimmed", 
+"acc_q0.75", 
+"pause_q0.25", 
+"missings_range", 
+"time_q0.75", 
+"missings_se", 
+"missings_max", 
+"acc_q0.25", 
+"dec_q0.25", 
+"acc_per_sec_q0.25", 
+"pause_se", 
+"acc_per_sec_q0.75", 
+"pause_kurtosis", 
+"missings_q0.25", 
+"pause_trimmed", 
+"missings_q0.75", 
+"acc_kurtosis", 
+"missings_kurtosis", 
+"dec_mad", 
+"acc_mad", 
+"pause_q0.75", 
+"missings_median", 
+"acc_per_sec_median", 
+"time_median", 
+"time_q0.25", 
+"time_trend", 
+"time_trimmed", 
+"acc_per_sec_trimmed", 
+"missings_trimmed", 
+"time_mean", 
+"distance_se", 
+"velocity_se", 
+"missings_mean", 
+"distance_mean", 
+"acc_range", 
+"dec_range", 
+"time_range", 
+"dec_median", 
+"time_max", 
+"dec_kurtosis", 
+"acc_trimmed", 
+"pause_median", 
+"velocity_q0.75", 
+"distance_kurtosis", 
+"distance_range", 
+"pause_mad", 
+"dec_q0.75", 
+"velocity_q0.25", 
+"acc_se", 
+"acc_max", 
+"acc_per_sec_mad", 
+"time_mad", 
+"dec_se", 
+"time_kurtosis", 
+"distance_max", 
+"time_se", 
+"missings_mad", 
+"dec_min", 
+"distance_median", 
+"dec_sd", 
+"distance_sd", 
+"distance_q0.75", 
+"acc_median", 
+"velocity_mad", 
+"velocity_range", 
+"dec_mean", 
+"time_sd", 
+"pause_mean", 
+"distance_q0.25", 
+"acc_per_sec_se", 
+"velocity_max", 
+"missings_skew", 
+"missings_min", 
+"accuracy_rate", 
+"time_min", 
+"distance_min", 
+"jerk_line", 
+"velocity_mean", 
+"missings_sd")
+```
 
+```{r}
+df.{{stage}}.num <- df.{{stage}}[, sapply(df.{{stage}}, typeof) == "double"]
+
+df.{{stage}}.num <- select(df.{{stage}}.num, -corr_vars)
+
+cor_matrix <- cor(df.{{stage}}.num, method = "spearman", use = "pairwise.complete.obs")
+
+cor_matrix[lower.tri(cor_matrix, diag = TRUE)] <- NA
+
+cor_df <- as.data.frame(as.table(cor_matrix)) %>%
+  filter(!is.na(Freq)) %>%
+  arrange(desc(abs(Freq)))  # сортируем по абсолютному значению корреляции по убыванию
+```
+
+```{r fig.height=30, fig.width=30, results='asis'}
+draw_corrplots(df.{{stage}}.num, method = "spearman", number.cex = 2, tl.cex = 3)
+```
