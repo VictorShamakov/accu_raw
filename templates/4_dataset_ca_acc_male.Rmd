@@ -1,0 +1,10 @@
+
+```{r}
+load("./data/envs/4_cluster_analysis/df.acc.male.RData")
+df$gender <- factor(df$gender, labels = "M")
+# df <- df.acc[df.acc$gender == "M", ]
+```
+
+```{r}
+sign_differences <- vector()
+```

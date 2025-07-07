@@ -15,7 +15,7 @@ output:
 editor_options:
   chunk_output_type: inline
 params:
-  user_id: 3438
+  user_id: 3449
   test_id: 84
   data_from_db: TRUE
 ---
@@ -212,6 +212,30 @@ write_xlsx(speed_datasets$ast_merged, file.path("data", "users", user_id, test_i
 
 ## Карта движений {.tabset .tabset-fade .tabset-pills}
 
+### Образец
+
+```{r fig.height=8, fig.width=9}
+ideal_dist <- sum(get_distance(ideal_coords$x_mouse_pos, ideal_coords$y_mouse_pos))
+
+ggplot(data = ideal_coords, aes(x_mouse_pos, y_mouse_pos)) + 
+    scale_y_reverse() + xlab("x") + ylab("y") + theme_bw() + 
+    geom_path(alpha = I(0.9), linewidth=0.5, color = "deepskyblue") +
+    geom_point(aes(x_mouse_pos, y_mouse_pos), color="black", fill="white", shape=21, size=11, alpha=0.7) +
+    theme(plot.title = element_text(size=22),
+          axis.text.x = element_text(size = 16),
+          axis.text.y = element_text(size = 16),
+          axis.title.x = element_text(size = 20),
+          axis.title.y = element_text(size = 20)) +
+    geom_text(
+          label=paste0("Время: ", "Расстояние: ", ideal_dist, " px\n"), 
+          x=0,
+          y=0,
+          size=5,
+          hjust = "left", vjust = "top",
+        )
+```
+
+
 ### Точность
 
 ```{r fig.height=8, fig.width=9}
@@ -378,6 +402,11 @@ ggplot(ast_long.wo_ctt, aes(velocity, miss_distance)) + geom_point(aes(col=hits)
   facet_grid(. ~ stage) +
   xlab("Скорость, px/s") + ylab("Расстояние промахов, px") +
   scale_color_manual(values = colors, labels = labels_legend) +
+  ggtitle("Компромисс между скоростью и точностью на каждом этапе") 
+
+
+ggplot(ast_long.wo_ctt, aes(velocity, miss_distance, group=stage)) + geom_point(aes(col=stage)) + stat_smooth(method = "lm") +
+  xlab("Скорость, px/s") + ylab("Расстояние промахов, px") +
   ggtitle("Компромисс между скоростью и точностью на каждом этапе") 
 
 ggplot(ast_long.wo_ctt, aes(velocity, miss_distance, col = hits)) + geom_point() + stat_smooth(method = "lm") +
