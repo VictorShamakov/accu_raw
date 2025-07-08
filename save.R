@@ -1,4 +1,9 @@
 rm(list=ls())
+library(parallel)
+# Функция для рендеринга одного файла
+render_file <- function(file) {
+  rmarkdown::render(input = file$input, output_file = file$output)
+}
 "%+%" <- function(...){paste0(...)}
 test_id <- 84
 user_id <- 3449
@@ -42,437 +47,278 @@ for (user_id in ast_results$user_id[1:length(ast_results$user_id)]) {
   rmarkdown::render('./1_preprocessing_files.Rmd', output_file = file.path("data", "users", user_id, test_id, "userid_" %+% user_id %+% "_testid_" %+% test_id %+% "_personal_report.html"), params = list(user_id = user_id, test_id = test_id, data_from_db = F))
 }
 
+## Генерация статистических отчетов параллельно
+files <- list(
+  list(input = './3.1_ds_acc.Rmd', output = './reports/3.1_ds_acc.html'),
+  list(input = './3.1_ds_spd.Rmd', output = './reports/3.1_ds_spd.html'),
+  list(input = './3.2_ds_by_stage.Rmd', output = './reports/3.2_ds_by_stage.html'),
+  list(input = './3.3_ds_acc_by_gender.Rmd', output = './reports/3.3_ds_acc_by_gender.html'),
+  list(input = './3.3_ds_spd_by_gender.Rmd', output = './reports/3.3_ds_spd_by_gender.html'),
+  list(input = './3.4_ds_by_stage_and_gender.Rmd', output = './reports/3.4_ds_by_stage_and_gender.html')
+)
 
-## Генерация статистических отчетов
-rmarkdown::render('./3.1_ds_acc.Rmd', output_file = './reports/3.1_ds_acc.html')
-rmarkdown::render('./3.1_ds_spd.Rmd', output_file = './reports/3.1_ds_spd.html')
-rmarkdown::render('./3.2_ds_by_stage.Rmd', output_file = './reports/3.2_ds_by_stage.html')
-rmarkdown::render('./3.3_ds_acc_by_gender.Rmd', output_file = './reports/3.3_ds_acc_by_gender.html')
-rmarkdown::render('./3.3_ds_spd_by_gender.Rmd', output_file = './reports/3.3_ds_spd_by_gender.html')
-rmarkdown::render('./3.4_ds_by_stage_and_gender.Rmd', output_file = './reports/3.4_ds_by_stage_and_gender.html')
+# Запуск параллельно на всех ядрах (или укажите нужное число)
+mclapply(files, render_file, mc.cores = detectCores())
 
-# Описательная статистика кластеров
-## Все респонденты acc
-rmarkdown::render('./4.1.1_ds_acc_by_all_hclust2.Rmd', output_file = './reports/4.1.1_ds_acc_by_all_hclust2.html')
-rmarkdown::render('./4.1.2_ds_acc_by_all_hclust3.Rmd', output_file = './reports/4.1.2_ds_acc_by_all_hclust3.html')
-rmarkdown::render('./4.1.3_ds_acc_by_all_hclust4.Rmd', output_file = './reports/4.1.3_ds_acc_by_all_hclust4.html')
-rmarkdown::render('./4.1.4_ds_acc_by_all_hclust5.Rmd', output_file = './reports/4.1.4_ds_acc_by_all_hclust5.html')
-rmarkdown::render('./4.1.5_ds_acc_by_all_hclust6.Rmd', output_file = './reports/4.1.5_ds_acc_by_all_hclust6.html')
-rmarkdown::render('./4.1.6_ds_acc_by_all_hclust7.Rmd', output_file = './reports/4.1.6_ds_acc_by_all_hclust7.html')
-rmarkdown::render('./4.1.7_ds_acc_by_all_hclust8.Rmd', output_file = './reports/4.1.7_ds_acc_by_all_hclust8.html')
-rmarkdown::render('./4.1.8_ds_acc_by_all_hclust9.Rmd', output_file = './reports/4.1.8_ds_acc_by_all_hclust9.html')
+files <- list(
+  # Описательная статистика кластеров
+  ## Все респонденты. Задание на точность.
+  list(input = './4.1.1_ds_acc_by_all_hclust2.Rmd', output = './reports/4.1.1_ds_acc_by_all_hclust2.html'),
+  list(input = './4.1.2_ds_acc_by_all_hclust3.Rmd', output = './reports/4.1.2_ds_acc_by_all_hclust3.html'),
+  list(input = './4.1.3_ds_acc_by_all_hclust4.Rmd', output = './reports/4.1.3_ds_acc_by_all_hclust4.html'),
+  list(input = './4.1.4_ds_acc_by_all_hclust5.Rmd', output = './reports/4.1.4_ds_acc_by_all_hclust5.html'),
+  
+  list(input = './4.1.1_ds_acc_by_notcorr_hclust2.Rmd', output = './reports/4.1.1_ds_acc_by_notcorr_hclust2.html'),
+  list(input = './4.1.2_ds_acc_by_notcorr_hclust3.Rmd', output = './reports/4.1.2_ds_acc_by_notcorr_hclust3.html'),
+  list(input = './4.1.3_ds_acc_by_notcorr_hclust4.Rmd', output = './reports/4.1.3_ds_acc_by_notcorr_hclust4.html'),
+  list(input = './4.1.4_ds_acc_by_notcorr_hclust5.Rmd', output = './reports/4.1.4_ds_acc_by_notcorr_hclust5.html'),
+  
+  list(input = './4.1.1_ds_acc_by_tdm_hclust2.Rmd', output = './reports/4.1.1_ds_acc_by_tdm_hclust2.html'),
+  list(input = './4.1.2_ds_acc_by_tdm_hclust3.Rmd', output = './reports/4.1.2_ds_acc_by_tdm_hclust3.html'),
+  list(input = './4.1.3_ds_acc_by_tdm_hclust4.Rmd', output = './reports/4.1.3_ds_acc_by_tdm_hclust4.html'),
+  list(input = './4.1.4_ds_acc_by_tdm_hclust5.Rmd', output = './reports/4.1.4_ds_acc_by_tdm_hclust5.html'),
+  
+  list(input = './4.1.1_ds_acc_by_pauses_hclust2.Rmd', output = './reports/4.1.1_ds_acc_by_pauses_hclust2.html'),
+  list(input = './4.1.2_ds_acc_by_pauses_hclust3.Rmd', output = './reports/4.1.2_ds_acc_by_pauses_hclust3.html'),
+  list(input = './4.1.3_ds_acc_by_pauses_hclust4.Rmd', output = './reports/4.1.3_ds_acc_by_pauses_hclust4.html'),
+  list(input = './4.1.4_ds_acc_by_pauses_hclust5.Rmd', output = './reports/4.1.4_ds_acc_by_pauses_hclust5.html'),
+  
+  ## Женщины acc
+  list(input = './4.2.1_ds_acc_female_by_all_hclust2.Rmd', output = './reports/4.2.1_ds_acc_female_by_all_hclust2.html'),
+  list(input = './4.2.2_ds_acc_female_by_all_hclust3.Rmd', output = './reports/4.2.2_ds_acc_female_by_all_hclust3.html'),
+  list(input = './4.2.3_ds_acc_female_by_all_hclust4.Rmd', output = './reports/4.2.3_ds_acc_female_by_all_hclust4.html'),
+  list(input = './4.2.4_ds_acc_female_by_all_hclust5.Rmd', output = './reports/4.2.4_ds_acc_female_by_all_hclust5.html'),
+  
+  list(input = './4.2.1_ds_acc_female_by_notcorr_hclust2.Rmd', output = './reports/4.2.1_ds_acc_female_by_notcorr_hclust2.html'),
+  list(input = './4.2.2_ds_acc_female_by_notcorr_hclust3.Rmd', output = './reports/4.2.2_ds_acc_female_by_notcorr_hclust3.html'),
+  list(input = './4.2.3_ds_acc_female_by_notcorr_hclust4.Rmd', output = './reports/4.2.3_ds_acc_female_by_notcorr_hclust4.html'),
+  list(input = './4.2.4_ds_acc_female_by_notcorr_hclust5.Rmd', output = './reports/4.2.4_ds_acc_female_by_notcorr_hclust5.html'),
+  
+  list(input = './4.2.1_ds_acc_female_by_tdm_hclust2.Rmd', output = './reports/4.2.1_ds_acc_female_by_tdm_hclust2.html'),
+  list(input = './4.2.2_ds_acc_female_by_tdm_hclust3.Rmd', output = './reports/4.2.2_ds_acc_female_by_tdm_hclust3.html'),
+  list(input = './4.2.3_ds_acc_female_by_tdm_hclust4.Rmd', output = './reports/4.2.3_ds_acc_female_by_tdm_hclust4.html'),
+  list(input = './4.2.4_ds_acc_female_by_tdm_hclust5.Rmd', output = './reports/4.2.4_ds_acc_female_by_tdm_hclust5.html'),
+  
+  list(input = './4.2.1_ds_acc_female_by_pauses_hclust2.Rmd', output = './reports/4.2.1_ds_acc_female_by_pauses_hclust2.html'),
+  list(input = './4.2.2_ds_acc_female_by_pauses_hclust3.Rmd', output = './reports/4.2.2_ds_acc_female_by_pauses_hclust3.html'),
+  list(input = './4.2.3_ds_acc_female_by_pauses_hclust4.Rmd', output = './reports/4.2.3_ds_acc_female_by_pauses_hclust4.html'),
+  list(input = './4.2.4_ds_acc_female_by_pauses_hclust5.Rmd', output = './reports/4.2.4_ds_acc_female_by_pauses_hclust5.html'),
+  
+  ## Мужчины acc
+  list(input = './4.3.1_ds_acc_male_by_all_hclust2.Rmd', output = './reports/4.3.1_ds_acc_male_by_all_hclust2.html'),
+  list(input = './4.3.2_ds_acc_male_by_all_hclust3.Rmd', output = './reports/4.3.2_ds_acc_male_by_all_hclust3.html'),
+  list(input = './4.3.3_ds_acc_male_by_all_hclust4.Rmd', output = './reports/4.3.3_ds_acc_male_by_all_hclust4.html'),
+  list(input = './4.3.4_ds_acc_male_by_all_hclust5.Rmd', output = './reports/4.3.4_ds_acc_male_by_all_hclust5.html'),
+  
+  list(input = './4.3.1_ds_acc_male_by_notcorr_hclust2.Rmd', output = './reports/4.3.1_ds_acc_male_by_notcorr_hclust2.html'),
+  list(input = './4.3.2_ds_acc_male_by_notcorr_hclust3.Rmd', output = './reports/4.3.2_ds_acc_male_by_notcorr_hclust3.html'),
+  list(input = './4.3.3_ds_acc_male_by_notcorr_hclust4.Rmd', output = './reports/4.3.3_ds_acc_male_by_notcorr_hclust4.html'),
+  list(input = './4.3.4_ds_acc_male_by_notcorr_hclust5.Rmd', output = './reports/4.3.4_ds_acc_male_by_notcorr_hclust5.html'),
+  
+  list(input = './4.3.1_ds_acc_male_by_tdm_hclust2.Rmd', output = './reports/4.3.1_ds_acc_male_by_tdm_hclust2.html'),
+  list(input = './4.3.2_ds_acc_male_by_tdm_hclust3.Rmd', output = './reports/4.3.2_ds_acc_male_by_tdm_hclust3.html'),
+  list(input = './4.3.3_ds_acc_male_by_tdm_hclust4.Rmd', output = './reports/4.3.3_ds_acc_male_by_tdm_hclust4.html'),
+  list(input = './4.3.4_ds_acc_male_by_tdm_hclust5.Rmd', output = './reports/4.3.4_ds_acc_male_by_tdm_hclust5.html'),
+  
+  list(input = './4.3.1_ds_acc_male_by_pauses_hclust2.Rmd', output = './reports/4.3.1_ds_acc_male_by_pauses_hclust2.html'),
+  list(input = './4.3.2_ds_acc_male_by_pauses_hclust3.Rmd', output = './reports/4.3.2_ds_acc_male_by_pauses_hclust3.html'),
+  list(input = './4.3.3_ds_acc_male_by_pauses_hclust4.Rmd', output = './reports/4.3.3_ds_acc_male_by_pauses_hclust4.html'),
+  list(input = './4.3.4_ds_acc_male_by_pauses_hclust5.Rmd', output = './reports/4.3.4_ds_acc_male_by_pauses_hclust5.html'),
+  
+  ## Все респонденты. Задание на скорость
+  list(input = './4.4.1_ds_spd_by_all_hclust2.Rmd', output = './reports/4.4.1_ds_spd_by_all_hclust2.html'),
+  list(input = './4.4.2_ds_spd_by_all_hclust3.Rmd', output = './reports/4.4.2_ds_spd_by_all_hclust3.html'),
+  list(input = './4.4.3_ds_spd_by_all_hclust4.Rmd', output = './reports/4.4.3_ds_spd_by_all_hclust4.html'),
+  list(input = './4.4.4_ds_spd_by_all_hclust5.Rmd', output = './reports/4.4.4_ds_spd_by_all_hclust5.html'),
+  
+  list(input = './4.4.1_ds_spd_by_notcorr_hclust2.Rmd', output = './reports/4.4.1_ds_spd_by_notcorr_hclust2.html'),
+  list(input = './4.4.2_ds_spd_by_notcorr_hclust3.Rmd', output = './reports/4.4.2_ds_spd_by_notcorr_hclust3.html'),
+  list(input = './4.4.3_ds_spd_by_notcorr_hclust4.Rmd', output = './reports/4.4.3_ds_spd_by_notcorr_hclust4.html'),
+  list(input = './4.4.4_ds_spd_by_notcorr_hclust5.Rmd', output = './reports/4.4.4_ds_spd_by_notcorr_hclust5.html'),
+  
+  list(input = './4.4.1_ds_spd_by_tdm_hclust2.Rmd', output = './reports/4.4.1_ds_spd_by_tdm_hclust2.html'),
+  list(input = './4.4.2_ds_spd_by_tdm_hclust3.Rmd', output = './reports/4.4.2_ds_spd_by_tdm_hclust3.html'),
+  list(input = './4.4.3_ds_spd_by_tdm_hclust4.Rmd', output = './reports/4.4.3_ds_spd_by_tdm_hclust4.html'),
+  list(input = './4.4.4_ds_spd_by_tdm_hclust5.Rmd', output = './reports/4.4.4_ds_spd_by_tdm_hclust5.html'),
+  
+  list(input = './4.4.1_ds_spd_by_pauses_hclust2.Rmd', output = './reports/4.4.1_ds_spd_by_pauses_hclust2.html'),
+  list(input = './4.4.2_ds_spd_by_pauses_hclust3.Rmd', output = './reports/4.4.2_ds_spd_by_pauses_hclust3.html'),
+  list(input = './4.4.3_ds_spd_by_pauses_hclust4.Rmd', output = './reports/4.4.3_ds_spd_by_pauses_hclust4.html'),
+  list(input = './4.4.4_ds_spd_by_pauses_hclust5.Rmd', output = './reports/4.4.4_ds_spd_by_pauses_hclust5.html'),
+  
+  ## Женщины spd
+  list(input = './4.5.1_ds_spd_female_by_all_hclust2.Rmd', output = './reports/4.5.1_ds_spd_female_by_all_hclust2.html'),
+  list(input = './4.5.2_ds_spd_female_by_all_hclust3.Rmd', output = './reports/4.5.2_ds_spd_female_by_all_hclust3.html'),
+  list(input = './4.5.3_ds_spd_female_by_all_hclust4.Rmd', output = './reports/4.5.3_ds_spd_female_by_all_hclust4.html'),
+  list(input = './4.5.4_ds_spd_female_by_all_hclust5.Rmd', output = './reports/4.5.4_ds_spd_female_by_all_hclust5.html'),
+  
+  list(input = './4.5.1_ds_spd_female_by_notcorr_hclust2.Rmd', output = './reports/4.5.1_ds_spd_female_by_notcorr_hclust2.html'),
+  list(input = './4.5.2_ds_spd_female_by_notcorr_hclust3.Rmd', output = './reports/4.5.2_ds_spd_female_by_notcorr_hclust3.html'),
+  list(input = './4.5.3_ds_spd_female_by_notcorr_hclust4.Rmd', output = './reports/4.5.3_ds_spd_female_by_notcorr_hclust4.html'),
+  list(input = './4.5.4_ds_spd_female_by_notcorr_hclust5.Rmd', output = './reports/4.5.4_ds_spd_female_by_notcorr_hclust5.html'),
+  
+  list(input = './4.5.1_ds_spd_female_by_tdm_hclust2.Rmd', output = './reports/4.5.1_ds_spd_female_by_tdm_hclust2.html'),
+  list(input = './4.5.2_ds_spd_female_by_tdm_hclust3.Rmd', output = './reports/4.5.2_ds_spd_female_by_tdm_hclust3.html'),
+  list(input = './4.5.3_ds_spd_female_by_tdm_hclust4.Rmd', output = './reports/4.5.3_ds_spd_female_by_tdm_hclust4.html'),
+  list(input = './4.5.4_ds_spd_female_by_tdm_hclust5.Rmd', output = './reports/4.5.4_ds_spd_female_by_tdm_hclust5.html'),
+  
+  list(input = './4.5.1_ds_spd_female_by_pauses_hclust2.Rmd', output = './reports/4.5.1_ds_spd_female_by_pauses_hclust2.html'),
+  list(input = './4.5.2_ds_spd_female_by_pauses_hclust3.Rmd', output = './reports/4.5.2_ds_spd_female_by_pauses_hclust3.html'),
+  list(input = './4.5.3_ds_spd_female_by_pauses_hclust4.Rmd', output = './reports/4.5.3_ds_spd_female_by_pauses_hclust4.html'),
+  list(input = './4.5.4_ds_spd_female_by_pauses_hclust5.Rmd', output = './reports/4.5.4_ds_spd_female_by_pauses_hclust5.html'),
+  
+  ## Мужчины spd
+  list(input = './4.6.1_ds_spd_male_by_all_hclust2.Rmd', output = './reports/4.6.1_ds_spd_male_by_all_hclust2.html'),
+  list(input = './4.6.2_ds_spd_male_by_all_hclust3.Rmd', output = './reports/4.6.2_ds_spd_male_by_all_hclust3.html'),
+  list(input = './4.6.3_ds_spd_male_by_all_hclust4.Rmd', output = './reports/4.6.3_ds_spd_male_by_all_hclust4.html'),
+  list(input = './4.6.4_ds_spd_male_by_all_hclust5.Rmd', output = './reports/4.6.4_ds_spd_male_by_all_hclust5.html'),
+  
+  list(input = './4.6.1_ds_spd_male_by_notcorr_hclust2.Rmd', output = './reports/4.6.1_ds_spd_male_by_notcorr_hclust2.html'),
+  list(input = './4.6.2_ds_spd_male_by_notcorr_hclust3.Rmd', output = './reports/4.6.2_ds_spd_male_by_notcorr_hclust3.html'),
+  list(input = './4.6.3_ds_spd_male_by_notcorr_hclust4.Rmd', output = './reports/4.6.3_ds_spd_male_by_notcorr_hclust4.html'),
+  list(input = './4.6.4_ds_spd_male_by_notcorr_hclust5.Rmd', output = './reports/4.6.4_ds_spd_male_by_notcorr_hclust5.html'),
+  
+  list(input = './4.6.1_ds_spd_male_by_tdm_hclust2.Rmd', output = './reports/4.6.1_ds_spd_male_by_tdm_hclust2.html'),
+  list(input = './4.6.2_ds_spd_male_by_tdm_hclust3.Rmd', output = './reports/4.6.2_ds_spd_male_by_tdm_hclust3.html'),
+  list(input = './4.6.3_ds_spd_male_by_tdm_hclust4.Rmd', output = './reports/4.6.3_ds_spd_male_by_tdm_hclust4.html'),
+  list(input = './4.6.4_ds_spd_male_by_tdm_hclust5.Rmd', output = './reports/4.6.4_ds_spd_male_by_tdm_hclust5.html'),
+  
+  list(input = './4.6.1_ds_spd_male_by_pauses_hclust2.Rmd', output = './reports/4.6.1_ds_spd_male_by_pauses_hclust2.html'),
+  list(input = './4.6.2_ds_spd_male_by_pauses_hclust3.Rmd', output = './reports/4.6.2_ds_spd_male_by_pauses_hclust3.html'),
+  list(input = './4.6.3_ds_spd_male_by_pauses_hclust4.Rmd', output = './reports/4.6.3_ds_spd_male_by_pauses_hclust4.html'),
+  list(input = './4.6.4_ds_spd_male_by_pauses_hclust5.Rmd', output = './reports/4.6.4_ds_spd_male_by_pauses_hclust5.html'),
+  
+  # Психодиагностика и кластеры
+  ## Все респонденты. Задание на точность
+  list(input = './5.1.1_sp_ds_acc_by_all_hclust2.Rmd', output = './reports/5.1.1_sp_ds_acc_by_all_hclust2.html'),
+  list(input = './5.1.2_sp_ds_acc_by_all_hclust3.Rmd', output = './reports/5.1.2_sp_ds_acc_by_all_hclust3.html'),
+  list(input = './5.1.3_sp_ds_acc_by_all_hclust4.Rmd', output = './reports/5.1.3_sp_ds_acc_by_all_hclust4.html'),
+  list(input = './5.1.4_sp_ds_acc_by_all_hclust5.Rmd', output = './reports/5.1.4_sp_ds_acc_by_all_hclust5.html'),
+  
+  list(input = './5.1.1_sp_ds_acc_by_notcorr_hclust2.Rmd', output = './reports/5.1.1_sp_ds_acc_by_notcorr_hclust2.html'),
+  list(input = './5.1.2_sp_ds_acc_by_notcorr_hclust3.Rmd', output = './reports/5.1.2_sp_ds_acc_by_notcorr_hclust3.html'),
+  list(input = './5.1.3_sp_ds_acc_by_notcorr_hclust4.Rmd', output = './reports/5.1.3_sp_ds_acc_by_notcorr_hclust4.html'),
+  list(input = './5.1.4_sp_ds_acc_by_notcorr_hclust5.Rmd', output = './reports/5.1.4_sp_ds_acc_by_notcorr_hclust5.html'),
+  
+  list(input = './5.1.1_sp_ds_acc_by_tdm_hclust2.Rmd', output = './reports/5.1.1_sp_ds_acc_by_tdm_hclust2.html'),
+  list(input = './5.1.2_sp_ds_acc_by_tdm_hclust3.Rmd', output = './reports/5.1.2_sp_ds_acc_by_tdm_hclust3.html'),
+  list(input = './5.1.3_sp_ds_acc_by_tdm_hclust4.Rmd', output = './reports/5.1.3_sp_ds_acc_by_tdm_hclust4.html'),
+  list(input = './5.1.4_sp_ds_acc_by_tdm_hclust5.Rmd', output = './reports/5.1.4_sp_ds_acc_by_tdm_hclust5.html'),
+  
+  list(input = './5.1.1_sp_ds_acc_by_pauses_hclust2.Rmd', output = './reports/5.1.1_sp_ds_acc_by_pauses_hclust2.html'),
+  list(input = './5.1.2_sp_ds_acc_by_pauses_hclust3.Rmd', output = './reports/5.1.2_sp_ds_acc_by_pauses_hclust3.html'),
+  list(input = './5.1.3_sp_ds_acc_by_pauses_hclust4.Rmd', output = './reports/5.1.3_sp_ds_acc_by_pauses_hclust4.html'),
+  list(input = './5.1.4_sp_ds_acc_by_pauses_hclust5.Rmd', output = './reports/5.1.4_sp_ds_acc_by_pauses_hclust5.html'),
+  
+  ## Женщины acc
+  list(input = './5.2.1_sp_ds_acc_female_by_all_hclust2.Rmd', output = './reports/5.2.1_sp_ds_acc_female_by_all_hclust2.html'),
+  list(input = './5.2.2_sp_ds_acc_female_by_all_hclust3.Rmd', output = './reports/5.2.2_sp_ds_acc_female_by_all_hclust3.html'),
+  list(input = './5.2.3_sp_ds_acc_female_by_all_hclust4.Rmd', output = './reports/5.2.3_sp_ds_acc_female_by_all_hclust4.html'),
+  list(input = './5.2.4_sp_ds_acc_female_by_all_hclust5.Rmd', output = './reports/5.2.4_sp_ds_acc_female_by_all_hclust5.html'),
+  
+  list(input = './5.2.1_sp_ds_acc_female_by_notcorr_hclust2.Rmd', output = './reports/5.2.1_sp_ds_acc_female_by_notcorr_hclust2.html'),
+  list(input = './5.2.2_sp_ds_acc_female_by_notcorr_hclust3.Rmd', output = './reports/5.2.2_sp_ds_acc_female_by_notcorr_hclust3.html'),
+  list(input = './5.2.3_sp_ds_acc_female_by_notcorr_hclust4.Rmd', output = './reports/5.2.3_sp_ds_acc_female_by_notcorr_hclust4.html'),
+  list(input = './5.2.4_sp_ds_acc_female_by_notcorr_hclust5.Rmd', output = './reports/5.2.4_sp_ds_acc_female_by_notcorr_hclust5.html'),
+  
+  list(input = './5.2.1_sp_ds_acc_female_by_tdm_hclust2.Rmd', output = './reports/5.2.1_sp_ds_acc_female_by_tdm_hclust2.html'),
+  list(input = './5.2.2_sp_ds_acc_female_by_tdm_hclust3.Rmd', output = './reports/5.2.2_sp_ds_acc_female_by_tdm_hclust3.html'),
+  list(input = './5.2.3_sp_ds_acc_female_by_tdm_hclust4.Rmd', output = './reports/5.2.3_sp_ds_acc_female_by_tdm_hclust4.html'),
+  list(input = './5.2.4_sp_ds_acc_female_by_tdm_hclust5.Rmd', output = './reports/5.2.4_sp_ds_acc_female_by_tdm_hclust5.html'),
+  
+  list(input = './5.2.1_sp_ds_acc_female_by_pauses_hclust2.Rmd', output = './reports/5.2.1_sp_ds_acc_female_by_pauses_hclust2.html'),
+  list(input = './5.2.2_sp_ds_acc_female_by_pauses_hclust3.Rmd', output = './reports/5.2.2_sp_ds_acc_female_by_pauses_hclust3.html'),
+  list(input = './5.2.3_sp_ds_acc_female_by_pauses_hclust4.Rmd', output = './reports/5.2.3_sp_ds_acc_female_by_pauses_hclust4.html'),
+  list(input = './5.2.4_sp_ds_acc_female_by_pauses_hclust5.Rmd', output = './reports/5.2.4_sp_ds_acc_female_by_pauses_hclust5.html'),
+  
+  
+  ## Мужчины acc
+  list(input = './5.3.1_sp_ds_acc_male_by_all_hclust2.Rmd', output = './reports/5.3.1_sp_ds_acc_male_by_all_hclust2.html'),
+  list(input = './5.3.2_sp_ds_acc_male_by_all_hclust3.Rmd', output = './reports/5.3.2_sp_ds_acc_male_by_all_hclust3.html'),
+  list(input = './5.3.3_sp_ds_acc_male_by_all_hclust4.Rmd', output = './reports/5.3.3_sp_ds_acc_male_by_all_hclust4.html'),
+  list(input = './5.3.4_sp_ds_acc_male_by_all_hclust5.Rmd', output = './reports/5.3.4_sp_ds_acc_male_by_all_hclust5.html'),
+  
+  list(input = './5.3.1_sp_ds_acc_male_by_notcorr_hclust2.Rmd', output = './reports/5.3.1_sp_ds_acc_male_by_notcorr_hclust2.html'),
+  list(input = './5.3.2_sp_ds_acc_male_by_notcorr_hclust3.Rmd', output = './reports/5.3.2_sp_ds_acc_male_by_notcorr_hclust3.html'),
+  list(input = './5.3.3_sp_ds_acc_male_by_notcorr_hclust4.Rmd', output = './reports/5.3.3_sp_ds_acc_male_by_notcorr_hclust4.html'),
+  list(input = './5.3.4_sp_ds_acc_male_by_notcorr_hclust5.Rmd', output = './reports/5.3.4_sp_ds_acc_male_by_notcorr_hclust5.html'),
+  
+  list(input = './5.3.1_sp_ds_acc_male_by_tdm_hclust2.Rmd', output = './reports/5.3.1_sp_ds_acc_male_by_tdm_hclust2.html'),
+  list(input = './5.3.2_sp_ds_acc_male_by_tdm_hclust3.Rmd', output = './reports/5.3.2_sp_ds_acc_male_by_tdm_hclust3.html'),
+  list(input = './5.3.3_sp_ds_acc_male_by_tdm_hclust4.Rmd', output = './reports/5.3.3_sp_ds_acc_male_by_tdm_hclust4.html'),
+  list(input = './5.3.4_sp_ds_acc_male_by_tdm_hclust5.Rmd', output = './reports/5.3.4_sp_ds_acc_male_by_tdm_hclust5.html'),
+  
+  list(input = './5.3.1_sp_ds_acc_male_by_pauses_hclust2.Rmd', output = './reports/5.3.1_sp_ds_acc_male_by_pauses_hclust2.html'),
+  list(input = './5.3.2_sp_ds_acc_male_by_pauses_hclust3.Rmd', output = './reports/5.3.2_sp_ds_acc_male_by_pauses_hclust3.html'),
+  list(input = './5.3.3_sp_ds_acc_male_by_pauses_hclust4.Rmd', output = './reports/5.3.3_sp_ds_acc_male_by_pauses_hclust4.html'),
+  list(input = './5.3.4_sp_ds_acc_male_by_pauses_hclust5.Rmd', output = './reports/5.3.4_sp_ds_acc_male_by_pauses_hclust5.html'),
+  
+  ## Все респонденты. Задание на скорость
+  list(input = './5.4.1_sp_ds_spd_by_all_hclust2.Rmd', output = './reports/5.4.1_sp_ds_spd_by_all_hclust2.html'),
+  list(input = './5.4.2_sp_ds_spd_by_all_hclust3.Rmd', output = './reports/5.4.2_sp_ds_spd_by_all_hclust3.html'),
+  list(input = './5.4.3_sp_ds_spd_by_all_hclust4.Rmd', output = './reports/5.4.3_sp_ds_spd_by_all_hclust4.html'),
+  list(input = './5.4.4_sp_ds_spd_by_all_hclust5.Rmd', output = './reports/5.4.4_sp_ds_spd_by_all_hclust5.html'),
+  
+  list(input = './5.4.1_sp_ds_spd_by_notcorr_hclust2.Rmd', output = './reports/5.4.1_sp_ds_spd_by_notcorr_hclust2.html'),
+  list(input = './5.4.2_sp_ds_spd_by_notcorr_hclust3.Rmd', output = './reports/5.4.2_sp_ds_spd_by_notcorr_hclust3.html'),
+  list(input = './5.4.3_sp_ds_spd_by_notcorr_hclust4.Rmd', output = './reports/5.4.3_sp_ds_spd_by_notcorr_hclust4.html'),
+  list(input = './5.4.4_sp_ds_spd_by_notcorr_hclust5.Rmd', output = './reports/5.4.4_sp_ds_spd_by_notcorr_hclust5.html'),
+  
+  list(input = './5.4.1_sp_ds_spd_by_tdm_hclust2.Rmd', output = './reports/5.4.1_sp_ds_spd_by_tdm_hclust2.html'),
+  list(input = './5.4.2_sp_ds_spd_by_tdm_hclust3.Rmd', output = './reports/5.4.2_sp_ds_spd_by_tdm_hclust3.html'),
+  list(input = './5.4.3_sp_ds_spd_by_tdm_hclust4.Rmd', output = './reports/5.4.3_sp_ds_spd_by_tdm_hclust4.html'),
+  list(input = './5.4.4_sp_ds_spd_by_tdm_hclust5.Rmd', output = './reports/5.4.4_sp_ds_spd_by_tdm_hclust5.html'),
+  
+  list(input = './5.4.1_sp_ds_spd_by_pauses_hclust2.Rmd', output = './reports/5.4.1_sp_ds_spd_by_pauses_hclust2.html'),
+  list(input = './5.4.2_sp_ds_spd_by_pauses_hclust3.Rmd', output = './reports/5.4.2_sp_ds_spd_by_pauses_hclust3.html'),
+  list(input = './5.4.3_sp_ds_spd_by_pauses_hclust4.Rmd', output = './reports/5.4.3_sp_ds_spd_by_pauses_hclust4.html'),
+  list(input = './5.4.4_sp_ds_spd_by_pauses_hclust5.Rmd', output = './reports/5.4.4_sp_ds_spd_by_pauses_hclust5.html'),
+  
+  ## Женщины spd
+  list(input = './5.5.1_sp_ds_spd_female_by_all_hclust2.Rmd', output = './reports/5.5.1_sp_ds_spd_female_by_all_hclust2.html'),
+  list(input = './5.5.2_sp_ds_spd_female_by_all_hclust3.Rmd', output = './reports/5.5.2_sp_ds_spd_female_by_all_hclust3.html'),
+  list(input = './5.5.3_sp_ds_spd_female_by_all_hclust4.Rmd', output = './reports/5.5.3_sp_ds_spd_female_by_all_hclust4.html'),
+  list(input = './5.5.4_sp_ds_spd_female_by_all_hclust5.Rmd', output = './reports/5.5.4_sp_ds_spd_female_by_all_hclust5.html'),
+  
+  list(input = './5.5.1_sp_ds_spd_female_by_notcorr_hclust2.Rmd', output = './reports/5.5.1_sp_ds_spd_female_by_notcorr_hclust2.html'),
+  list(input = './5.5.2_sp_ds_spd_female_by_notcorr_hclust3.Rmd', output = './reports/5.5.2_sp_ds_spd_female_by_notcorr_hclust3.html'),
+  list(input = './5.5.3_sp_ds_spd_female_by_notcorr_hclust4.Rmd', output = './reports/5.5.3_sp_ds_spd_female_by_notcorr_hclust4.html'),
+  list(input = './5.5.4_sp_ds_spd_female_by_notcorr_hclust5.Rmd', output = './reports/5.5.4_sp_ds_spd_female_by_notcorr_hclust5.html'),
+  
+  list(input = './5.5.1_sp_ds_spd_female_by_tdm_hclust2.Rmd', output = './reports/5.5.1_sp_ds_spd_female_by_tdm_hclust2.html'),
+  list(input = './5.5.2_sp_ds_spd_female_by_tdm_hclust3.Rmd', output = './reports/5.5.2_sp_ds_spd_female_by_tdm_hclust3.html'),
+  list(input = './5.5.3_sp_ds_spd_female_by_tdm_hclust4.Rmd', output = './reports/5.5.3_sp_ds_spd_female_by_tdm_hclust4.html'),
+  list(input = './5.5.4_sp_ds_spd_female_by_tdm_hclust5.Rmd', output = './reports/5.5.4_sp_ds_spd_female_by_tdm_hclust5.html'),
+  
+  list(input = './5.5.1_sp_ds_spd_female_by_pauses_hclust2.Rmd', output = './reports/5.5.1_sp_ds_spd_female_by_pauses_hclust2.html'),
+  list(input = './5.5.2_sp_ds_spd_female_by_pauses_hclust3.Rmd', output = './reports/5.5.2_sp_ds_spd_female_by_pauses_hclust3.html'),
+  list(input = './5.5.3_sp_ds_spd_female_by_pauses_hclust4.Rmd', output = './reports/5.5.3_sp_ds_spd_female_by_pauses_hclust4.html'),
+  list(input = './5.5.4_sp_ds_spd_female_by_pauses_hclust5.Rmd', output = './reports/5.5.4_sp_ds_spd_female_by_pauses_hclust5.html'),
+  
+  ## Мужчины spd
+  list(input = './5.6.1_sp_ds_spd_male_by_all_hclust2.Rmd', output = './reports/5.6.1_sp_ds_spd_male_by_all_hclust2.html'),
+  list(input = './5.6.2_sp_ds_spd_male_by_all_hclust3.Rmd', output = './reports/5.6.2_sp_ds_spd_male_by_all_hclust3.html'),
+  list(input = './5.6.3_sp_ds_spd_male_by_all_hclust4.Rmd', output = './reports/5.6.3_sp_ds_spd_male_by_all_hclust4.html'),
+  list(input = './5.6.4_sp_ds_spd_male_by_all_hclust5.Rmd', output = './reports/5.6.4_sp_ds_spd_male_by_all_hclust5.html'),
+  
+  list(input = './5.6.1_sp_ds_spd_male_by_notcorr_hclust2.Rmd', output = './reports/5.6.1_sp_ds_spd_male_by_notcorr_hclust2.html'),
+  list(input = './5.6.2_sp_ds_spd_male_by_notcorr_hclust3.Rmd', output = './reports/5.6.2_sp_ds_spd_male_by_notcorr_hclust3.html'),
+  list(input = './5.6.3_sp_ds_spd_male_by_notcorr_hclust4.Rmd', output = './reports/5.6.3_sp_ds_spd_male_by_notcorr_hclust4.html'),
+  list(input = './5.6.4_sp_ds_spd_male_by_notcorr_hclust5.Rmd', output = './reports/5.6.4_sp_ds_spd_male_by_notcorr_hclust5.html'),
+  
+  list(input = './5.6.1_sp_ds_spd_male_by_tdm_hclust2.Rmd', output = './reports/5.6.1_sp_ds_spd_male_by_tdm_hclust2.html'),
+  list(input = './5.6.2_sp_ds_spd_male_by_tdm_hclust3.Rmd', output = './reports/5.6.2_sp_ds_spd_male_by_tdm_hclust3.html'),
+  list(input = './5.6.3_sp_ds_spd_male_by_tdm_hclust4.Rmd', output = './reports/5.6.3_sp_ds_spd_male_by_tdm_hclust4.html'),
+  list(input = './5.6.4_sp_ds_spd_male_by_tdm_hclust5.Rmd', output = './reports/5.6.4_sp_ds_spd_male_by_tdm_hclust5.html'),
+  
+  list(input = './5.6.1_sp_ds_spd_male_by_pauses_hclust2.Rmd', output = './reports/5.6.1_sp_ds_spd_male_by_pauses_hclust2.html'),
+  list(input = './5.6.2_sp_ds_spd_male_by_pauses_hclust3.Rmd', output = './reports/5.6.2_sp_ds_spd_male_by_pauses_hclust3.html'),
+  list(input = './5.6.3_sp_ds_spd_male_by_pauses_hclust4.Rmd', output = './reports/5.6.3_sp_ds_spd_male_by_pauses_hclust4.html'),
+  list(input = './5.6.4_sp_ds_spd_male_by_pauses_hclust5.Rmd', output = './reports/5.6.4_sp_ds_spd_male_by_pauses_hclust5.html')
+)
 
-rmarkdown::render('./4.1.1_ds_acc_by_notcorr_hclust2.Rmd', output_file = './reports/4.1.1_ds_acc_by_notcorr_hclust2.html')
-rmarkdown::render('./4.1.2_ds_acc_by_notcorr_hclust3.Rmd', output_file = './reports/4.1.2_ds_acc_by_notcorr_hclust3.html')
-rmarkdown::render('./4.1.3_ds_acc_by_notcorr_hclust4.Rmd', output_file = './reports/4.1.3_ds_acc_by_notcorr_hclust4.html')
-rmarkdown::render('./4.1.4_ds_acc_by_notcorr_hclust5.Rmd', output_file = './reports/4.1.4_ds_acc_by_notcorr_hclust5.html')
-rmarkdown::render('./4.1.5_ds_acc_by_notcorr_hclust6.Rmd', output_file = './reports/4.1.5_ds_acc_by_notcorr_hclust6.html')
-rmarkdown::render('./4.1.6_ds_acc_by_notcorr_hclust7.Rmd', output_file = './reports/4.1.6_ds_acc_by_notcorr_hclust7.html')
-rmarkdown::render('./4.1.7_ds_acc_by_notcorr_hclust8.Rmd', output_file = './reports/4.1.7_ds_acc_by_notcorr_hclust8.html')
-rmarkdown::render('./4.1.8_ds_acc_by_notcorr_hclust9.Rmd', output_file = './reports/4.1.8_ds_acc_by_notcorr_hclust9.html')
+# Запуск параллельно на всех ядрах (или укажите нужное число)
+mclapply(files, render_file, mc.cores = detectCores() - 1)
 
-rmarkdown::render('./4.1.1_ds_acc_by_tdm_hclust2.Rmd', output_file = './reports/4.1.1_ds_acc_by_tdm_hclust2.html')
-rmarkdown::render('./4.1.2_ds_acc_by_tdm_hclust3.Rmd', output_file = './reports/4.1.2_ds_acc_by_tdm_hclust3.html')
-rmarkdown::render('./4.1.3_ds_acc_by_tdm_hclust4.Rmd', output_file = './reports/4.1.3_ds_acc_by_tdm_hclust4.html')
-rmarkdown::render('./4.1.4_ds_acc_by_tdm_hclust5.Rmd', output_file = './reports/4.1.4_ds_acc_by_tdm_hclust5.html')
-rmarkdown::render('./4.1.5_ds_acc_by_tdm_hclust6.Rmd', output_file = './reports/4.1.5_ds_acc_by_tdm_hclust6.html')
-rmarkdown::render('./4.1.6_ds_acc_by_tdm_hclust7.Rmd', output_file = './reports/4.1.6_ds_acc_by_tdm_hclust7.html')
-rmarkdown::render('./4.1.7_ds_acc_by_tdm_hclust8.Rmd', output_file = './reports/4.1.7_ds_acc_by_tdm_hclust8.html')
-rmarkdown::render('./4.1.8_ds_acc_by_tdm_hclust9.Rmd', output_file = './reports/4.1.8_ds_acc_by_tdm_hclust9.html')
-
-rmarkdown::render('./4.1.1_ds_acc_by_pauses_hclust2.Rmd', output_file = './reports/4.1.1_ds_acc_by_pauses_hclust2.html')
-rmarkdown::render('./4.1.2_ds_acc_by_pauses_hclust3.Rmd', output_file = './reports/4.1.2_ds_acc_by_pauses_hclust3.html')
-rmarkdown::render('./4.1.3_ds_acc_by_pauses_hclust4.Rmd', output_file = './reports/4.1.3_ds_acc_by_pauses_hclust4.html')
-rmarkdown::render('./4.1.4_ds_acc_by_pauses_hclust5.Rmd', output_file = './reports/4.1.4_ds_acc_by_pauses_hclust5.html')
-rmarkdown::render('./4.1.5_ds_acc_by_pauses_hclust6.Rmd', output_file = './reports/4.1.5_ds_acc_by_pauses_hclust6.html')
-rmarkdown::render('./4.1.6_ds_acc_by_pauses_hclust7.Rmd', output_file = './reports/4.1.6_ds_acc_by_pauses_hclust7.html')
-rmarkdown::render('./4.1.7_ds_acc_by_pauses_hclust8.Rmd', output_file = './reports/4.1.7_ds_acc_by_pauses_hclust8.html')
-rmarkdown::render('./4.1.8_ds_acc_by_pauses_hclust9.Rmd', output_file = './reports/4.1.8_ds_acc_by_pauses_hclust9.html')
-
-## Женщины acc
-rmarkdown::render('./4.2.1_ds_acc_female_by_all_hclust2.Rmd', output_file = './reports/4.2.1_ds_acc_female_by_all_hclust2.html')
-rmarkdown::render('./4.2.2_ds_acc_female_by_all_hclust3.Rmd', output_file = './reports/4.2.2_ds_acc_female_by_all_hclust3.html')
-rmarkdown::render('./4.2.3_ds_acc_female_by_all_hclust4.Rmd', output_file = './reports/4.2.3_ds_acc_female_by_all_hclust4.html')
-rmarkdown::render('./4.2.4_ds_acc_female_by_all_hclust5.Rmd', output_file = './reports/4.2.4_ds_acc_female_by_all_hclust5.html')
-rmarkdown::render('./4.2.5_ds_acc_female_by_all_hclust6.Rmd', output_file = './reports/4.2.5_ds_acc_female_by_all_hclust6.html')
-rmarkdown::render('./4.2.6_ds_acc_female_by_all_hclust7.Rmd', output_file = './reports/4.2.6_ds_acc_female_by_all_hclust7.html')
-rmarkdown::render('./4.2.7_ds_acc_female_by_all_hclust8.Rmd', output_file = './reports/4.2.7_ds_acc_female_by_all_hclust8.html')
-rmarkdown::render('./4.2.8_ds_acc_female_by_all_hclust9.Rmd', output_file = './reports/4.2.8_ds_acc_female_by_all_hclust9.html')
-
-rmarkdown::render('./4.2.1_ds_acc_female_by_notcorr_hclust2.Rmd', output_file = './reports/4.2.1_ds_acc_female_by_notcorr_hclust2.html')
-rmarkdown::render('./4.2.2_ds_acc_female_by_notcorr_hclust3.Rmd', output_file = './reports/4.2.2_ds_acc_female_by_notcorr_hclust3.html')
-rmarkdown::render('./4.2.3_ds_acc_female_by_notcorr_hclust4.Rmd', output_file = './reports/4.2.3_ds_acc_female_by_notcorr_hclust4.html')
-rmarkdown::render('./4.2.4_ds_acc_female_by_notcorr_hclust5.Rmd', output_file = './reports/4.2.4_ds_acc_female_by_notcorr_hclust5.html')
-rmarkdown::render('./4.2.5_ds_acc_female_by_notcorr_hclust6.Rmd', output_file = './reports/4.2.5_ds_acc_female_by_notcorr_hclust6.html')
-rmarkdown::render('./4.2.6_ds_acc_female_by_notcorr_hclust7.Rmd', output_file = './reports/4.2.6_ds_acc_female_by_notcorr_hclust7.html')
-rmarkdown::render('./4.2.7_ds_acc_female_by_notcorr_hclust8.Rmd', output_file = './reports/4.2.7_ds_acc_female_by_notcorr_hclust8.html')
-rmarkdown::render('./4.2.8_ds_acc_female_by_notcorr_hclust9.Rmd', output_file = './reports/4.2.8_ds_acc_female_by_notcorr_hclust9.html')
-
-rmarkdown::render('./4.2.1_ds_acc_female_by_tdm_hclust2.Rmd', output_file = './reports/4.2.1_ds_acc_female_by_tdm_hclust2.html')
-rmarkdown::render('./4.2.2_ds_acc_female_by_tdm_hclust3.Rmd', output_file = './reports/4.2.2_ds_acc_female_by_tdm_hclust3.html')
-rmarkdown::render('./4.2.3_ds_acc_female_by_tdm_hclust4.Rmd', output_file = './reports/4.2.3_ds_acc_female_by_tdm_hclust4.html')
-rmarkdown::render('./4.2.4_ds_acc_female_by_tdm_hclust5.Rmd', output_file = './reports/4.2.4_ds_acc_female_by_tdm_hclust5.html')
-rmarkdown::render('./4.2.5_ds_acc_female_by_tdm_hclust6.Rmd', output_file = './reports/4.2.5_ds_acc_female_by_tdm_hclust6.html')
-rmarkdown::render('./4.2.6_ds_acc_female_by_tdm_hclust7.Rmd', output_file = './reports/4.2.6_ds_acc_female_by_tdm_hclust7.html')
-rmarkdown::render('./4.2.7_ds_acc_female_by_tdm_hclust8.Rmd', output_file = './reports/4.2.7_ds_acc_female_by_tdm_hclust8.html')
-rmarkdown::render('./4.2.8_ds_acc_female_by_tdm_hclust9.Rmd', output_file = './reports/4.2.8_ds_acc_female_by_tdm_hclust9.html')
-
-rmarkdown::render('./4.2.1_ds_acc_female_by_pauses_hclust2.Rmd', output_file = './reports/4.2.1_ds_acc_female_by_pauses_hclust2.html')
-rmarkdown::render('./4.2.2_ds_acc_female_by_pauses_hclust3.Rmd', output_file = './reports/4.2.2_ds_acc_female_by_pauses_hclust3.html')
-rmarkdown::render('./4.2.3_ds_acc_female_by_pauses_hclust4.Rmd', output_file = './reports/4.2.3_ds_acc_female_by_pauses_hclust4.html')
-rmarkdown::render('./4.2.4_ds_acc_female_by_pauses_hclust5.Rmd', output_file = './reports/4.2.4_ds_acc_female_by_pauses_hclust5.html')
-rmarkdown::render('./4.2.5_ds_acc_female_by_pauses_hclust6.Rmd', output_file = './reports/4.2.5_ds_acc_female_by_pauses_hclust6.html')
-rmarkdown::render('./4.2.6_ds_acc_female_by_pauses_hclust7.Rmd', output_file = './reports/4.2.6_ds_acc_female_by_pauses_hclust7.html')
-rmarkdown::render('./4.2.7_ds_acc_female_by_pauses_hclust8.Rmd', output_file = './reports/4.2.7_ds_acc_female_by_pauses_hclust8.html')
-rmarkdown::render('./4.2.8_ds_acc_female_by_pauses_hclust9.Rmd', output_file = './reports/4.2.8_ds_acc_female_by_pauses_hclust9.html')
-
-
-## Мужчины acc
-rmarkdown::render('./4.3.1_ds_acc_male_by_all_hclust2.Rmd', output_file = './reports/4.3.1_ds_acc_male_by_all_hclust2.html')
-rmarkdown::render('./4.3.2_ds_acc_male_by_all_hclust3.Rmd', output_file = './reports/4.3.2_ds_acc_male_by_all_hclust3.html')
-rmarkdown::render('./4.3.3_ds_acc_male_by_all_hclust4.Rmd', output_file = './reports/4.3.3_ds_acc_male_by_all_hclust4.html')
-rmarkdown::render('./4.3.4_ds_acc_male_by_all_hclust5.Rmd', output_file = './reports/4.3.4_ds_acc_male_by_all_hclust5.html')
-rmarkdown::render('./4.3.5_ds_acc_male_by_all_hclust6.Rmd', output_file = './reports/4.3.5_ds_acc_male_by_all_hclust6.html')
-rmarkdown::render('./4.3.6_ds_acc_male_by_all_hclust7.Rmd', output_file = './reports/4.3.6_ds_acc_male_by_all_hclust7.html')
-rmarkdown::render('./4.3.7_ds_acc_male_by_all_hclust8.Rmd', output_file = './reports/4.3.7_ds_acc_male_by_all_hclust8.html')
-rmarkdown::render('./4.3.8_ds_acc_male_by_all_hclust9.Rmd', output_file = './reports/4.3.8_ds_acc_male_by_all_hclust9.html')
-
-rmarkdown::render('./4.3.1_ds_acc_male_by_notcorr_hclust2.Rmd', output_file = './reports/4.3.1_ds_acc_male_by_notcorr_hclust2.html')
-rmarkdown::render('./4.3.2_ds_acc_male_by_notcorr_hclust3.Rmd', output_file = './reports/4.3.2_ds_acc_male_by_notcorr_hclust3.html')
-rmarkdown::render('./4.3.3_ds_acc_male_by_notcorr_hclust4.Rmd', output_file = './reports/4.3.3_ds_acc_male_by_notcorr_hclust4.html')
-rmarkdown::render('./4.3.4_ds_acc_male_by_notcorr_hclust5.Rmd', output_file = './reports/4.3.4_ds_acc_male_by_notcorr_hclust5.html')
-rmarkdown::render('./4.3.5_ds_acc_male_by_notcorr_hclust6.Rmd', output_file = './reports/4.3.5_ds_acc_male_by_notcorr_hclust6.html')
-rmarkdown::render('./4.3.6_ds_acc_male_by_notcorr_hclust7.Rmd', output_file = './reports/4.3.6_ds_acc_male_by_notcorr_hclust7.html')
-rmarkdown::render('./4.3.7_ds_acc_male_by_notcorr_hclust8.Rmd', output_file = './reports/4.3.7_ds_acc_male_by_notcorr_hclust8.html')
-rmarkdown::render('./4.3.8_ds_acc_male_by_notcorr_hclust9.Rmd', output_file = './reports/4.3.8_ds_acc_male_by_notcorr_hclust9.html')
-
-rmarkdown::render('./4.3.1_ds_acc_male_by_tdm_hclust2.Rmd', output_file = './reports/4.3.1_ds_acc_male_by_tdm_hclust2.html')
-rmarkdown::render('./4.3.2_ds_acc_male_by_tdm_hclust3.Rmd', output_file = './reports/4.3.2_ds_acc_male_by_tdm_hclust3.html')
-rmarkdown::render('./4.3.3_ds_acc_male_by_tdm_hclust4.Rmd', output_file = './reports/4.3.3_ds_acc_male_by_tdm_hclust4.html')
-rmarkdown::render('./4.3.4_ds_acc_male_by_tdm_hclust5.Rmd', output_file = './reports/4.3.4_ds_acc_male_by_tdm_hclust5.html')
-rmarkdown::render('./4.3.5_ds_acc_male_by_tdm_hclust6.Rmd', output_file = './reports/4.3.5_ds_acc_male_by_tdm_hclust6.html')
-rmarkdown::render('./4.3.6_ds_acc_male_by_tdm_hclust7.Rmd', output_file = './reports/4.3.6_ds_acc_male_by_tdm_hclust7.html')
-rmarkdown::render('./4.3.7_ds_acc_male_by_tdm_hclust8.Rmd', output_file = './reports/4.3.7_ds_acc_male_by_tdm_hclust8.html')
-rmarkdown::render('./4.3.8_ds_acc_male_by_tdm_hclust9.Rmd', output_file = './reports/4.3.8_ds_acc_male_by_tdm_hclust9.html')
-
-rmarkdown::render('./4.3.1_ds_acc_male_by_pauses_hclust2.Rmd', output_file = './reports/4.3.1_ds_acc_male_by_pauses_hclust2.html')
-rmarkdown::render('./4.3.2_ds_acc_male_by_pauses_hclust3.Rmd', output_file = './reports/4.3.2_ds_acc_male_by_pauses_hclust3.html')
-rmarkdown::render('./4.3.3_ds_acc_male_by_pauses_hclust4.Rmd', output_file = './reports/4.3.3_ds_acc_male_by_pauses_hclust4.html')
-rmarkdown::render('./4.3.4_ds_acc_male_by_pauses_hclust5.Rmd', output_file = './reports/4.3.4_ds_acc_male_by_pauses_hclust5.html')
-rmarkdown::render('./4.3.5_ds_acc_male_by_pauses_hclust6.Rmd', output_file = './reports/4.3.5_ds_acc_male_by_pauses_hclust6.html')
-rmarkdown::render('./4.3.6_ds_acc_male_by_pauses_hclust7.Rmd', output_file = './reports/4.3.6_ds_acc_male_by_pauses_hclust7.html')
-rmarkdown::render('./4.3.7_ds_acc_male_by_pauses_hclust8.Rmd', output_file = './reports/4.3.7_ds_acc_male_by_pauses_hclust8.html')
-rmarkdown::render('./4.3.8_ds_acc_male_by_pauses_hclust9.Rmd', output_file = './reports/4.3.8_ds_acc_male_by_pauses_hclust9.html')
-
-## Все респонденты spd
-rmarkdown::render('./4.4.1_ds_spd_by_all_hclust2.Rmd', output_file = './reports/4.4.1_ds_spd_by_all_hclust2.html')
-rmarkdown::render('./4.4.2_ds_spd_by_all_hclust3.Rmd', output_file = './reports/4.4.2_ds_spd_by_all_hclust3.html')
-rmarkdown::render('./4.4.3_ds_spd_by_all_hclust4.Rmd', output_file = './reports/4.4.3_ds_spd_by_all_hclust4.html')
-rmarkdown::render('./4.4.4_ds_spd_by_all_hclust5.Rmd', output_file = './reports/4.4.4_ds_spd_by_all_hclust5.html')
-rmarkdown::render('./4.4.5_ds_spd_by_all_hclust6.Rmd', output_file = './reports/4.4.5_ds_spd_by_all_hclust6.html')
-rmarkdown::render('./4.4.6_ds_spd_by_all_hclust7.Rmd', output_file = './reports/4.4.6_ds_spd_by_all_hclust7.html')
-rmarkdown::render('./4.4.7_ds_spd_by_all_hclust8.Rmd', output_file = './reports/4.4.7_ds_spd_by_all_hclust8.html')
-rmarkdown::render('./4.4.8_ds_spd_by_all_hclust9.Rmd', output_file = './reports/4.4.8_ds_spd_by_all_hclust9.html')
-rmarkdown::render('./4.4.1_ds_spd_by_notcorr_hclust2.Rmd', output_file = './reports/4.4.1_ds_spd_by_notcorr_hclust2.html')
-rmarkdown::render('./4.4.2_ds_spd_by_notcorr_hclust3.Rmd', output_file = './reports/4.4.2_ds_spd_by_notcorr_hclust3.html')
-rmarkdown::render('./4.4.3_ds_spd_by_notcorr_hclust4.Rmd', output_file = './reports/4.4.3_ds_spd_by_notcorr_hclust4.html')
-rmarkdown::render('./4.4.4_ds_spd_by_notcorr_hclust5.Rmd', output_file = './reports/4.4.4_ds_spd_by_notcorr_hclust5.html')
-rmarkdown::render('./4.4.5_ds_spd_by_notcorr_hclust6.Rmd', output_file = './reports/4.4.5_ds_spd_by_notcorr_hclust6.html')
-rmarkdown::render('./4.4.6_ds_spd_by_notcorr_hclust7.Rmd', output_file = './reports/4.4.6_ds_spd_by_notcorr_hclust7.html')
-rmarkdown::render('./4.4.7_ds_spd_by_notcorr_hclust8.Rmd', output_file = './reports/4.4.7_ds_spd_by_notcorr_hclust8.html')
-rmarkdown::render('./4.4.8_ds_spd_by_notcorr_hclust9.Rmd', output_file = './reports/4.4.8_ds_spd_by_notcorr_hclust9.html')
-rmarkdown::render('./4.4.1_ds_spd_by_tdm_hclust2.Rmd', output_file = './reports/4.4.1_ds_spd_by_tdm_hclust2.html')
-rmarkdown::render('./4.4.2_ds_spd_by_tdm_hclust3.Rmd', output_file = './reports/4.4.2_ds_spd_by_tdm_hclust3.html')
-rmarkdown::render('./4.4.3_ds_spd_by_tdm_hclust4.Rmd', output_file = './reports/4.4.3_ds_spd_by_tdm_hclust4.html')
-rmarkdown::render('./4.4.4_ds_spd_by_tdm_hclust5.Rmd', output_file = './reports/4.4.4_ds_spd_by_tdm_hclust5.html')
-rmarkdown::render('./4.4.5_ds_spd_by_tdm_hclust6.Rmd', output_file = './reports/4.4.5_ds_spd_by_tdm_hclust6.html')
-rmarkdown::render('./4.4.6_ds_spd_by_tdm_hclust7.Rmd', output_file = './reports/4.4.6_ds_spd_by_tdm_hclust7.html')
-rmarkdown::render('./4.4.7_ds_spd_by_tdm_hclust8.Rmd', output_file = './reports/4.4.7_ds_spd_by_tdm_hclust8.html')
-rmarkdown::render('./4.4.8_ds_spd_by_tdm_hclust9.Rmd', output_file = './reports/4.4.8_ds_spd_by_tdm_hclust9.html')
-rmarkdown::render('./4.4.1_ds_spd_by_pauses_hclust2.Rmd', output_file = './reports/4.4.1_ds_spd_by_pauses_hclust2.html')
-rmarkdown::render('./4.4.2_ds_spd_by_pauses_hclust3.Rmd', output_file = './reports/4.4.2_ds_spd_by_pauses_hclust3.html')
-rmarkdown::render('./4.4.3_ds_spd_by_pauses_hclust4.Rmd', output_file = './reports/4.4.3_ds_spd_by_pauses_hclust4.html')
-rmarkdown::render('./4.4.4_ds_spd_by_pauses_hclust5.Rmd', output_file = './reports/4.4.4_ds_spd_by_pauses_hclust5.html')
-rmarkdown::render('./4.4.5_ds_spd_by_pauses_hclust6.Rmd', output_file = './reports/4.4.5_ds_spd_by_pauses_hclust6.html')
-rmarkdown::render('./4.4.6_ds_spd_by_pauses_hclust7.Rmd', output_file = './reports/4.4.6_ds_spd_by_pauses_hclust7.html')
-rmarkdown::render('./4.4.7_ds_spd_by_pauses_hclust8.Rmd', output_file = './reports/4.4.7_ds_spd_by_pauses_hclust8.html')
-rmarkdown::render('./4.4.8_ds_spd_by_pauses_hclust9.Rmd', output_file = './reports/4.4.8_ds_spd_by_pauses_hclust9.html')
-## Женщины spd
-rmarkdown::render('./4.5.1_ds_spd_female_by_all_hclust2.Rmd', output_file = './reports/4.5.1_ds_spd_female_by_all_hclust2.html')
-rmarkdown::render('./4.5.2_ds_spd_female_by_all_hclust3.Rmd', output_file = './reports/4.5.2_ds_spd_female_by_all_hclust3.html')
-rmarkdown::render('./4.5.3_ds_spd_female_by_all_hclust4.Rmd', output_file = './reports/4.5.3_ds_spd_female_by_all_hclust4.html')
-rmarkdown::render('./4.5.4_ds_spd_female_by_all_hclust5.Rmd', output_file = './reports/4.5.4_ds_spd_female_by_all_hclust5.html')
-rmarkdown::render('./4.5.5_ds_spd_female_by_all_hclust6.Rmd', output_file = './reports/4.5.5_ds_spd_female_by_all_hclust6.html')
-rmarkdown::render('./4.5.6_ds_spd_female_by_all_hclust7.Rmd', output_file = './reports/4.5.6_ds_spd_female_by_all_hclust7.html')
-rmarkdown::render('./4.5.7_ds_spd_female_by_all_hclust8.Rmd', output_file = './reports/4.5.7_ds_spd_female_by_all_hclust8.html')
-rmarkdown::render('./4.5.8_ds_spd_female_by_all_hclust9.Rmd', output_file = './reports/4.5.8_ds_spd_female_by_all_hclust9.html')
-rmarkdown::render('./4.5.1_ds_spd_female_by_notcorr_hclust2.Rmd', output_file = './reports/4.5.1_ds_spd_female_by_notcorr_hclust2.html')
-rmarkdown::render('./4.5.2_ds_spd_female_by_notcorr_hclust3.Rmd', output_file = './reports/4.5.2_ds_spd_female_by_notcorr_hclust3.html')
-rmarkdown::render('./4.5.3_ds_spd_female_by_notcorr_hclust4.Rmd', output_file = './reports/4.5.3_ds_spd_female_by_notcorr_hclust4.html')
-rmarkdown::render('./4.5.4_ds_spd_female_by_notcorr_hclust5.Rmd', output_file = './reports/4.5.4_ds_spd_female_by_notcorr_hclust5.html')
-rmarkdown::render('./4.5.5_ds_spd_female_by_notcorr_hclust6.Rmd', output_file = './reports/4.5.5_ds_spd_female_by_notcorr_hclust6.html')
-rmarkdown::render('./4.5.6_ds_spd_female_by_notcorr_hclust7.Rmd', output_file = './reports/4.5.6_ds_spd_female_by_notcorr_hclust7.html')
-rmarkdown::render('./4.5.7_ds_spd_female_by_notcorr_hclust8.Rmd', output_file = './reports/4.5.7_ds_spd_female_by_notcorr_hclust8.html')
-rmarkdown::render('./4.5.8_ds_spd_female_by_notcorr_hclust9.Rmd', output_file = './reports/4.5.8_ds_spd_female_by_notcorr_hclust9.html')
-rmarkdown::render('./4.5.1_ds_spd_female_by_tdm_hclust2.Rmd', output_file = './reports/4.5.1_ds_spd_female_by_tdm_hclust2.html')
-rmarkdown::render('./4.5.2_ds_spd_female_by_tdm_hclust3.Rmd', output_file = './reports/4.5.2_ds_spd_female_by_tdm_hclust3.html')
-rmarkdown::render('./4.5.3_ds_spd_female_by_tdm_hclust4.Rmd', output_file = './reports/4.5.3_ds_spd_female_by_tdm_hclust4.html')
-rmarkdown::render('./4.5.4_ds_spd_female_by_tdm_hclust5.Rmd', output_file = './reports/4.5.4_ds_spd_female_by_tdm_hclust5.html')
-rmarkdown::render('./4.5.5_ds_spd_female_by_tdm_hclust6.Rmd', output_file = './reports/4.5.5_ds_spd_female_by_tdm_hclust6.html')
-rmarkdown::render('./4.5.6_ds_spd_female_by_tdm_hclust7.Rmd', output_file = './reports/4.5.6_ds_spd_female_by_tdm_hclust7.html')
-rmarkdown::render('./4.5.7_ds_spd_female_by_tdm_hclust8.Rmd', output_file = './reports/4.5.7_ds_spd_female_by_tdm_hclust8.html')
-rmarkdown::render('./4.5.8_ds_spd_female_by_tdm_hclust9.Rmd', output_file = './reports/4.5.8_ds_spd_female_by_tdm_hclust9.html')
-rmarkdown::render('./4.5.1_ds_spd_female_by_pauses_hclust2.Rmd', output_file = './reports/4.5.1_ds_spd_female_by_pauses_hclust2.html')
-rmarkdown::render('./4.5.2_ds_spd_female_by_pauses_hclust3.Rmd', output_file = './reports/4.5.2_ds_spd_female_by_pauses_hclust3.html')
-rmarkdown::render('./4.5.3_ds_spd_female_by_pauses_hclust4.Rmd', output_file = './reports/4.5.3_ds_spd_female_by_pauses_hclust4.html')
-rmarkdown::render('./4.5.4_ds_spd_female_by_pauses_hclust5.Rmd', output_file = './reports/4.5.4_ds_spd_female_by_pauses_hclust5.html')
-rmarkdown::render('./4.5.5_ds_spd_female_by_pauses_hclust6.Rmd', output_file = './reports/4.5.5_ds_spd_female_by_pauses_hclust6.html')
-rmarkdown::render('./4.5.6_ds_spd_female_by_pauses_hclust7.Rmd', output_file = './reports/4.5.6_ds_spd_female_by_pauses_hclust7.html')
-rmarkdown::render('./4.5.7_ds_spd_female_by_pauses_hclust8.Rmd', output_file = './reports/4.5.7_ds_spd_female_by_pauses_hclust8.html')
-rmarkdown::render('./4.5.8_ds_spd_female_by_pauses_hclust9.Rmd', output_file = './reports/4.5.8_ds_spd_female_by_pauses_hclust9.html')
-## Мужчины spd
-rmarkdown::render('./4.6.1_ds_spd_male_by_all_hclust2.Rmd', output_file = './reports/4.6.1_ds_spd_male_by_all_hclust2.html')
-rmarkdown::render('./4.6.2_ds_spd_male_by_all_hclust3.Rmd', output_file = './reports/4.6.2_ds_spd_male_by_all_hclust3.html')
-rmarkdown::render('./4.6.3_ds_spd_male_by_all_hclust4.Rmd', output_file = './reports/4.6.3_ds_spd_male_by_all_hclust4.html')
-rmarkdown::render('./4.6.4_ds_spd_male_by_all_hclust5.Rmd', output_file = './reports/4.6.4_ds_spd_male_by_all_hclust5.html')
-rmarkdown::render('./4.6.5_ds_spd_male_by_all_hclust6.Rmd', output_file = './reports/4.6.5_ds_spd_male_by_all_hclust6.html')
-rmarkdown::render('./4.6.6_ds_spd_male_by_all_hclust7.Rmd', output_file = './reports/4.6.6_ds_spd_male_by_all_hclust7.html')
-rmarkdown::render('./4.6.7_ds_spd_male_by_all_hclust8.Rmd', output_file = './reports/4.6.7_ds_spd_male_by_all_hclust8.html')
-rmarkdown::render('./4.6.8_ds_spd_male_by_all_hclust9.Rmd', output_file = './reports/4.6.8_ds_spd_male_by_all_hclust9.html')
-rmarkdown::render('./4.6.1_ds_spd_male_by_notcorr_hclust2.Rmd', output_file = './reports/4.6.1_ds_spd_male_by_notcorr_hclust2.html')
-rmarkdown::render('./4.6.2_ds_spd_male_by_notcorr_hclust3.Rmd', output_file = './reports/4.6.2_ds_spd_male_by_notcorr_hclust3.html')
-rmarkdown::render('./4.6.3_ds_spd_male_by_notcorr_hclust4.Rmd', output_file = './reports/4.6.3_ds_spd_male_by_notcorr_hclust4.html')
-rmarkdown::render('./4.6.4_ds_spd_male_by_notcorr_hclust5.Rmd', output_file = './reports/4.6.4_ds_spd_male_by_notcorr_hclust5.html')
-rmarkdown::render('./4.6.5_ds_spd_male_by_notcorr_hclust6.Rmd', output_file = './reports/4.6.5_ds_spd_male_by_notcorr_hclust6.html')
-rmarkdown::render('./4.6.6_ds_spd_male_by_notcorr_hclust7.Rmd', output_file = './reports/4.6.6_ds_spd_male_by_notcorr_hclust7.html')
-rmarkdown::render('./4.6.7_ds_spd_male_by_notcorr_hclust8.Rmd', output_file = './reports/4.6.7_ds_spd_male_by_notcorr_hclust8.html')
-rmarkdown::render('./4.6.8_ds_spd_male_by_notcorr_hclust9.Rmd', output_file = './reports/4.6.8_ds_spd_male_by_notcorr_hclust9.html')
-rmarkdown::render('./4.6.1_ds_spd_male_by_tdm_hclust2.Rmd', output_file = './reports/4.6.1_ds_spd_male_by_tdm_hclust2.html')
-rmarkdown::render('./4.6.2_ds_spd_male_by_tdm_hclust3.Rmd', output_file = './reports/4.6.2_ds_spd_male_by_tdm_hclust3.html')
-rmarkdown::render('./4.6.3_ds_spd_male_by_tdm_hclust4.Rmd', output_file = './reports/4.6.3_ds_spd_male_by_tdm_hclust4.html')
-rmarkdown::render('./4.6.4_ds_spd_male_by_tdm_hclust5.Rmd', output_file = './reports/4.6.4_ds_spd_male_by_tdm_hclust5.html')
-rmarkdown::render('./4.6.5_ds_spd_male_by_tdm_hclust6.Rmd', output_file = './reports/4.6.5_ds_spd_male_by_tdm_hclust6.html')
-rmarkdown::render('./4.6.6_ds_spd_male_by_tdm_hclust7.Rmd', output_file = './reports/4.6.6_ds_spd_male_by_tdm_hclust7.html')
-rmarkdown::render('./4.6.7_ds_spd_male_by_tdm_hclust8.Rmd', output_file = './reports/4.6.7_ds_spd_male_by_tdm_hclust8.html')
-rmarkdown::render('./4.6.8_ds_spd_male_by_tdm_hclust9.Rmd', output_file = './reports/4.6.8_ds_spd_male_by_tdm_hclust9.html')
-rmarkdown::render('./4.6.1_ds_spd_male_by_pauses_hclust2.Rmd', output_file = './reports/4.6.1_ds_spd_male_by_pauses_hclust2.html')
-rmarkdown::render('./4.6.2_ds_spd_male_by_pauses_hclust3.Rmd', output_file = './reports/4.6.2_ds_spd_male_by_pauses_hclust3.html')
-rmarkdown::render('./4.6.3_ds_spd_male_by_pauses_hclust4.Rmd', output_file = './reports/4.6.3_ds_spd_male_by_pauses_hclust4.html')
-rmarkdown::render('./4.6.4_ds_spd_male_by_pauses_hclust5.Rmd', output_file = './reports/4.6.4_ds_spd_male_by_pauses_hclust5.html')
-rmarkdown::render('./4.6.5_ds_spd_male_by_pauses_hclust6.Rmd', output_file = './reports/4.6.5_ds_spd_male_by_pauses_hclust6.html')
-rmarkdown::render('./4.6.6_ds_spd_male_by_pauses_hclust7.Rmd', output_file = './reports/4.6.6_ds_spd_male_by_pauses_hclust7.html')
-rmarkdown::render('./4.6.7_ds_spd_male_by_pauses_hclust8.Rmd', output_file = './reports/4.6.7_ds_spd_male_by_pauses_hclust8.html')
-rmarkdown::render('./4.6.8_ds_spd_male_by_pauses_hclust9.Rmd', output_file = './reports/4.6.8_ds_spd_male_by_pauses_hclust9.html')
-
-# Психодиагностика и кластеры
-# acc
-rmarkdown::render('./5.1.1_sp_ds_acc_by_all_hclust2.Rmd', output_file = './reports/5.1.1_sp_ds_acc_by_all_hclust2.html')
-rmarkdown::render('./5.1.2_sp_ds_acc_by_all_hclust3.Rmd', output_file = './reports/5.1.2_sp_ds_acc_by_all_hclust3.html')
-rmarkdown::render('./5.1.3_sp_ds_acc_by_all_hclust4.Rmd', output_file = './reports/5.1.3_sp_ds_acc_by_all_hclust4.html')
-rmarkdown::render('./5.1.4_sp_ds_acc_by_all_hclust5.Rmd', output_file = './reports/5.1.4_sp_ds_acc_by_all_hclust5.html')
-rmarkdown::render('./5.1.5_sp_ds_acc_by_all_hclust6.Rmd', output_file = './reports/5.1.5_sp_ds_acc_by_all_hclust6.html')
-rmarkdown::render('./5.1.6_sp_ds_acc_by_all_hclust7.Rmd', output_file = './reports/5.1.6_sp_ds_acc_by_all_hclust7.html')
-rmarkdown::render('./5.1.7_sp_ds_acc_by_all_hclust8.Rmd', output_file = './reports/5.1.7_sp_ds_acc_by_all_hclust8.html')
-rmarkdown::render('./5.1.8_sp_ds_acc_by_all_hclust9.Rmd', output_file = './reports/5.1.8_sp_ds_acc_by_all_hclust9.html')
-rmarkdown::render('./5.1.1_sp_ds_acc_by_notcorr_hclust2.Rmd', output_file = './reports/5.1.1_sp_ds_acc_by_notcorr_hclust2.html')
-rmarkdown::render('./5.1.2_sp_ds_acc_by_notcorr_hclust3.Rmd', output_file = './reports/5.1.2_sp_ds_acc_by_notcorr_hclust3.html')
-rmarkdown::render('./5.1.3_sp_ds_acc_by_notcorr_hclust4.Rmd', output_file = './reports/5.1.3_sp_ds_acc_by_notcorr_hclust4.html')
-rmarkdown::render('./5.1.4_sp_ds_acc_by_notcorr_hclust5.Rmd', output_file = './reports/5.1.4_sp_ds_acc_by_notcorr_hclust5.html')
-rmarkdown::render('./5.1.5_sp_ds_acc_by_notcorr_hclust6.Rmd', output_file = './reports/5.1.5_sp_ds_acc_by_notcorr_hclust6.html')
-rmarkdown::render('./5.1.6_sp_ds_acc_by_notcorr_hclust7.Rmd', output_file = './reports/5.1.6_sp_ds_acc_by_notcorr_hclust7.html')
-rmarkdown::render('./5.1.7_sp_ds_acc_by_notcorr_hclust8.Rmd', output_file = './reports/5.1.7_sp_ds_acc_by_notcorr_hclust8.html')
-rmarkdown::render('./5.1.8_sp_ds_acc_by_notcorr_hclust9.Rmd', output_file = './reports/5.1.8_sp_ds_acc_by_notcorr_hclust9.html')
-rmarkdown::render('./5.1.1_sp_ds_acc_by_tdm_hclust2.Rmd', output_file = './reports/5.1.1_sp_ds_acc_by_tdm_hclust2.html')
-rmarkdown::render('./5.1.2_sp_ds_acc_by_tdm_hclust3.Rmd', output_file = './reports/5.1.2_sp_ds_acc_by_tdm_hclust3.html')
-rmarkdown::render('./5.1.3_sp_ds_acc_by_tdm_hclust4.Rmd', output_file = './reports/5.1.3_sp_ds_acc_by_tdm_hclust4.html')
-rmarkdown::render('./5.1.4_sp_ds_acc_by_tdm_hclust5.Rmd', output_file = './reports/5.1.4_sp_ds_acc_by_tdm_hclust5.html')
-rmarkdown::render('./5.1.5_sp_ds_acc_by_tdm_hclust6.Rmd', output_file = './reports/5.1.5_sp_ds_acc_by_tdm_hclust6.html')
-rmarkdown::render('./5.1.6_sp_ds_acc_by_tdm_hclust7.Rmd', output_file = './reports/5.1.6_sp_ds_acc_by_tdm_hclust7.html')
-rmarkdown::render('./5.1.7_sp_ds_acc_by_tdm_hclust8.Rmd', output_file = './reports/5.1.7_sp_ds_acc_by_tdm_hclust8.html')
-rmarkdown::render('./5.1.8_sp_ds_acc_by_tdm_hclust9.Rmd', output_file = './reports/5.1.8_sp_ds_acc_by_tdm_hclust9.html')
-rmarkdown::render('./5.1.1_sp_ds_acc_by_pauses_hclust2.Rmd', output_file = './reports/5.1.1_sp_ds_acc_by_pauses_hclust2.html')
-rmarkdown::render('./5.1.2_sp_ds_acc_by_pauses_hclust3.Rmd', output_file = './reports/5.1.2_sp_ds_acc_by_pauses_hclust3.html')
-rmarkdown::render('./5.1.3_sp_ds_acc_by_pauses_hclust4.Rmd', output_file = './reports/5.1.3_sp_ds_acc_by_pauses_hclust4.html')
-rmarkdown::render('./5.1.4_sp_ds_acc_by_pauses_hclust5.Rmd', output_file = './reports/5.1.4_sp_ds_acc_by_pauses_hclust5.html')
-rmarkdown::render('./5.1.5_sp_ds_acc_by_pauses_hclust6.Rmd', output_file = './reports/5.1.5_sp_ds_acc_by_pauses_hclust6.html')
-rmarkdown::render('./5.1.6_sp_ds_acc_by_pauses_hclust7.Rmd', output_file = './reports/5.1.6_sp_ds_acc_by_pauses_hclust7.html')
-rmarkdown::render('./5.1.7_sp_ds_acc_by_pauses_hclust8.Rmd', output_file = './reports/5.1.7_sp_ds_acc_by_pauses_hclust8.html')
-rmarkdown::render('./5.1.8_sp_ds_acc_by_pauses_hclust9.Rmd', output_file = './reports/5.1.8_sp_ds_acc_by_pauses_hclust9.html')
-
-## Женщины acc
-rmarkdown::render('./5.2.1_sp_ds_acc_female_by_all_hclust2.Rmd', output_file = './reports/5.2.1_sp_ds_acc_female_by_all_hclust2.html')
-rmarkdown::render('./5.2.2_sp_ds_acc_female_by_all_hclust3.Rmd', output_file = './reports/5.2.2_sp_ds_acc_female_by_all_hclust3.html')
-rmarkdown::render('./5.2.3_sp_ds_acc_female_by_all_hclust4.Rmd', output_file = './reports/5.2.3_sp_ds_acc_female_by_all_hclust4.html')
-rmarkdown::render('./5.2.4_sp_ds_acc_female_by_all_hclust5.Rmd', output_file = './reports/5.2.4_sp_ds_acc_female_by_all_hclust5.html')
-rmarkdown::render('./5.2.5_sp_ds_acc_female_by_all_hclust6.Rmd', output_file = './reports/5.2.5_sp_ds_acc_female_by_all_hclust6.html')
-rmarkdown::render('./5.2.6_sp_ds_acc_female_by_all_hclust7.Rmd', output_file = './reports/5.2.6_sp_ds_acc_female_by_all_hclust7.html')
-rmarkdown::render('./5.2.7_sp_ds_acc_female_by_all_hclust8.Rmd', output_file = './reports/5.2.7_sp_ds_acc_female_by_all_hclust8.html')
-rmarkdown::render('./5.2.8_sp_ds_acc_female_by_all_hclust9.Rmd', output_file = './reports/5.2.8_sp_ds_acc_female_by_all_hclust9.html')
-rmarkdown::render('./5.2.1_sp_ds_acc_female_by_notcorr_hclust2.Rmd', output_file = './reports/5.2.1_sp_ds_acc_female_by_notcorr_hclust2.html')
-rmarkdown::render('./5.2.2_sp_ds_acc_female_by_notcorr_hclust3.Rmd', output_file = './reports/5.2.2_sp_ds_acc_female_by_notcorr_hclust3.html')
-rmarkdown::render('./5.2.3_sp_ds_acc_female_by_notcorr_hclust4.Rmd', output_file = './reports/5.2.3_sp_ds_acc_female_by_notcorr_hclust4.html')
-rmarkdown::render('./5.2.4_sp_ds_acc_female_by_notcorr_hclust5.Rmd', output_file = './reports/5.2.4_sp_ds_acc_female_by_notcorr_hclust5.html')
-rmarkdown::render('./5.2.5_sp_ds_acc_female_by_notcorr_hclust6.Rmd', output_file = './reports/5.2.5_sp_ds_acc_female_by_notcorr_hclust6.html')
-rmarkdown::render('./5.2.6_sp_ds_acc_female_by_notcorr_hclust7.Rmd', output_file = './reports/5.2.6_sp_ds_acc_female_by_notcorr_hclust7.html')
-rmarkdown::render('./5.2.7_sp_ds_acc_female_by_notcorr_hclust8.Rmd', output_file = './reports/5.2.7_sp_ds_acc_female_by_notcorr_hclust8.html')
-rmarkdown::render('./5.2.8_sp_ds_acc_female_by_notcorr_hclust9.Rmd', output_file = './reports/5.2.8_sp_ds_acc_female_by_notcorr_hclust9.html')
-rmarkdown::render('./5.2.1_sp_ds_acc_female_by_tdm_hclust2.Rmd', output_file = './reports/5.2.1_sp_ds_acc_female_by_tdm_hclust2.html')
-rmarkdown::render('./5.2.2_sp_ds_acc_female_by_tdm_hclust3.Rmd', output_file = './reports/5.2.2_sp_ds_acc_female_by_tdm_hclust3.html')
-rmarkdown::render('./5.2.3_sp_ds_acc_female_by_tdm_hclust4.Rmd', output_file = './reports/5.2.3_sp_ds_acc_female_by_tdm_hclust4.html')
-rmarkdown::render('./5.2.4_sp_ds_acc_female_by_tdm_hclust5.Rmd', output_file = './reports/5.2.4_sp_ds_acc_female_by_tdm_hclust5.html')
-rmarkdown::render('./5.2.5_sp_ds_acc_female_by_tdm_hclust6.Rmd', output_file = './reports/5.2.5_sp_ds_acc_female_by_tdm_hclust6.html')
-rmarkdown::render('./5.2.6_sp_ds_acc_female_by_tdm_hclust7.Rmd', output_file = './reports/5.2.6_sp_ds_acc_female_by_tdm_hclust7.html')
-rmarkdown::render('./5.2.7_sp_ds_acc_female_by_tdm_hclust8.Rmd', output_file = './reports/5.2.7_sp_ds_acc_female_by_tdm_hclust8.html')
-rmarkdown::render('./5.2.8_sp_ds_acc_female_by_tdm_hclust9.Rmd', output_file = './reports/5.2.8_sp_ds_acc_female_by_tdm_hclust9.html')
-rmarkdown::render('./5.2.1_sp_ds_acc_female_by_pauses_hclust2.Rmd', output_file = './reports/5.2.1_sp_ds_acc_female_by_pauses_hclust2.html')
-rmarkdown::render('./5.2.2_sp_ds_acc_female_by_pauses_hclust3.Rmd', output_file = './reports/5.2.2_sp_ds_acc_female_by_pauses_hclust3.html')
-rmarkdown::render('./5.2.3_sp_ds_acc_female_by_pauses_hclust4.Rmd', output_file = './reports/5.2.3_sp_ds_acc_female_by_pauses_hclust4.html')
-rmarkdown::render('./5.2.4_sp_ds_acc_female_by_pauses_hclust5.Rmd', output_file = './reports/5.2.4_sp_ds_acc_female_by_pauses_hclust5.html')
-rmarkdown::render('./5.2.5_sp_ds_acc_female_by_pauses_hclust6.Rmd', output_file = './reports/5.2.5_sp_ds_acc_female_by_pauses_hclust6.html')
-rmarkdown::render('./5.2.6_sp_ds_acc_female_by_pauses_hclust7.Rmd', output_file = './reports/5.2.6_sp_ds_acc_female_by_pauses_hclust7.html')
-rmarkdown::render('./5.2.7_sp_ds_acc_female_by_pauses_hclust8.Rmd', output_file = './reports/5.2.7_sp_ds_acc_female_by_pauses_hclust8.html')
-rmarkdown::render('./5.2.8_sp_ds_acc_female_by_pauses_hclust9.Rmd', output_file = './reports/5.2.8_sp_ds_acc_female_by_pauses_hclust9.html')
-
-
-## Мужчины acc
-rmarkdown::render('./5.3.1_sp_ds_acc_male_by_all_hclust2.Rmd', output_file = './reports/5.3.1_sp_ds_acc_male_by_all_hclust2.html')
-rmarkdown::render('./5.3.2_sp_ds_acc_male_by_all_hclust3.Rmd', output_file = './reports/5.3.2_sp_ds_acc_male_by_all_hclust3.html')
-rmarkdown::render('./5.3.3_sp_ds_acc_male_by_all_hclust4.Rmd', output_file = './reports/5.3.3_sp_ds_acc_male_by_all_hclust4.html')
-rmarkdown::render('./5.3.4_sp_ds_acc_male_by_all_hclust5.Rmd', output_file = './reports/5.3.4_sp_ds_acc_male_by_all_hclust5.html')
-rmarkdown::render('./5.3.5_sp_ds_acc_male_by_all_hclust6.Rmd', output_file = './reports/5.3.5_sp_ds_acc_male_by_all_hclust6.html')
-rmarkdown::render('./5.3.6_sp_ds_acc_male_by_all_hclust7.Rmd', output_file = './reports/5.3.6_sp_ds_acc_male_by_all_hclust7.html')
-rmarkdown::render('./5.3.7_sp_ds_acc_male_by_all_hclust8.Rmd', output_file = './reports/5.3.7_sp_ds_acc_male_by_all_hclust8.html')
-rmarkdown::render('./5.3.8_sp_ds_acc_male_by_all_hclust9.Rmd', output_file = './reports/5.3.8_sp_ds_acc_male_by_all_hclust9.html')
-
-rmarkdown::render('./5.3.1_sp_ds_acc_male_by_notcorr_hclust2.Rmd', output_file = './reports/5.3.1_sp_ds_acc_male_by_notcorr_hclust2.html')
-rmarkdown::render('./5.3.2_sp_ds_acc_male_by_notcorr_hclust3.Rmd', output_file = './reports/5.3.2_sp_ds_acc_male_by_notcorr_hclust3.html')
-rmarkdown::render('./5.3.3_sp_ds_acc_male_by_notcorr_hclust4.Rmd', output_file = './reports/5.3.3_sp_ds_acc_male_by_notcorr_hclust4.html')
-rmarkdown::render('./5.3.4_sp_ds_acc_male_by_notcorr_hclust5.Rmd', output_file = './reports/5.3.4_sp_ds_acc_male_by_notcorr_hclust5.html')
-rmarkdown::render('./5.3.5_sp_ds_acc_male_by_notcorr_hclust6.Rmd', output_file = './reports/5.3.5_sp_ds_acc_male_by_notcorr_hclust6.html')
-rmarkdown::render('./5.3.6_sp_ds_acc_male_by_notcorr_hclust7.Rmd', output_file = './reports/5.3.6_sp_ds_acc_male_by_notcorr_hclust7.html')
-rmarkdown::render('./5.3.7_sp_ds_acc_male_by_notcorr_hclust8.Rmd', output_file = './reports/5.3.7_sp_ds_acc_male_by_notcorr_hclust8.html')
-rmarkdown::render('./5.3.8_sp_ds_acc_male_by_notcorr_hclust9.Rmd', output_file = './reports/5.3.8_sp_ds_acc_male_by_notcorr_hclust9.html')
-
-rmarkdown::render('./5.3.1_sp_ds_acc_male_by_tdm_hclust2.Rmd', output_file = './reports/5.3.1_sp_ds_acc_male_by_tdm_hclust2.html')
-rmarkdown::render('./5.3.2_sp_ds_acc_male_by_tdm_hclust3.Rmd', output_file = './reports/5.3.2_sp_ds_acc_male_by_tdm_hclust3.html')
-rmarkdown::render('./5.3.3_sp_ds_acc_male_by_tdm_hclust4.Rmd', output_file = './reports/5.3.3_sp_ds_acc_male_by_tdm_hclust4.html')
-rmarkdown::render('./5.3.4_sp_ds_acc_male_by_tdm_hclust5.Rmd', output_file = './reports/5.3.4_sp_ds_acc_male_by_tdm_hclust5.html')
-rmarkdown::render('./5.3.5_sp_ds_acc_male_by_tdm_hclust6.Rmd', output_file = './reports/5.3.5_sp_ds_acc_male_by_tdm_hclust6.html')
-rmarkdown::render('./5.3.6_sp_ds_acc_male_by_tdm_hclust7.Rmd', output_file = './reports/5.3.6_sp_ds_acc_male_by_tdm_hclust7.html')
-rmarkdown::render('./5.3.7_sp_ds_acc_male_by_tdm_hclust8.Rmd', output_file = './reports/5.3.7_sp_ds_acc_male_by_tdm_hclust8.html')
-rmarkdown::render('./5.3.8_sp_ds_acc_male_by_tdm_hclust9.Rmd', output_file = './reports/5.3.8_sp_ds_acc_male_by_tdm_hclust9.html')
-
-rmarkdown::render('./5.3.1_sp_ds_acc_male_by_pauses_hclust2.Rmd', output_file = './reports/5.3.1_sp_ds_acc_male_by_pauses_hclust2.html')
-rmarkdown::render('./5.3.2_sp_ds_acc_male_by_pauses_hclust3.Rmd', output_file = './reports/5.3.2_sp_ds_acc_male_by_pauses_hclust3.html')
-rmarkdown::render('./5.3.3_sp_ds_acc_male_by_pauses_hclust4.Rmd', output_file = './reports/5.3.3_sp_ds_acc_male_by_pauses_hclust4.html')
-rmarkdown::render('./5.3.4_sp_ds_acc_male_by_pauses_hclust5.Rmd', output_file = './reports/5.3.4_sp_ds_acc_male_by_pauses_hclust5.html')
-rmarkdown::render('./5.3.5_sp_ds_acc_male_by_pauses_hclust6.Rmd', output_file = './reports/5.3.5_sp_ds_acc_male_by_pauses_hclust6.html')
-rmarkdown::render('./5.3.6_sp_ds_acc_male_by_pauses_hclust7.Rmd', output_file = './reports/5.3.6_sp_ds_acc_male_by_pauses_hclust7.html')
-rmarkdown::render('./5.3.7_sp_ds_acc_male_by_pauses_hclust8.Rmd', output_file = './reports/5.3.7_sp_ds_acc_male_by_pauses_hclust8.html')
-rmarkdown::render('./5.3.8_sp_ds_acc_male_by_pauses_hclust9.Rmd', output_file = './reports/5.3.8_sp_ds_acc_male_by_pauses_hclust9.html')
-
-
-
-# spd
-rmarkdown::render('./5.4.1_sp_ds_spd_by_all_hclust2.Rmd', output_file = './reports/5.4.1_sp_ds_spd_by_all_hclust2.html')
-rmarkdown::render('./5.4.2_sp_ds_spd_by_all_hclust3.Rmd', output_file = './reports/5.4.2_sp_ds_spd_by_all_hclust3.html')
-rmarkdown::render('./5.4.3_sp_ds_spd_by_all_hclust4.Rmd', output_file = './reports/5.4.3_sp_ds_spd_by_all_hclust4.html')
-rmarkdown::render('./5.4.4_sp_ds_spd_by_all_hclust5.Rmd', output_file = './reports/5.4.4_sp_ds_spd_by_all_hclust5.html')
-rmarkdown::render('./5.4.5_sp_ds_spd_by_all_hclust6.Rmd', output_file = './reports/5.4.5_sp_ds_spd_by_all_hclust6.html')
-rmarkdown::render('./5.4.6_sp_ds_spd_by_all_hclust7.Rmd', output_file = './reports/5.4.6_sp_ds_spd_by_all_hclust7.html')
-rmarkdown::render('./5.4.7_sp_ds_spd_by_all_hclust8.Rmd', output_file = './reports/5.4.7_sp_ds_spd_by_all_hclust8.html')
-rmarkdown::render('./5.4.8_sp_ds_spd_by_all_hclust9.Rmd', output_file = './reports/5.4.8_sp_ds_spd_by_all_hclust9.html')
-rmarkdown::render('./5.4.1_sp_ds_spd_by_notcorr_hclust2.Rmd', output_file = './reports/5.4.1_sp_ds_spd_by_notcorr_hclust2.html')
-rmarkdown::render('./5.4.2_sp_ds_spd_by_notcorr_hclust3.Rmd', output_file = './reports/5.4.2_sp_ds_spd_by_notcorr_hclust3.html')
-rmarkdown::render('./5.4.3_sp_ds_spd_by_notcorr_hclust4.Rmd', output_file = './reports/5.4.3_sp_ds_spd_by_notcorr_hclust4.html')
-rmarkdown::render('./5.4.4_sp_ds_spd_by_notcorr_hclust5.Rmd', output_file = './reports/5.4.4_sp_ds_spd_by_notcorr_hclust5.html')
-rmarkdown::render('./5.4.5_sp_ds_spd_by_notcorr_hclust6.Rmd', output_file = './reports/5.4.5_sp_ds_spd_by_notcorr_hclust6.html')
-rmarkdown::render('./5.4.6_sp_ds_spd_by_notcorr_hclust7.Rmd', output_file = './reports/5.4.6_sp_ds_spd_by_notcorr_hclust7.html')
-rmarkdown::render('./5.4.7_sp_ds_spd_by_notcorr_hclust8.Rmd', output_file = './reports/5.4.7_sp_ds_spd_by_notcorr_hclust8.html')
-rmarkdown::render('./5.4.8_sp_ds_spd_by_notcorr_hclust9.Rmd', output_file = './reports/5.4.8_sp_ds_spd_by_notcorr_hclust9.html')
-rmarkdown::render('./5.4.1_sp_ds_spd_by_tdm_hclust2.Rmd', output_file = './reports/5.4.1_sp_ds_spd_by_tdm_hclust2.html')
-rmarkdown::render('./5.4.2_sp_ds_spd_by_tdm_hclust3.Rmd', output_file = './reports/5.4.2_sp_ds_spd_by_tdm_hclust3.html')
-rmarkdown::render('./5.4.3_sp_ds_spd_by_tdm_hclust4.Rmd', output_file = './reports/5.4.3_sp_ds_spd_by_tdm_hclust4.html')
-rmarkdown::render('./5.4.4_sp_ds_spd_by_tdm_hclust5.Rmd', output_file = './reports/5.4.4_sp_ds_spd_by_tdm_hclust5.html')
-rmarkdown::render('./5.4.5_sp_ds_spd_by_tdm_hclust6.Rmd', output_file = './reports/5.4.5_sp_ds_spd_by_tdm_hclust6.html')
-rmarkdown::render('./5.4.6_sp_ds_spd_by_tdm_hclust7.Rmd', output_file = './reports/5.4.6_sp_ds_spd_by_tdm_hclust7.html')
-rmarkdown::render('./5.4.7_sp_ds_spd_by_tdm_hclust8.Rmd', output_file = './reports/5.4.7_sp_ds_spd_by_tdm_hclust8.html')
-rmarkdown::render('./5.4.8_sp_ds_spd_by_tdm_hclust9.Rmd', output_file = './reports/5.4.8_sp_ds_spd_by_tdm_hclust9.html')
-rmarkdown::render('./5.4.1_sp_ds_spd_by_pauses_hclust2.Rmd', output_file = './reports/5.4.1_sp_ds_spd_by_pauses_hclust2.html')
-rmarkdown::render('./5.4.2_sp_ds_spd_by_pauses_hclust3.Rmd', output_file = './reports/5.4.2_sp_ds_spd_by_pauses_hclust3.html')
-rmarkdown::render('./5.4.3_sp_ds_spd_by_pauses_hclust4.Rmd', output_file = './reports/5.4.3_sp_ds_spd_by_pauses_hclust4.html')
-rmarkdown::render('./5.4.4_sp_ds_spd_by_pauses_hclust5.Rmd', output_file = './reports/5.4.4_sp_ds_spd_by_pauses_hclust5.html')
-rmarkdown::render('./5.4.5_sp_ds_spd_by_pauses_hclust6.Rmd', output_file = './reports/5.4.5_sp_ds_spd_by_pauses_hclust6.html')
-rmarkdown::render('./5.4.6_sp_ds_spd_by_pauses_hclust7.Rmd', output_file = './reports/5.4.6_sp_ds_spd_by_pauses_hclust7.html')
-rmarkdown::render('./5.4.7_sp_ds_spd_by_pauses_hclust8.Rmd', output_file = './reports/5.4.7_sp_ds_spd_by_pauses_hclust8.html')
-rmarkdown::render('./5.4.8_sp_ds_spd_by_pauses_hclust9.Rmd', output_file = './reports/5.4.8_sp_ds_spd_by_pauses_hclust9.html')
-
-## Женщины spd
-rmarkdown::render('./5.5.1_sp_ds_spd_female_by_all_hclust2.Rmd', output_file = './reports/5.5.1_sp_ds_spd_female_by_all_hclust2.html')
-rmarkdown::render('./5.5.2_sp_ds_spd_female_by_all_hclust3.Rmd', output_file = './reports/5.5.2_sp_ds_spd_female_by_all_hclust3.html')
-rmarkdown::render('./5.5.3_sp_ds_spd_female_by_all_hclust4.Rmd', output_file = './reports/5.5.3_sp_ds_spd_female_by_all_hclust4.html')
-rmarkdown::render('./5.5.4_sp_ds_spd_female_by_all_hclust5.Rmd', output_file = './reports/5.5.4_sp_ds_spd_female_by_all_hclust5.html')
-rmarkdown::render('./5.5.5_sp_ds_spd_female_by_all_hclust6.Rmd', output_file = './reports/5.5.5_sp_ds_spd_female_by_all_hclust6.html')
-rmarkdown::render('./5.5.6_sp_ds_spd_female_by_all_hclust7.Rmd', output_file = './reports/5.5.6_sp_ds_spd_female_by_all_hclust7.html')
-rmarkdown::render('./5.5.7_sp_ds_spd_female_by_all_hclust8.Rmd', output_file = './reports/5.5.7_sp_ds_spd_female_by_all_hclust8.html')
-rmarkdown::render('./5.5.8_sp_ds_spd_female_by_all_hclust9.Rmd', output_file = './reports/5.5.8_sp_ds_spd_female_by_all_hclust9.html')
-rmarkdown::render('./5.5.1_sp_ds_spd_female_by_notcorr_hclust2.Rmd', output_file = './reports/5.5.1_sp_ds_spd_female_by_notcorr_hclust2.html')
-rmarkdown::render('./5.5.2_sp_ds_spd_female_by_notcorr_hclust3.Rmd', output_file = './reports/5.5.2_sp_ds_spd_female_by_notcorr_hclust3.html')
-rmarkdown::render('./5.5.3_sp_ds_spd_female_by_notcorr_hclust4.Rmd', output_file = './reports/5.5.3_sp_ds_spd_female_by_notcorr_hclust4.html')
-rmarkdown::render('./5.5.4_sp_ds_spd_female_by_notcorr_hclust5.Rmd', output_file = './reports/5.5.4_sp_ds_spd_female_by_notcorr_hclust5.html')
-rmarkdown::render('./5.5.5_sp_ds_spd_female_by_notcorr_hclust6.Rmd', output_file = './reports/5.5.5_sp_ds_spd_female_by_notcorr_hclust6.html')
-rmarkdown::render('./5.5.6_sp_ds_spd_female_by_notcorr_hclust7.Rmd', output_file = './reports/5.5.6_sp_ds_spd_female_by_notcorr_hclust7.html')
-rmarkdown::render('./5.5.7_sp_ds_spd_female_by_notcorr_hclust8.Rmd', output_file = './reports/5.5.7_sp_ds_spd_female_by_notcorr_hclust8.html')
-rmarkdown::render('./5.5.8_sp_ds_spd_female_by_notcorr_hclust9.Rmd', output_file = './reports/5.5.8_sp_ds_spd_female_by_notcorr_hclust9.html')
-rmarkdown::render('./5.5.1_sp_ds_spd_female_by_tdm_hclust2.Rmd', output_file = './reports/5.5.1_sp_ds_spd_female_by_tdm_hclust2.html')
-rmarkdown::render('./5.5.2_sp_ds_spd_female_by_tdm_hclust3.Rmd', output_file = './reports/5.5.2_sp_ds_spd_female_by_tdm_hclust3.html')
-rmarkdown::render('./5.5.3_sp_ds_spd_female_by_tdm_hclust4.Rmd', output_file = './reports/5.5.3_sp_ds_spd_female_by_tdm_hclust4.html')
-rmarkdown::render('./5.5.4_sp_ds_spd_female_by_tdm_hclust5.Rmd', output_file = './reports/5.5.4_sp_ds_spd_female_by_tdm_hclust5.html')
-rmarkdown::render('./5.5.5_sp_ds_spd_female_by_tdm_hclust6.Rmd', output_file = './reports/5.5.5_sp_ds_spd_female_by_tdm_hclust6.html')
-rmarkdown::render('./5.5.6_sp_ds_spd_female_by_tdm_hclust7.Rmd', output_file = './reports/5.5.6_sp_ds_spd_female_by_tdm_hclust7.html')
-rmarkdown::render('./5.5.7_sp_ds_spd_female_by_tdm_hclust8.Rmd', output_file = './reports/5.5.7_sp_ds_spd_female_by_tdm_hclust8.html')
-rmarkdown::render('./5.5.8_sp_ds_spd_female_by_tdm_hclust9.Rmd', output_file = './reports/5.5.8_sp_ds_spd_female_by_tdm_hclust9.html')
-rmarkdown::render('./5.5.1_sp_ds_spd_female_by_pauses_hclust2.Rmd', output_file = './reports/5.5.1_sp_ds_spd_female_by_pauses_hclust2.html')
-rmarkdown::render('./5.5.2_sp_ds_spd_female_by_pauses_hclust3.Rmd', output_file = './reports/5.5.2_sp_ds_spd_female_by_pauses_hclust3.html')
-rmarkdown::render('./5.5.3_sp_ds_spd_female_by_pauses_hclust4.Rmd', output_file = './reports/5.5.3_sp_ds_spd_female_by_pauses_hclust4.html')
-rmarkdown::render('./5.5.4_sp_ds_spd_female_by_pauses_hclust5.Rmd', output_file = './reports/5.5.4_sp_ds_spd_female_by_pauses_hclust5.html')
-rmarkdown::render('./5.5.5_sp_ds_spd_female_by_pauses_hclust6.Rmd', output_file = './reports/5.5.5_sp_ds_spd_female_by_pauses_hclust6.html')
-rmarkdown::render('./5.5.6_sp_ds_spd_female_by_pauses_hclust7.Rmd', output_file = './reports/5.5.6_sp_ds_spd_female_by_pauses_hclust7.html')
-rmarkdown::render('./5.5.7_sp_ds_spd_female_by_pauses_hclust8.Rmd', output_file = './reports/5.5.7_sp_ds_spd_female_by_pauses_hclust8.html')
-rmarkdown::render('./5.5.8_sp_ds_spd_female_by_pauses_hclust9.Rmd', output_file = './reports/5.5.8_sp_ds_spd_female_by_pauses_hclust9.html')
-
-## Мужчины spd
-rmarkdown::render('./5.6.1_sp_ds_spd_male_by_all_hclust2.Rmd', output_file = './reports/5.6.1_sp_ds_spd_male_by_all_hclust2.html')
-rmarkdown::render('./5.6.2_sp_ds_spd_male_by_all_hclust3.Rmd', output_file = './reports/5.6.2_sp_ds_spd_male_by_all_hclust3.html')
-rmarkdown::render('./5.6.3_sp_ds_spd_male_by_all_hclust4.Rmd', output_file = './reports/5.6.3_sp_ds_spd_male_by_all_hclust4.html')
-rmarkdown::render('./5.6.4_sp_ds_spd_male_by_all_hclust5.Rmd', output_file = './reports/5.6.4_sp_ds_spd_male_by_all_hclust5.html')
-rmarkdown::render('./5.6.5_sp_ds_spd_male_by_all_hclust6.Rmd', output_file = './reports/5.6.5_sp_ds_spd_male_by_all_hclust6.html')
-rmarkdown::render('./5.6.6_sp_ds_spd_male_by_all_hclust7.Rmd', output_file = './reports/5.6.6_sp_ds_spd_male_by_all_hclust7.html')
-rmarkdown::render('./5.6.7_sp_ds_spd_male_by_all_hclust8.Rmd', output_file = './reports/5.6.7_sp_ds_spd_male_by_all_hclust8.html')
-rmarkdown::render('./5.6.8_sp_ds_spd_male_by_all_hclust9.Rmd', output_file = './reports/5.6.8_sp_ds_spd_male_by_all_hclust9.html')
-rmarkdown::render('./5.6.1_sp_ds_spd_male_by_notcorr_hclust2.Rmd', output_file = './reports/5.6.1_sp_ds_spd_male_by_notcorr_hclust2.html')
-rmarkdown::render('./5.6.2_sp_ds_spd_male_by_notcorr_hclust3.Rmd', output_file = './reports/5.6.2_sp_ds_spd_male_by_notcorr_hclust3.html')
-rmarkdown::render('./5.6.3_sp_ds_spd_male_by_notcorr_hclust4.Rmd', output_file = './reports/5.6.3_sp_ds_spd_male_by_notcorr_hclust4.html')
-rmarkdown::render('./5.6.4_sp_ds_spd_male_by_notcorr_hclust5.Rmd', output_file = './reports/5.6.4_sp_ds_spd_male_by_notcorr_hclust5.html')
-rmarkdown::render('./5.6.5_sp_ds_spd_male_by_notcorr_hclust6.Rmd', output_file = './reports/5.6.5_sp_ds_spd_male_by_notcorr_hclust6.html')
-rmarkdown::render('./5.6.6_sp_ds_spd_male_by_notcorr_hclust7.Rmd', output_file = './reports/5.6.6_sp_ds_spd_male_by_notcorr_hclust7.html')
-rmarkdown::render('./5.6.7_sp_ds_spd_male_by_notcorr_hclust8.Rmd', output_file = './reports/5.6.7_sp_ds_spd_male_by_notcorr_hclust8.html')
-rmarkdown::render('./5.6.8_sp_ds_spd_male_by_notcorr_hclust9.Rmd', output_file = './reports/5.6.8_sp_ds_spd_male_by_notcorr_hclust9.html')
-rmarkdown::render('./5.6.1_sp_ds_spd_male_by_tdm_hclust2.Rmd', output_file = './reports/5.6.1_sp_ds_spd_male_by_tdm_hclust2.html')
-rmarkdown::render('./5.6.2_sp_ds_spd_male_by_tdm_hclust3.Rmd', output_file = './reports/5.6.2_sp_ds_spd_male_by_tdm_hclust3.html')
-rmarkdown::render('./5.6.3_sp_ds_spd_male_by_tdm_hclust4.Rmd', output_file = './reports/5.6.3_sp_ds_spd_male_by_tdm_hclust4.html')
-rmarkdown::render('./5.6.4_sp_ds_spd_male_by_tdm_hclust5.Rmd', output_file = './reports/5.6.4_sp_ds_spd_male_by_tdm_hclust5.html')
-rmarkdown::render('./5.6.5_sp_ds_spd_male_by_tdm_hclust6.Rmd', output_file = './reports/5.6.5_sp_ds_spd_male_by_tdm_hclust6.html')
-rmarkdown::render('./5.6.6_sp_ds_spd_male_by_tdm_hclust7.Rmd', output_file = './reports/5.6.6_sp_ds_spd_male_by_tdm_hclust7.html')
-rmarkdown::render('./5.6.7_sp_ds_spd_male_by_tdm_hclust8.Rmd', output_file = './reports/5.6.7_sp_ds_spd_male_by_tdm_hclust8.html')
-rmarkdown::render('./5.6.8_sp_ds_spd_male_by_tdm_hclust9.Rmd', output_file = './reports/5.6.8_sp_ds_spd_male_by_tdm_hclust9.html')
-rmarkdown::render('./5.6.1_sp_ds_spd_male_by_pauses_hclust2.Rmd', output_file = './reports/5.6.1_sp_ds_spd_male_by_pauses_hclust2.html')
-rmarkdown::render('./5.6.2_sp_ds_spd_male_by_pauses_hclust3.Rmd', output_file = './reports/5.6.2_sp_ds_spd_male_by_pauses_hclust3.html')
-rmarkdown::render('./5.6.3_sp_ds_spd_male_by_pauses_hclust4.Rmd', output_file = './reports/5.6.3_sp_ds_spd_male_by_pauses_hclust4.html')
-rmarkdown::render('./5.6.4_sp_ds_spd_male_by_pauses_hclust5.Rmd', output_file = './reports/5.6.4_sp_ds_spd_male_by_pauses_hclust5.html')
-rmarkdown::render('./5.6.5_sp_ds_spd_male_by_pauses_hclust6.Rmd', output_file = './reports/5.6.5_sp_ds_spd_male_by_pauses_hclust6.html')
-rmarkdown::render('./5.6.6_sp_ds_spd_male_by_pauses_hclust7.Rmd', output_file = './reports/5.6.6_sp_ds_spd_male_by_pauses_hclust7.html')
-rmarkdown::render('./5.6.7_sp_ds_spd_male_by_pauses_hclust8.Rmd', output_file = './reports/5.6.7_sp_ds_spd_male_by_pauses_hclust8.html')
-rmarkdown::render('./5.6.8_sp_ds_spd_male_by_pauses_hclust9.Rmd', output_file = './reports/5.6.8_sp_ds_spd_male_by_pauses_hclust9.html')
 
 
