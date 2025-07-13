@@ -205,6 +205,421 @@ ggplot(df, aes(x=notcorr_hclust5, y=time_total, color=notcorr_hclust5, group=not
 
 
 
+### velocity_mean {.tabset .tabset-fade .tabset-pills}
+**Средняя гармоническая скорость**
+
+#### Descriptive stat
+
+```{r}
+describeBy(velocity_mean ~ notcorr_hclust5, data = df, quant = c(0.25, 0.75), mat = T)
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "velocity_mean"
+plot_list <- draw_plots_continuous_by_group(df, var = velocity_mean, df$notcorr_hclust5, group_lab = "notcorr_hclust5", x_lab = "Средняя гармоническая скорость", title = plot_title)
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df$velocity_mean);print(st)
+check_normal_distribution(st)
+ks <- ks.test(df$velocity_mean, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r}
+tryCatch(
+    expr = {
+      df %>%
+        group_by() %>%
+        summarise(
+          W = shapiro.test(velocity_mean)$statistic,
+          p.value = shapiro.test(velocity_mean)$p.value,
+          message = ifelse(p.value < 0.05, "Проверка на нормальность не пройдена", "Проверка на нормальность пройдена")
+        )
+    },
+    error = function(e){
+      print(e)
+    }
+)
+```
+
+
+```{r results='asis'}
+p1 <- ggplot(df, aes(sample = velocity_mean)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - velocity_mean", tabname="QQPlot", filename=paste0(plot_title, "_QQplot")) + facet_wrap(". ~ notcorr_hclust5")
+
+create_tabs(list(p1))
+```
+
+#### Сравнение групп
+
+```{r}
+users_with_na <- df$user_id[is.na(df$velocity_mean)]
+df.test <- df[!df$user_id %in% users_with_na,]
+df.test$user_id <- factor(df.test$user_id)
+
+t_test_results <- pairwise.t.test(df.test$velocity_mean, df.test$notcorr_hclust5, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$velocity_mean, df.test$notcorr_hclust5, p.adjust.method = "bonferroni");wilcox_test_results
+```
+
+```{r results='asis'}
+if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
+  sign_differences <- c(sign_differences, "velocity_mean")
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('velocity_mean', 'highlight');});</script>")
+}
+```
+
+#### CI ~ notcorr_hclust5
+
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=notcorr_hclust5, y=velocity_mean, color=notcorr_hclust5, group=notcorr_hclust5)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.2, lwd=0.8, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=2.5, position = pd, pch = 15)
+
+```
+
+
+
+
+
+
+### missings_distance {.tabset .tabset-fade .tabset-pills}
+**Расстояние промахов от центра мишеней, пикс.**
+
+#### Descriptive stat
+
+```{r}
+describeBy(missings_distance ~ notcorr_hclust5, data = df, quant = c(0.25, 0.75), mat = T)
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "missings_distance"
+plot_list <- draw_plots_continuous_by_group(df, var = missings_distance, df$notcorr_hclust5, group_lab = "notcorr_hclust5", x_lab = "Расстояние промахов от центра мишеней, пикс.", title = plot_title)
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df$missings_distance);print(st)
+check_normal_distribution(st)
+ks <- ks.test(df$missings_distance, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r}
+tryCatch(
+    expr = {
+      df %>%
+        group_by() %>%
+        summarise(
+          W = shapiro.test(missings_distance)$statistic,
+          p.value = shapiro.test(missings_distance)$p.value,
+          message = ifelse(p.value < 0.05, "Проверка на нормальность не пройдена", "Проверка на нормальность пройдена")
+        )
+    },
+    error = function(e){
+      print(e)
+    }
+)
+```
+
+
+```{r results='asis'}
+p1 <- ggplot(df, aes(sample = missings_distance)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings_distance", tabname="QQPlot", filename=paste0(plot_title, "_QQplot")) + facet_wrap(". ~ notcorr_hclust5")
+
+create_tabs(list(p1))
+```
+
+#### Сравнение групп
+
+```{r}
+users_with_na <- df$user_id[is.na(df$missings_distance)]
+df.test <- df[!df$user_id %in% users_with_na,]
+df.test$user_id <- factor(df.test$user_id)
+
+t_test_results <- pairwise.t.test(df.test$missings_distance, df.test$notcorr_hclust5, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$missings_distance, df.test$notcorr_hclust5, p.adjust.method = "bonferroni");wilcox_test_results
+```
+
+```{r results='asis'}
+if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
+  sign_differences <- c(sign_differences, "missings_distance")
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('missings_distance', 'highlight');});</script>")
+}
+```
+
+#### CI ~ notcorr_hclust5
+
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=notcorr_hclust5, y=missings_distance, color=notcorr_hclust5, group=notcorr_hclust5)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.2, lwd=0.8, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=2.5, position = pd, pch = 15)
+
+```
+
+
+
+
+
+
+### distance_total {.tabset .tabset-fade .tabset-pills}
+**Общая амплитуда**
+
+#### Descriptive stat
+
+```{r}
+describeBy(distance_total ~ notcorr_hclust5, data = df, quant = c(0.25, 0.75), mat = T)
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "distance_total"
+plot_list <- draw_plots_continuous_by_group(df, var = distance_total, df$notcorr_hclust5, group_lab = "notcorr_hclust5", x_lab = "Общая амплитуда", title = plot_title)
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df$distance_total);print(st)
+check_normal_distribution(st)
+ks <- ks.test(df$distance_total, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r}
+tryCatch(
+    expr = {
+      df %>%
+        group_by() %>%
+        summarise(
+          W = shapiro.test(distance_total)$statistic,
+          p.value = shapiro.test(distance_total)$p.value,
+          message = ifelse(p.value < 0.05, "Проверка на нормальность не пройдена", "Проверка на нормальность пройдена")
+        )
+    },
+    error = function(e){
+      print(e)
+    }
+)
+```
+
+
+```{r results='asis'}
+p1 <- ggplot(df, aes(sample = distance_total)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - distance_total", tabname="QQPlot", filename=paste0(plot_title, "_QQplot")) + facet_wrap(". ~ notcorr_hclust5")
+
+create_tabs(list(p1))
+```
+
+#### Сравнение групп
+
+```{r}
+users_with_na <- df$user_id[is.na(df$distance_total)]
+df.test <- df[!df$user_id %in% users_with_na,]
+df.test$user_id <- factor(df.test$user_id)
+
+t_test_results <- pairwise.t.test(df.test$distance_total, df.test$notcorr_hclust5, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$distance_total, df.test$notcorr_hclust5, p.adjust.method = "bonferroni");wilcox_test_results
+```
+
+```{r results='asis'}
+if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
+  sign_differences <- c(sign_differences, "distance_total")
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('distance_total', 'highlight');});</script>")
+}
+```
+
+#### CI ~ notcorr_hclust5
+
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=notcorr_hclust5, y=distance_total, color=notcorr_hclust5, group=notcorr_hclust5)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.2, lwd=0.8, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=2.5, position = pd, pch = 15)
+
+```
+
+
+
+
+
+
+### pause_total {.tabset .tabset-fade .tabset-pills}
+**Общее время пауз**
+
+#### Descriptive stat
+
+```{r}
+describeBy(pause_total ~ notcorr_hclust5, data = df, quant = c(0.25, 0.75), mat = T)
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "pause_total"
+plot_list <- draw_plots_continuous_by_group(df, var = pause_total, df$notcorr_hclust5, group_lab = "notcorr_hclust5", x_lab = "Общее время пауз", title = plot_title)
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df$pause_total);print(st)
+check_normal_distribution(st)
+ks <- ks.test(df$pause_total, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r}
+tryCatch(
+    expr = {
+      df %>%
+        group_by() %>%
+        summarise(
+          W = shapiro.test(pause_total)$statistic,
+          p.value = shapiro.test(pause_total)$p.value,
+          message = ifelse(p.value < 0.05, "Проверка на нормальность не пройдена", "Проверка на нормальность пройдена")
+        )
+    },
+    error = function(e){
+      print(e)
+    }
+)
+```
+
+
+```{r results='asis'}
+p1 <- ggplot(df, aes(sample = pause_total)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_total", tabname="QQPlot", filename=paste0(plot_title, "_QQplot")) + facet_wrap(". ~ notcorr_hclust5")
+
+create_tabs(list(p1))
+```
+
+#### Сравнение групп
+
+```{r}
+users_with_na <- df$user_id[is.na(df$pause_total)]
+df.test <- df[!df$user_id %in% users_with_na,]
+df.test$user_id <- factor(df.test$user_id)
+
+t_test_results <- pairwise.t.test(df.test$pause_total, df.test$notcorr_hclust5, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$pause_total, df.test$notcorr_hclust5, p.adjust.method = "bonferroni");wilcox_test_results
+```
+
+```{r results='asis'}
+if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
+  sign_differences <- c(sign_differences, "pause_total")
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('pause_total', 'highlight');});</script>")
+}
+```
+
+#### CI ~ notcorr_hclust5
+
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=notcorr_hclust5, y=pause_total, color=notcorr_hclust5, group=notcorr_hclust5)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.2, lwd=0.8, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=2.5, position = pd, pch = 15)
+
+```
+
+
+
+
+
+
+### time_total {.tabset .tabset-fade .tabset-pills}
+**Общее время выполнения**
+
+#### Descriptive stat
+
+```{r}
+describeBy(time_total ~ notcorr_hclust5, data = df, quant = c(0.25, 0.75), mat = T)
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "time_total"
+plot_list <- draw_plots_continuous_by_group(df, var = time_total, df$notcorr_hclust5, group_lab = "notcorr_hclust5", x_lab = "Общее время выполнения", title = plot_title)
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df$time_total);print(st)
+check_normal_distribution(st)
+ks <- ks.test(df$time_total, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r}
+tryCatch(
+    expr = {
+      df %>%
+        group_by() %>%
+        summarise(
+          W = shapiro.test(time_total)$statistic,
+          p.value = shapiro.test(time_total)$p.value,
+          message = ifelse(p.value < 0.05, "Проверка на нормальность не пройдена", "Проверка на нормальность пройдена")
+        )
+    },
+    error = function(e){
+      print(e)
+    }
+)
+```
+
+
+```{r results='asis'}
+p1 <- ggplot(df, aes(sample = time_total)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - time_total", tabname="QQPlot", filename=paste0(plot_title, "_QQplot")) + facet_wrap(". ~ notcorr_hclust5")
+
+create_tabs(list(p1))
+```
+
+#### Сравнение групп
+
+```{r}
+users_with_na <- df$user_id[is.na(df$time_total)]
+df.test <- df[!df$user_id %in% users_with_na,]
+df.test$user_id <- factor(df.test$user_id)
+
+t_test_results <- pairwise.t.test(df.test$time_total, df.test$notcorr_hclust5, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$time_total, df.test$notcorr_hclust5, p.adjust.method = "bonferroni");wilcox_test_results
+```
+
+```{r results='asis'}
+if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
+  sign_differences <- c(sign_differences, "time_total")
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('time_total', 'highlight');});</script>")
+}
+```
+
+#### CI ~ notcorr_hclust5
+
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=notcorr_hclust5, y=time_total, color=notcorr_hclust5, group=notcorr_hclust5)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.2, lwd=0.8, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=2.5, position = pd, pch = 15)
+
+```
+
+
+
+
+
+
 ### time_mean {.tabset .tabset-fade .tabset-pills}
 **Среднее время на клик**
 
