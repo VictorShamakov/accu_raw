@@ -36,6 +36,9 @@ rm(list=ls())
 load("./data/envs/1_desc_stat/df.RData")
 load("./data/envs/1_desc_stat/df.acc.RData")
 load("./data/envs/1_desc_stat/df.spd.RData")
+load("./data/envs/1_desc_stat/clickers.acc.RData")
+load("./data/envs/1_desc_stat/clickers.spd.RData")
+
 source("functions.R")
 library("factoextra")
 library("ggdendro")
@@ -43,18 +46,29 @@ library(cluster)
 ```
 
 ```{r}
+#Пропуски
 df.spd <- na.omit(df.spd)
-df.spd <- df.spd[df.spd$gender == "Мужской",]
+```
 
-df.spd$science_type <- factor(df.spd$science_type, labels = c("Natural", "Social", "Tech"))
-df.spd <- cbind(df.spd, model.matrix(~ science_type - 1, data = df.spd)) # one hot encoding
 
-df.spd$direction <- factor(df.spd$direction)
+```{r}
+df.spd <- df.spd[df.spd$gender == "M",]
+```
 
+
+
+```{r}
 df <- df.spd
 ```
 
+
+
+
 ## Иерархический кластерный анализ
+
+```{r}
+set.seed(11)
+```
 
 ```{r}
 vars_class <- lapply(df, class)
@@ -69,7 +83,7 @@ df.num.scaled <- scale(df.num)
 dist <- dist(df.num.scaled)
 hc <- hclust(dist, method = "ward.D2")
 
-for (k in 2:9) {
+for (k in 2:5) {
   plot(hc, cex = 0.3, hang = -1)
   rect.hclust(hc, k = k, border = 2:10)
   
@@ -176,7 +190,7 @@ df.not_corr <- scale(select(df.num, -corr_vars))
 dist <- dist(df.not_corr)
 hc <- hclust(dist, method = "ward.D2")
 
-for (k in 2:9) {
+for (k in 2:5) {
   plot(hc, cex = 0.3, hang = -1)
   rect.hclust(hc, k = k, border = 2:9)
   
@@ -194,7 +208,7 @@ df.tdm <- scale(select(df.num, time_total, distance_total, missings_distance))
 dist <- dist(df.tdm)
 hc <- hclust(dist, method = "ward.D2")
 
-for (k in 2:9) {
+for (k in 2:5) {
   plot(hc, cex = 0.3, hang = -1)
   rect.hclust(hc, k = k, border = 2:10)
   
@@ -211,7 +225,7 @@ df.pauses <- scale(select(df.num, starts_with("pause")))
 dist <- dist(df.pauses)
 hc <- hclust(dist, method = "ward.D2")
 
-for (k in 2:9) {
+for (k in 2:5) {
   plot(hc, cex = 0.3, hang = -1)
   rect.hclust(hc, k = k, border = 2:10)
   
@@ -258,7 +272,7 @@ ggplot(elbow_df, aes(x = k, y = wss)) +
 set.seed(11)
 km_results <- list()
 
-for (k in 2:9) {
+for (k in 2:5) {
   km.res <- kmeans(df.num.scaled, k, nstart = 25)
   km_results[[paste0("km.res", k)]] <- km.res
   df[, paste0("all_kmclust", k)] <- km.res$cluster
@@ -283,7 +297,7 @@ for (k in 2:9) {
 set.seed(11)
 km_results <- list()
 
-for (k in 2:9) {
+for (k in 2:5) {
   km.res <- kmeans(df.not_corr, k, nstart = 25)
   km_results[[paste0("km.res", k)]] <- km.res
   df[, paste0("notcorr_kmclust", k)] <- km.res$cluster
@@ -307,7 +321,7 @@ for (k in 2:9) {
 set.seed(11)
 km_results <- list()
 
-for (k in 2:9) {
+for (k in 2:5) {
   km.res <- kmeans(df.tdm, k, nstart = 25)
   km_results[[paste0("km.res", k)]] <- km.res
   df[, paste0("tdm_kmclust", k)] <- km.res$cluster
@@ -330,7 +344,7 @@ for (k in 2:9) {
 set.seed(11)
 km_results <- list()
 
-for (k in 2:9) {
+for (k in 2:5) {
   km.res <- kmeans(df.pauses, k, nstart = 25)
   km_results[[paste0("km.res", k)]] <- km.res
   df[, paste0("pauses_kmclust", k)] <- km.res$cluster
@@ -346,14 +360,18 @@ for (k in 2:9) {
 }
 ```
 
+
+
 ```{r}
 df[, grep("clust", names(df))] <- lapply(df[, grep("clust", names(df))], factor)
 ```
 
 
+
+
+
+
 ```{r}
 save(df, file = "./data/envs/4_cluster_analysis/df.spd.male.RData")
 ```
-
-
 

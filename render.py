@@ -69,6 +69,34 @@ def main():
     with open("./3.4_ds_by_stage_and_gender.Rmd", 'w', encoding="utf8") as file:
         file.write(rendered_page)
 
+    ## Кластеризация
+    ca_template = get_template('./templates/4.0_ca_template.Rmd')
+
+    rendered_page = ca_template.render(stage="acc", gender="", custom=False)
+    with open("./4.0.1_ca_acc.Rmd", 'w', encoding="utf8") as file:
+        file.write(rendered_page)
+
+    rendered_page = ca_template.render(stage="acc", gender="female", custom=False)
+    with open("./4.0.2_female_ca_acc.Rmd", 'w', encoding="utf8") as file:
+        file.write(rendered_page)
+
+    rendered_page = ca_template.render(stage="acc", gender="male", custom=False)
+    with open("./4.0.3_male_ca_acc.Rmd", 'w', encoding="utf8") as file:
+        file.write(rendered_page)
+
+    rendered_page = ca_template.render(stage="spd", gender="", custom=False)
+    with open("./4.0.4_ca_spd.Rmd", 'w', encoding="utf8") as file:
+        file.write(rendered_page)
+
+    rendered_page = ca_template.render(stage="spd", gender="female", custom=False)
+    with open("./4.0.5_female_ca_spd.Rmd", 'w', encoding="utf8") as file:
+        file.write(rendered_page)
+
+    rendered_page = ca_template.render(stage="spd", gender="male", custom=False)
+    with open("./4.0.6_male_ca_spd.Rmd", 'w', encoding="utf8") as file:
+        file.write(rendered_page)
+
+
 
     ## DS hclusters acc
     template_group2 = get_template('./templates/4_ds_by_group_template2.Rmd')

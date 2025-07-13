@@ -36,6 +36,9 @@ rm(list=ls())
 load("./data/envs/1_desc_stat/df.RData")
 load("./data/envs/1_desc_stat/df.acc.RData")
 load("./data/envs/1_desc_stat/df.spd.RData")
+load("./data/envs/1_desc_stat/clickers.acc.RData")
+load("./data/envs/1_desc_stat/clickers.spd.RData")
+
 source("functions.R")
 library("factoextra")
 library("ggdendro")
@@ -43,43 +46,64 @@ library(cluster)
 ```
 
 ```{r}
-df.acc <- na.omit(df.acc)
-df.acc <- df.acc[df.acc$gender == "Женский",]
-
-df.acc$science_type <- factor(df.acc$science_type, labels = c("Natural", "Social", "Tech"))
-df.acc <- cbind(df.acc, model.matrix(~ science_type - 1, data = df.acc)) # one hot encoding
-
-df.acc$direction <- factor(df.acc$direction)
+#Пропуски
+df.{{stage}} <- na.omit(df.{{stage}})
 ```
+
+{% if gender == 'male' %}
+```{r}
+df.{{stage}} <- df.{{stage}}[df.{{stage}}$gender == "M",]
+```
+{% elif gender == "female" %}
+```{r}
+df.{{stage}} <- df.{{stage}}[df.{{stage}}$gender == "F",]
+```
+{% else %}
+```{r}
+df.{{stage}}$gender_num <- as.numeric(df.{{stage}}$gender) - 1
+```
+{% endif %}
+
+
+```{r}
+df <- df.{{stage}}
+```
+
+
+
 
 ## Иерархический кластерный анализ
 
 ```{r}
-vars_class <- lapply(df.acc, class)
-df.acc.num <- df.acc[, vars_class == "numeric" | vars_class == "integer"]
-df.acc.num <- select(df.acc.num, -user_id, -test_id, -ratio, -clicked_through_targets, -combo_clicked_through_targets)
+set.seed(11)
+```
+
+```{r}
+vars_class <- lapply(df, class)
+df.num <- df[, vars_class == "numeric" | vars_class == "integer"]
+df.num <- select(df.num, -user_id, -test_id, -ratio, -clicked_through_targets, -combo_clicked_through_targets)
 ```
 
 ### Все переменные
 
 ```{r}
-df.acc.num.scaled <- scale(df.acc.num)
-dist <- dist(df.acc.num.scaled)
-hc.acc <- hclust(dist, method = "ward.D2")
+df.num.scaled <- scale(df.num)
+dist <- dist(df.num.scaled)
+hc <- hclust(dist, method = "ward.D2")
 
-for (k in 2:9) {
-  plot(hc.acc, cex = 0.3, hang = -1)
-  rect.hclust(hc.acc, k = k, border = 2:10)
+for (k in 2:5) {
+  plot(hc, cex = 0.3, hang = -1)
+  rect.hclust(hc, k = k, border = 2:10)
   
-  df.acc[, paste0("all_hclust", k)] <- cutree(hc.acc, k = k)
+  df[, paste0("all_hclust", k)] <- cutree(hc, k = k)
   
-  sil <- silhouette(cutree(hc.acc, k = k), dist)
+  sil <- silhouette(cutree(hc, k = k), dist)
   print(fviz_silhouette(sil))
 }
 ```
 
 ```{r fig.height=11, fig.width=11}
-# ggpairs(df.acc, columns = 8:22, mapping = aes(color = gender),
+# ggpairs(df, columns = 8:22, mapping = aes(color = gender),
         # diag = list(continuous = wrap("densityDiag", alpha = 0.5), discrete = "barDiag", na = "naDiag"))
 ```
 
@@ -170,17 +194,17 @@ corr_vars <- c("distance_trimmed",
 
 
 ```{r}
-df.acc.not_corr <- scale(select(df.acc.num, -corr_vars))
-dist <- dist(df.acc.not_corr)
-hc.acc <- hclust(dist, method = "ward.D2")
+df.not_corr <- scale(select(df.num, -corr_vars))
+dist <- dist(df.not_corr)
+hc <- hclust(dist, method = "ward.D2")
 
-for (k in 2:9) {
-  plot(hc.acc, cex = 0.3, hang = -1)
-  rect.hclust(hc.acc, k = k, border = 2:9)
+for (k in 2:5) {
+  plot(hc, cex = 0.3, hang = -1)
+  rect.hclust(hc, k = k, border = 2:9)
   
-  df.acc[, paste0("notcorr_hclust", k)] <- cutree(hc.acc, k = k)
+  df[, paste0("notcorr_hclust", k)] <- cutree(hc, k = k)
   
-  sil <- silhouette(cutree(hc.acc, k = k), dist)
+  sil <- silhouette(cutree(hc, k = k), dist)
   print(fviz_silhouette(sil))
 }
 ```
@@ -188,41 +212,41 @@ for (k in 2:9) {
 
 ### Время, расстояние, точность
 ```{r}
-df.acc.tdm <- scale(select(df.acc.num, time_total, distance_total, missings_distance))
-dist <- dist(df.acc.tdm)
-hc.acc <- hclust(dist, method = "ward.D2")
+df.tdm <- scale(select(df.num, time_total, distance_total, missings_distance))
+dist <- dist(df.tdm)
+hc <- hclust(dist, method = "ward.D2")
 
-for (k in 2:9) {
-  plot(hc.acc, cex = 0.3, hang = -1)
-  rect.hclust(hc.acc, k = k, border = 2:10)
+for (k in 2:5) {
+  plot(hc, cex = 0.3, hang = -1)
+  rect.hclust(hc, k = k, border = 2:10)
   
-  df.acc[, paste0("tdm_hclust", k)] <- cutree(hc.acc, k = k)
+  df[, paste0("tdm_hclust", k)] <- cutree(hc, k = k)
   
-  sil <- silhouette(cutree(hc.acc, k = k), dist)
+  sil <- silhouette(cutree(hc, k = k), dist)
   print(fviz_silhouette(sil))
 }
 ```
 
 ### Паузы
 ```{r}
-df.acc.pauses <- scale(select(df.acc.num, starts_with("pause")))
-dist <- dist(df.acc.pauses)
-hc.acc <- hclust(dist, method = "ward.D2")
+df.pauses <- scale(select(df.num, starts_with("pause")))
+dist <- dist(df.pauses)
+hc <- hclust(dist, method = "ward.D2")
 
-for (k in 2:9) {
-  plot(hc.acc, cex = 0.3, hang = -1)
-  rect.hclust(hc.acc, k = k, border = 2:10)
+for (k in 2:5) {
+  plot(hc, cex = 0.3, hang = -1)
+  rect.hclust(hc, k = k, border = 2:10)
   
-  df.acc[, paste0("pauses_hclust", k)] <- cutree(hc.acc, k = k)
+  df[, paste0("pauses_hclust", k)] <- cutree(hc, k = k)
   
-  sil <- silhouette(cutree(hc.acc, k = k), dist)
+  sil <- silhouette(cutree(hc, k = k), dist)
   print(fviz_silhouette(sil))
 }
 ```
 
 ### Все кластеры
 ```{r}
-df.acc[, grep("hclust", names(df.acc))]
+df[, grep("hclust", names(df))]
 ```
 
 
@@ -231,7 +255,7 @@ df.acc[, grep("hclust", names(df.acc))]
 ```{r}
 # Вычисляем WSS для k от 1 до 10
 wss_values <- sapply(1:10, function(k) {
-  kmeans(df.acc.num.scaled, centers = k, nstart = 25)$tot.withinss
+  kmeans(df.num.scaled, centers = k, nstart = 25)$tot.withinss
 })
 
 # Создаем датафрейм для ggplot
@@ -256,15 +280,15 @@ ggplot(elbow_df, aes(x = k, y = wss)) +
 set.seed(11)
 km_results <- list()
 
-for (k in 2:9) {
-  km.res <- kmeans(df.acc.num.scaled, k, nstart = 25)
+for (k in 2:5) {
+  km.res <- kmeans(df.num.scaled, k, nstart = 25)
   km_results[[paste0("km.res", k)]] <- km.res
-  df.acc[, paste0("all_kmclust", k)] <- km.res$cluster
+  df[, paste0("all_kmclust", k)] <- km.res$cluster
   
-  sil <- silhouette(km.res$cluster, dist(df.acc.num.scaled))
+  sil <- silhouette(km.res$cluster, dist(df.num.scaled))
   print(fviz_silhouette(sil))
   
-  print(fviz_cluster(km.res, data = na.omit(df.acc.num.scaled),
+  print(fviz_cluster(km.res, data = na.omit(df.num.scaled),
                ggtheme = theme_minimal(),
                main = "Partitioning Clustering Plot",
                geom = c("point")
@@ -281,15 +305,15 @@ for (k in 2:9) {
 set.seed(11)
 km_results <- list()
 
-for (k in 2:9) {
-  km.res <- kmeans(df.acc.not_corr, k, nstart = 25)
+for (k in 2:5) {
+  km.res <- kmeans(df.not_corr, k, nstart = 25)
   km_results[[paste0("km.res", k)]] <- km.res
-  df.acc[, paste0("notcorr_kmclust", k)] <- km.res$cluster
+  df[, paste0("notcorr_kmclust", k)] <- km.res$cluster
   
-  sil <- silhouette(km.res$cluster, dist(df.acc.not_corr))
+  sil <- silhouette(km.res$cluster, dist(df.not_corr))
   print(fviz_silhouette(sil))
   
-  print(fviz_cluster(km.res, data = na.omit(df.acc.not_corr),
+  print(fviz_cluster(km.res, data = na.omit(df.not_corr),
                ggtheme = theme_minimal(),
                main = "Partitioning Clustering Plot",
                geom = c("point")
@@ -305,15 +329,15 @@ for (k in 2:9) {
 set.seed(11)
 km_results <- list()
 
-for (k in 2:9) {
-  km.res <- kmeans(df.acc.tdm, k, nstart = 25)
+for (k in 2:5) {
+  km.res <- kmeans(df.tdm, k, nstart = 25)
   km_results[[paste0("km.res", k)]] <- km.res
-  df.acc[, paste0("tdm_kmclust", k)] <- km.res$cluster
+  df[, paste0("tdm_kmclust", k)] <- km.res$cluster
   
-  sil <- silhouette(km.res$cluster, dist(df.acc.tdm))
+  sil <- silhouette(km.res$cluster, dist(df.tdm))
   print(fviz_silhouette(sil))
   
-  print(fviz_cluster(km.res, data = na.omit(df.acc.tdm),
+  print(fviz_cluster(km.res, data = na.omit(df.tdm),
                ggtheme = theme_minimal(),
                main = "Partitioning Clustering Plot",
                geom = c("point")
@@ -328,15 +352,15 @@ for (k in 2:9) {
 set.seed(11)
 km_results <- list()
 
-for (k in 2:9) {
-  km.res <- kmeans(df.acc.pauses, k, nstart = 25)
+for (k in 2:5) {
+  km.res <- kmeans(df.pauses, k, nstart = 25)
   km_results[[paste0("km.res", k)]] <- km.res
-  df.acc[, paste0("pauses_kmclust", k)] <- km.res$cluster
+  df[, paste0("pauses_kmclust", k)] <- km.res$cluster
   
-  sil <- silhouette(km.res$cluster, dist(df.acc.pauses))
+  sil <- silhouette(km.res$cluster, dist(df.pauses))
   print(fviz_silhouette(sil))
   
-  print(fviz_cluster(km.res, data = na.omit(df.acc.pauses),
+  print(fviz_cluster(km.res, data = na.omit(df.pauses),
                ggtheme = theme_minimal(),
                main = "Partitioning Clustering Plot",
                geom = c("point")
@@ -344,16 +368,43 @@ for (k in 2:9) {
 }
 ```
 
-```{r}
-df.acc[, grep("clust", names(df.acc))] <- lapply(df.acc[, grep("clust", names(df.acc))], factor)
-# names(df.acc)[grep("clust", names(df.acc))] <- paste0("female_", names(df.acc)[grep("clust", names(df.acc))])
+{% if custom %}
 
+## Ручная кластеризация
+### Кликеры
+```{r}
+cluster_clickers.{{stage}} <- as.data.frame(matrix("clickers", nrow = nrow(clickers.{{stage}}), ncol = length(names(df)[grep("clust", names(df))])))
+colnames(cluster_clickers.{{stage}}) <- names(df)[grep("clust", names(df))]
+
+clickers.{{stage}} <- cbind(clickers.{{stage}}, cluster_clickers.{{stage}})
+
+clickers.{{stage}} <- na.omit(clickers.{{stage}})
+clickers.{{stage}} <- cbind(clickers.{{stage}}, model.matrix(~ gender - 1, data = clickers.{{stage}}))
+
+df <- rbind(df, select(clickers.{{stage}}, names(df)))
+```
+
+{% endif %}
+
+```{r}
+df[, grep("clust", names(df))] <- lapply(df[, grep("clust", names(df))], factor)
 ```
 
 
+
+
+
+{% if gender == 'male' %}
 ```{r}
-save(df.acc, file = "./data/envs/4_cluster_analysis/df.acc.female.RData")
+save(df, file = "./data/envs/4_cluster_analysis/df.{{stage}}.male.RData")
 ```
-
-
+{% elif gender == "female" %}
+```{r}
+save(df, file = "./data/envs/4_cluster_analysis/df.{{stage}}.female.RData")
+```
+{% else %}
+```{r}
+save(df, file = "./data/envs/4_cluster_analysis/df.{{stage}}.RData")
+```
+{% endif %}
 
