@@ -44,7 +44,6 @@ function addClassToTitle(containerId, className) {
 }
 </script>
 
-
 ```{r}
 # Набор данных: Точность
 df.acc <- read.csv("./data/accuracy_features.csv")
@@ -83,6 +82,21 @@ names(df.spd) <- tolower(names(df.spd))
 ```
 
 ```{r}
+## Данные тестов психодиагностики
+sp_results <- read_xlsx("../../Все тесты/data/results/sp_results_impersonal.xlsx")
+
+df.acc <- merge(df.acc, select(sp_results, userid, gender), by.x = "user_id", by.y = "userid", all.x = T)
+df.acc <- select(df.acc, 1:4, gender, everything())
+df.acc <- df.acc[!is.na(df.acc$gender),]
+df.acc$gender <- factor(df.acc$gender, labels = c("F", "M"))
+
+df.spd <- merge(df.spd, select(sp_results, userid, gender), by.x = "user_id", by.y = "userid", all.x = T)
+df.spd <- select(df.spd, 1:4, gender, everything())
+df.spd <- df.spd[!is.na(df.spd$gender),]
+df.spd$gender <- factor(df.spd$gender, labels = c("F", "M"))
+```
+
+```{r}
 ## Кликеры
 clickers.acc <- df.acc[df.acc$clicked_through_targets > 5 & df.acc$combo_clicked_through_targets > 5, ]
 clickers.spd <- df.spd[df.spd$clicked_through_targets > 5 & df.spd$combo_clicked_through_targets > 5, ]
@@ -90,7 +104,40 @@ clickers <- unique(c(clickers.acc$user_id, clickers.spd$user_id))
 
 df.acc <- df.acc[!df.acc$user_id %in% clickers, ]
 df.spd <- df.spd[!df.spd$user_id %in% clickers, ]
+
+save(clickers.acc, file = "./data/envs/1_desc_stat/clickers.acc.RData")
+save(clickers.spd, file = "./data/envs/1_desc_stat/clickers.spd.RData")
 ```
+
+```{r}
+# # Очень продолжительное выполнение теста
+# longduration.acc <- df.acc[df.acc$time_total %in% boxplot.stats(df.acc$time_total, coef = 1)$out, ]
+# longduration.spd <- df.spd[df.spd$time_total %in% boxplot.stats(df.spd$time_total, coef = 1)$out, ]
+# longduration <- unique(c(longduration.acc$user_id, longduration.spd$user_id))
+# 
+# 
+# df.acc <- df.acc[!df.acc$user_id %in% longduration, ]
+# df.spd <- df.spd[!df.spd$user_id %in% longduration, ]
+
+# save(longduration.acc, file = "./data/envs/1_desc_stat/longduration.acc.RData")
+# save(longduration.spd, file = "./data/envs/1_desc_stat/longduration.spd.RData")
+```
+
+
+```{r}
+# # Парадоксальные
+# paradox.acc <- df.acc[df.acc$corr_sat < 0, ]
+# paradox.spd <- df.spd[df.spd$corr_sat < 0, ]
+# paradox <- unique(c(paradox.acc$user_id, paradox.spd$user_id))
+# 
+# 
+# df.acc <- df.acc[!df.acc$user_id %in% paradox, ]
+# df.spd <- df.spd[!df.spd$user_id %in% paradox, ]
+
+# save(paradox.acc, file = "./data/envs/1_desc_stat/paradox.acc.RData")
+# save(paradox.spd, file = "./data/envs/1_desc_stat/paradox.spd.RData")
+```
+
 
 
 ```{r}
@@ -104,46 +151,27 @@ df.spd <- df.spd[!df.spd$user_id %in% long_stops, ]
 ```
 
 ```{r}
-## Данные тестов психодиагностики
-sp_results <- read_xlsx("../../Все тесты/data/results/sp_results_impersonal.xlsx")
-science_types <- read.csv("../../Все тесты/data/results/science_types.csv")
-
-sp_results$science_type[sp_results$direction %in% science_types$direction[science_types$knowledge_field == "Natural Sciences"]] <- "Natural Sciences"
-sp_results$science_type[sp_results$direction %in% science_types$direction[science_types$knowledge_field == "Social and Humanitarian Sciences"]] <- "Social and Humanitarian Sciences"
-sp_results$science_type[sp_results$direction %in% science_types$direction[science_types$knowledge_field == "Technical Sciences"]] <- "Technical Sciences"
-
-df.acc <- merge(df.acc, select(sp_results, userid, gender, science_type, direction), by.x = "user_id", by.y = "userid", all.x = T)
-df.acc <- select(df.acc, 1:4, gender, science_type, direction, everything())
-df.acc <- df.acc[!is.na(df.acc$gender),]
-
-df.spd <- merge(df.spd, select(sp_results, userid, gender, science_type, direction), by.x = "user_id", by.y = "userid", all.x = T)
-df.spd <- select(df.spd, 1:4, gender, science_type, direction, everything())
-df.spd <- df.spd[!is.na(df.spd$gender),]
-```
-
-```{r}
 ## Длинный формат данных
 df <- rbind(df.acc, df.spd)
 
 df$gender <- factor(df$gender, labels = c("F", "M"))
-df$direction <- factor(df$direction)
 df$stage <- factor(df$stage, levels = c("accuracy", "speed"))
 df$user_id <- factor(df$user_id)
 ```
+
 
 ```{r}
 save(df, file = "./data/envs/1_desc_stat/df.RData")
 save(df.acc, file = "./data/envs/1_desc_stat/df.acc.RData")
 save(df.spd, file = "./data/envs/1_desc_stat/df.spd.RData")
 save(sp_results, file = "./data/envs/1_desc_stat/sp_results.RData")
-save(clickers, file = "./data/envs/1_desc_stat/clickers.RData")
-
 ```
-
 
 ```{r}
 sign_differences <- vector()
 ```
+
+
 
 
 # Описательные статистики
@@ -203,6 +231,341 @@ data.frame(
   frequency = as.vector(tab),
   percent = as.vector(round(prop.table(tab) * 100, 2))
 )
+```
+
+
+
+
+
+
+### time_total {.tabset .tabset-fade .tabset-pills}
+**Общее время выполнения**
+
+#### Descriptive stat
+
+```{r}
+describeBy(time_total ~ gender, data = df.spd, quant = c(0.25, 0.75), mat = T)
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "time_total"
+plot_list <- draw_plots_continuous_by_group(df.spd, var = time_total,  df.spd$gender, group_lab = "gender", x_lab = "Общее время выполнения", title = plot_title)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.spd$time_total);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.spd$time_total, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.spd, aes(sample = time_total)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - time_total", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Сравнение групп
+
+```{r}
+t_test_results <- t.test(df.spd$time_total[df.spd$gender == "Мужской"], df.spd$time_total[df.spd$gender == "Женский"]);t_test_results
+
+wilcox_test_results <- wilcox.test(df.spd$time_total[df.spd$gender == "Мужской"], df.spd$time_total[df.spd$gender == "Женский"]);wilcox_test_results
+```
+
+
+```{r results='asis'}
+if (wilcox_test_results$p.value <= 0.05) {
+  sign_differences <- c(sign_differences, "time_total")
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('time_total', 'highlight');});</script>")
+}
+```
+
+
+#### CI ~ gender
+
+```{r}
+pd = position_dodge(0.1)
+ggplot(df.acc, aes(x=gender, y=time_total, color=gender, group=gender)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.2, lwd=0.8, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=2.5, position = pd, pch = 15)
+
+```
+
+
+
+
+
+
+### velocity_mean {.tabset .tabset-fade .tabset-pills}
+**Средняя гармоническая скорость**
+
+#### Descriptive stat
+
+```{r}
+describeBy(velocity_mean ~ gender, data = df.spd, quant = c(0.25, 0.75), mat = T)
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "velocity_mean"
+plot_list <- draw_plots_continuous_by_group(df.spd, var = velocity_mean,  df.spd$gender, group_lab = "gender", x_lab = "Средняя гармоническая скорость", title = plot_title)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.spd$velocity_mean);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.spd$velocity_mean, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.spd, aes(sample = velocity_mean)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - velocity_mean", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Сравнение групп
+
+```{r}
+t_test_results <- t.test(df.spd$velocity_mean[df.spd$gender == "Мужской"], df.spd$velocity_mean[df.spd$gender == "Женский"]);t_test_results
+
+wilcox_test_results <- wilcox.test(df.spd$velocity_mean[df.spd$gender == "Мужской"], df.spd$velocity_mean[df.spd$gender == "Женский"]);wilcox_test_results
+```
+
+
+```{r results='asis'}
+if (wilcox_test_results$p.value <= 0.05) {
+  sign_differences <- c(sign_differences, "velocity_mean")
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('velocity_mean', 'highlight');});</script>")
+}
+```
+
+
+#### CI ~ gender
+
+```{r}
+pd = position_dodge(0.1)
+ggplot(df.acc, aes(x=gender, y=velocity_mean, color=gender, group=gender)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.2, lwd=0.8, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=2.5, position = pd, pch = 15)
+
+```
+
+
+
+
+
+
+### missings_distance {.tabset .tabset-fade .tabset-pills}
+**Расстояние промахов от центра мишеней, пикс.**
+
+#### Descriptive stat
+
+```{r}
+describeBy(missings_distance ~ gender, data = df.spd, quant = c(0.25, 0.75), mat = T)
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "missings_distance"
+plot_list <- draw_plots_continuous_by_group(df.spd, var = missings_distance,  df.spd$gender, group_lab = "gender", x_lab = "Расстояние промахов от центра мишеней, пикс.", title = plot_title)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.spd$missings_distance);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.spd$missings_distance, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.spd, aes(sample = missings_distance)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - missings_distance", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Сравнение групп
+
+```{r}
+t_test_results <- t.test(df.spd$missings_distance[df.spd$gender == "Мужской"], df.spd$missings_distance[df.spd$gender == "Женский"]);t_test_results
+
+wilcox_test_results <- wilcox.test(df.spd$missings_distance[df.spd$gender == "Мужской"], df.spd$missings_distance[df.spd$gender == "Женский"]);wilcox_test_results
+```
+
+
+```{r results='asis'}
+if (wilcox_test_results$p.value <= 0.05) {
+  sign_differences <- c(sign_differences, "missings_distance")
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('missings_distance', 'highlight');});</script>")
+}
+```
+
+
+#### CI ~ gender
+
+```{r}
+pd = position_dodge(0.1)
+ggplot(df.acc, aes(x=gender, y=missings_distance, color=gender, group=gender)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.2, lwd=0.8, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=2.5, position = pd, pch = 15)
+
+```
+
+
+
+
+
+
+### distance_total {.tabset .tabset-fade .tabset-pills}
+**Общая амплитуда**
+
+#### Descriptive stat
+
+```{r}
+describeBy(distance_total ~ gender, data = df.spd, quant = c(0.25, 0.75), mat = T)
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "distance_total"
+plot_list <- draw_plots_continuous_by_group(df.spd, var = distance_total,  df.spd$gender, group_lab = "gender", x_lab = "Общая амплитуда", title = plot_title)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.spd$distance_total);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.spd$distance_total, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.spd, aes(sample = distance_total)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - distance_total", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Сравнение групп
+
+```{r}
+t_test_results <- t.test(df.spd$distance_total[df.spd$gender == "Мужской"], df.spd$distance_total[df.spd$gender == "Женский"]);t_test_results
+
+wilcox_test_results <- wilcox.test(df.spd$distance_total[df.spd$gender == "Мужской"], df.spd$distance_total[df.spd$gender == "Женский"]);wilcox_test_results
+```
+
+
+```{r results='asis'}
+if (wilcox_test_results$p.value <= 0.05) {
+  sign_differences <- c(sign_differences, "distance_total")
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('distance_total', 'highlight');});</script>")
+}
+```
+
+
+#### CI ~ gender
+
+```{r}
+pd = position_dodge(0.1)
+ggplot(df.acc, aes(x=gender, y=distance_total, color=gender, group=gender)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.2, lwd=0.8, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=2.5, position = pd, pch = 15)
+
+```
+
+
+
+
+
+
+### pause_total {.tabset .tabset-fade .tabset-pills}
+**Общее время пауз**
+
+#### Descriptive stat
+
+```{r}
+describeBy(pause_total ~ gender, data = df.spd, quant = c(0.25, 0.75), mat = T)
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "pause_total"
+plot_list <- draw_plots_continuous_by_group(df.spd, var = pause_total,  df.spd$gender, group_lab = "gender", x_lab = "Общее время пауз", title = plot_title)
+
+create_tabs(plot_list)
+```
+
+
+#### Normal test
+```{r}
+st <- shapiro.test(df.spd$pause_total);print(st)
+check_normal_distribution(st)
+
+ks <- ks.test(df.spd$pause_total, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df.spd, aes(sample = pause_total)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - pause_total", tabname="QQPlot", filename=paste0(plot_title, "_QQplot"))
+
+create_tabs(list(p1))
+```
+
+
+#### Сравнение групп
+
+```{r}
+t_test_results <- t.test(df.spd$pause_total[df.spd$gender == "Мужской"], df.spd$pause_total[df.spd$gender == "Женский"]);t_test_results
+
+wilcox_test_results <- wilcox.test(df.spd$pause_total[df.spd$gender == "Мужской"], df.spd$pause_total[df.spd$gender == "Женский"]);wilcox_test_results
+```
+
+
+```{r results='asis'}
+if (wilcox_test_results$p.value <= 0.05) {
+  sign_differences <- c(sign_differences, "pause_total")
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('pause_total', 'highlight');});</script>")
+}
+```
+
+
+#### CI ~ gender
+
+```{r}
+pd = position_dodge(0.1)
+ggplot(df.acc, aes(x=gender, y=pause_total, color=gender, group=gender)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.2, lwd=0.8, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=2.5, position = pd, pch = 15)
+
 ```
 
 

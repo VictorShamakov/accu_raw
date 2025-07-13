@@ -45,7 +45,6 @@ function addClassToTitle(containerId, className) {
 </script>
 
 
-
 ```{r}
 # Набор данных: Точность
 df.acc <- read.csv("./data/accuracy_features.csv")
@@ -84,6 +83,21 @@ names(df.spd) <- tolower(names(df.spd))
 ```
 
 ```{r}
+## Данные тестов психодиагностики
+sp_results <- read_xlsx("../../Все тесты/data/results/sp_results_impersonal.xlsx")
+
+df.acc <- merge(df.acc, select(sp_results, userid, gender), by.x = "user_id", by.y = "userid", all.x = T)
+df.acc <- select(df.acc, 1:4, gender, everything())
+df.acc <- df.acc[!is.na(df.acc$gender),]
+df.acc$gender <- factor(df.acc$gender, labels = c("F", "M"))
+
+df.spd <- merge(df.spd, select(sp_results, userid, gender), by.x = "user_id", by.y = "userid", all.x = T)
+df.spd <- select(df.spd, 1:4, gender, everything())
+df.spd <- df.spd[!is.na(df.spd$gender),]
+df.spd$gender <- factor(df.spd$gender, labels = c("F", "M"))
+```
+
+```{r}
 ## Кликеры
 clickers.acc <- df.acc[df.acc$clicked_through_targets > 5 & df.acc$combo_clicked_through_targets > 5, ]
 clickers.spd <- df.spd[df.spd$clicked_through_targets > 5 & df.spd$combo_clicked_through_targets > 5, ]
@@ -91,7 +105,40 @@ clickers <- unique(c(clickers.acc$user_id, clickers.spd$user_id))
 
 df.acc <- df.acc[!df.acc$user_id %in% clickers, ]
 df.spd <- df.spd[!df.spd$user_id %in% clickers, ]
+
+save(clickers.acc, file = "./data/envs/1_desc_stat/clickers.acc.RData")
+save(clickers.spd, file = "./data/envs/1_desc_stat/clickers.spd.RData")
 ```
+
+```{r}
+# # Очень продолжительное выполнение теста
+# longduration.acc <- df.acc[df.acc$time_total %in% boxplot.stats(df.acc$time_total, coef = 1)$out, ]
+# longduration.spd <- df.spd[df.spd$time_total %in% boxplot.stats(df.spd$time_total, coef = 1)$out, ]
+# longduration <- unique(c(longduration.acc$user_id, longduration.spd$user_id))
+# 
+# 
+# df.acc <- df.acc[!df.acc$user_id %in% longduration, ]
+# df.spd <- df.spd[!df.spd$user_id %in% longduration, ]
+
+# save(longduration.acc, file = "./data/envs/1_desc_stat/longduration.acc.RData")
+# save(longduration.spd, file = "./data/envs/1_desc_stat/longduration.spd.RData")
+```
+
+
+```{r}
+# # Парадоксальные
+# paradox.acc <- df.acc[df.acc$corr_sat < 0, ]
+# paradox.spd <- df.spd[df.spd$corr_sat < 0, ]
+# paradox <- unique(c(paradox.acc$user_id, paradox.spd$user_id))
+# 
+# 
+# df.acc <- df.acc[!df.acc$user_id %in% paradox, ]
+# df.spd <- df.spd[!df.spd$user_id %in% paradox, ]
+
+# save(paradox.acc, file = "./data/envs/1_desc_stat/paradox.acc.RData")
+# save(paradox.spd, file = "./data/envs/1_desc_stat/paradox.spd.RData")
+```
+
 
 
 ```{r}
@@ -105,46 +152,27 @@ df.spd <- df.spd[!df.spd$user_id %in% long_stops, ]
 ```
 
 ```{r}
-## Данные тестов психодиагностики
-sp_results <- read_xlsx("../../Все тесты/data/results/sp_results_impersonal.xlsx")
-science_types <- read.csv("../../Все тесты/data/results/science_types.csv")
-
-sp_results$science_type[sp_results$direction %in% science_types$direction[science_types$knowledge_field == "Natural Sciences"]] <- "Natural Sciences"
-sp_results$science_type[sp_results$direction %in% science_types$direction[science_types$knowledge_field == "Social and Humanitarian Sciences"]] <- "Social and Humanitarian Sciences"
-sp_results$science_type[sp_results$direction %in% science_types$direction[science_types$knowledge_field == "Technical Sciences"]] <- "Technical Sciences"
-
-df.acc <- merge(df.acc, select(sp_results, userid, gender, science_type, direction), by.x = "user_id", by.y = "userid", all.x = T)
-df.acc <- select(df.acc, 1:4, gender, science_type, direction, everything())
-df.acc <- df.acc[!is.na(df.acc$gender),]
-
-df.spd <- merge(df.spd, select(sp_results, userid, gender, science_type, direction), by.x = "user_id", by.y = "userid", all.x = T)
-df.spd <- select(df.spd, 1:4, gender, science_type, direction, everything())
-df.spd <- df.spd[!is.na(df.spd$gender),]
-```
-
-```{r}
 ## Длинный формат данных
 df <- rbind(df.acc, df.spd)
 
 df$gender <- factor(df$gender, labels = c("F", "M"))
-df$direction <- factor(df$direction)
 df$stage <- factor(df$stage, levels = c("accuracy", "speed"))
 df$user_id <- factor(df$user_id)
 ```
+
 
 ```{r}
 save(df, file = "./data/envs/1_desc_stat/df.RData")
 save(df.acc, file = "./data/envs/1_desc_stat/df.acc.RData")
 save(df.spd, file = "./data/envs/1_desc_stat/df.spd.RData")
 save(sp_results, file = "./data/envs/1_desc_stat/sp_results.RData")
-save(clickers, file = "./data/envs/1_desc_stat/clickers.RData")
-
 ```
-
 
 ```{r}
 sign_differences <- vector()
 ```
+
+
 
 
 # Описательные статистики
@@ -205,6 +233,556 @@ data.frame(
   percent = as.vector(round(prop.table(tab) * 100, 2))
 )
 ```
+
+
+
+
+
+
+### time_total {.tabset .tabset-fade .tabset-pills}
+**Общее время выполнения**
+
+#### Descriptive stat
+
+```{r}
+describeBy(time_total ~ gender + stage, data = df, quant = c(0.25, 0.75), mat = T)
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "time_total"
+p1 <- ggplot(df, aes(time_total, fill=gender)) + 
+    geom_histogram() + 
+  facet_wrap("gender ~ stage") +
+  labs(title=plot_title, tabname="Hist")
+
+p2 <- ggplot(df, aes(time_total, fill=gender)) + 
+    geom_density() + 
+  facet_wrap("gender ~ stage") +
+  labs(title=plot_title, tabname="Density")
+
+p3 <- ggplot(df, aes(stage, time_total, fill=gender)) + 
+    geom_boxplot() +
+  labs(title=plot_title, tabname="Boxplot")
+
+
+create_tabs(list(p1, p2, p3))
+```
+
+
+
+#### CI ~ gender
+
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=stage, y=time_total, color=gender, group=gender)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.2, lwd=0.8, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=2.5, position = pd, pch = 15)
+
+```
+
+
+#### ANOVA
+
+```{r}
+df <- df[!df$user_id %in% unique(df$user_id[is.na(df$time_total)]), ]
+```
+
+```{r}
+aov_model <- aov(time_total ~ gender * stage, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ stage + gender)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Различия
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### ART
+
+```{r}
+model <- art(time_total ~ stage * gender + Error(user_id/stage), data = df)
+```
+
+```{r}
+anova_model <- anova(model)
+anova_model
+```
+
+#### Post-hoc
+```{r}
+art.con(model, formula = ~ stage * gender)
+```
+
+```{r results='asis'}
+if (sum(anova_model$`Pr(>F)` <= 0.05) >= 1) {
+  sign_differences <- c(sign_differences, "time_total")
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('time_total', 'highlight');});</script>")
+}
+
+```
+
+
+
+
+
+
+
+### velocity_mean {.tabset .tabset-fade .tabset-pills}
+**Средняя гармоническая скорость**
+
+#### Descriptive stat
+
+```{r}
+describeBy(velocity_mean ~ gender + stage, data = df, quant = c(0.25, 0.75), mat = T)
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "velocity_mean"
+p1 <- ggplot(df, aes(velocity_mean, fill=gender)) + 
+    geom_histogram() + 
+  facet_wrap("gender ~ stage") +
+  labs(title=plot_title, tabname="Hist")
+
+p2 <- ggplot(df, aes(velocity_mean, fill=gender)) + 
+    geom_density() + 
+  facet_wrap("gender ~ stage") +
+  labs(title=plot_title, tabname="Density")
+
+p3 <- ggplot(df, aes(stage, velocity_mean, fill=gender)) + 
+    geom_boxplot() +
+  labs(title=plot_title, tabname="Boxplot")
+
+
+create_tabs(list(p1, p2, p3))
+```
+
+
+
+#### CI ~ gender
+
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=stage, y=velocity_mean, color=gender, group=gender)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.2, lwd=0.8, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=2.5, position = pd, pch = 15)
+
+```
+
+
+#### ANOVA
+
+```{r}
+df <- df[!df$user_id %in% unique(df$user_id[is.na(df$velocity_mean)]), ]
+```
+
+```{r}
+aov_model <- aov(velocity_mean ~ gender * stage, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ stage + gender)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Различия
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### ART
+
+```{r}
+model <- art(velocity_mean ~ stage * gender + Error(user_id/stage), data = df)
+```
+
+```{r}
+anova_model <- anova(model)
+anova_model
+```
+
+#### Post-hoc
+```{r}
+art.con(model, formula = ~ stage * gender)
+```
+
+```{r results='asis'}
+if (sum(anova_model$`Pr(>F)` <= 0.05) >= 1) {
+  sign_differences <- c(sign_differences, "velocity_mean")
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('velocity_mean', 'highlight');});</script>")
+}
+
+```
+
+
+
+
+
+
+
+### missings_distance {.tabset .tabset-fade .tabset-pills}
+**Расстояние промахов от центра мишеней, пикс.**
+
+#### Descriptive stat
+
+```{r}
+describeBy(missings_distance ~ gender + stage, data = df, quant = c(0.25, 0.75), mat = T)
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "missings_distance"
+p1 <- ggplot(df, aes(missings_distance, fill=gender)) + 
+    geom_histogram() + 
+  facet_wrap("gender ~ stage") +
+  labs(title=plot_title, tabname="Hist")
+
+p2 <- ggplot(df, aes(missings_distance, fill=gender)) + 
+    geom_density() + 
+  facet_wrap("gender ~ stage") +
+  labs(title=plot_title, tabname="Density")
+
+p3 <- ggplot(df, aes(stage, missings_distance, fill=gender)) + 
+    geom_boxplot() +
+  labs(title=plot_title, tabname="Boxplot")
+
+
+create_tabs(list(p1, p2, p3))
+```
+
+
+
+#### CI ~ gender
+
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=stage, y=missings_distance, color=gender, group=gender)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.2, lwd=0.8, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=2.5, position = pd, pch = 15)
+
+```
+
+
+#### ANOVA
+
+```{r}
+df <- df[!df$user_id %in% unique(df$user_id[is.na(df$missings_distance)]), ]
+```
+
+```{r}
+aov_model <- aov(missings_distance ~ gender * stage, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ stage + gender)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Различия
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### ART
+
+```{r}
+model <- art(missings_distance ~ stage * gender + Error(user_id/stage), data = df)
+```
+
+```{r}
+anova_model <- anova(model)
+anova_model
+```
+
+#### Post-hoc
+```{r}
+art.con(model, formula = ~ stage * gender)
+```
+
+```{r results='asis'}
+if (sum(anova_model$`Pr(>F)` <= 0.05) >= 1) {
+  sign_differences <- c(sign_differences, "missings_distance")
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('missings_distance', 'highlight');});</script>")
+}
+
+```
+
+
+
+
+
+
+
+### distance_total {.tabset .tabset-fade .tabset-pills}
+**Общая амплитуда**
+
+#### Descriptive stat
+
+```{r}
+describeBy(distance_total ~ gender + stage, data = df, quant = c(0.25, 0.75), mat = T)
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "distance_total"
+p1 <- ggplot(df, aes(distance_total, fill=gender)) + 
+    geom_histogram() + 
+  facet_wrap("gender ~ stage") +
+  labs(title=plot_title, tabname="Hist")
+
+p2 <- ggplot(df, aes(distance_total, fill=gender)) + 
+    geom_density() + 
+  facet_wrap("gender ~ stage") +
+  labs(title=plot_title, tabname="Density")
+
+p3 <- ggplot(df, aes(stage, distance_total, fill=gender)) + 
+    geom_boxplot() +
+  labs(title=plot_title, tabname="Boxplot")
+
+
+create_tabs(list(p1, p2, p3))
+```
+
+
+
+#### CI ~ gender
+
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=stage, y=distance_total, color=gender, group=gender)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.2, lwd=0.8, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=2.5, position = pd, pch = 15)
+
+```
+
+
+#### ANOVA
+
+```{r}
+df <- df[!df$user_id %in% unique(df$user_id[is.na(df$distance_total)]), ]
+```
+
+```{r}
+aov_model <- aov(distance_total ~ gender * stage, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ stage + gender)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Различия
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### ART
+
+```{r}
+model <- art(distance_total ~ stage * gender + Error(user_id/stage), data = df)
+```
+
+```{r}
+anova_model <- anova(model)
+anova_model
+```
+
+#### Post-hoc
+```{r}
+art.con(model, formula = ~ stage * gender)
+```
+
+```{r results='asis'}
+if (sum(anova_model$`Pr(>F)` <= 0.05) >= 1) {
+  sign_differences <- c(sign_differences, "distance_total")
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('distance_total', 'highlight');});</script>")
+}
+
+```
+
+
+
+
+
+
+
+### pause_total {.tabset .tabset-fade .tabset-pills}
+**Общее время пауз**
+
+#### Descriptive stat
+
+```{r}
+describeBy(pause_total ~ gender + stage, data = df, quant = c(0.25, 0.75), mat = T)
+```
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "pause_total"
+p1 <- ggplot(df, aes(pause_total, fill=gender)) + 
+    geom_histogram() + 
+  facet_wrap("gender ~ stage") +
+  labs(title=plot_title, tabname="Hist")
+
+p2 <- ggplot(df, aes(pause_total, fill=gender)) + 
+    geom_density() + 
+  facet_wrap("gender ~ stage") +
+  labs(title=plot_title, tabname="Density")
+
+p3 <- ggplot(df, aes(stage, pause_total, fill=gender)) + 
+    geom_boxplot() +
+  labs(title=plot_title, tabname="Boxplot")
+
+
+create_tabs(list(p1, p2, p3))
+```
+
+
+
+#### CI ~ gender
+
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=stage, y=pause_total, color=gender, group=gender)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.2, lwd=0.8, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=2.5, position = pd, pch = 15)
+
+```
+
+
+#### ANOVA
+
+```{r}
+df <- df[!df$user_id %in% unique(df$user_id[is.na(df$pause_total)]), ]
+```
+
+```{r}
+aov_model <- aov(pause_total ~ gender * stage, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ stage + gender)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Различия
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### ART
+
+```{r}
+model <- art(pause_total ~ stage * gender + Error(user_id/stage), data = df)
+```
+
+```{r}
+anova_model <- anova(model)
+anova_model
+```
+
+#### Post-hoc
+```{r}
+art.con(model, formula = ~ stage * gender)
+```
+
+```{r results='asis'}
+if (sum(anova_model$`Pr(>F)` <= 0.05) >= 1) {
+  sign_differences <- c(sign_differences, "pause_total")
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('pause_total', 'highlight');});</script>")
+}
+
+```
+
 
 
 

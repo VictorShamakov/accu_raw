@@ -1,4 +1,3 @@
-
 ```{r}
 # Набор данных: Точность
 df.acc <- read.csv("./data/accuracy_features.csv")
@@ -37,6 +36,21 @@ names(df.spd) <- tolower(names(df.spd))
 ```
 
 ```{r}
+## Данные тестов психодиагностики
+sp_results <- read_xlsx("../../Все тесты/data/results/sp_results_impersonal.xlsx")
+
+df.acc <- merge(df.acc, select(sp_results, userid, gender), by.x = "user_id", by.y = "userid", all.x = T)
+df.acc <- select(df.acc, 1:4, gender, everything())
+df.acc <- df.acc[!is.na(df.acc$gender),]
+df.acc$gender <- factor(df.acc$gender, labels = c("F", "M"))
+
+df.spd <- merge(df.spd, select(sp_results, userid, gender), by.x = "user_id", by.y = "userid", all.x = T)
+df.spd <- select(df.spd, 1:4, gender, everything())
+df.spd <- df.spd[!is.na(df.spd$gender),]
+df.spd$gender <- factor(df.spd$gender, labels = c("F", "M"))
+```
+
+```{r}
 ## Кликеры
 clickers.acc <- df.acc[df.acc$clicked_through_targets > 5 & df.acc$combo_clicked_through_targets > 5, ]
 clickers.spd <- df.spd[df.spd$clicked_through_targets > 5 & df.spd$combo_clicked_through_targets > 5, ]
@@ -44,7 +58,40 @@ clickers <- unique(c(clickers.acc$user_id, clickers.spd$user_id))
 
 df.acc <- df.acc[!df.acc$user_id %in% clickers, ]
 df.spd <- df.spd[!df.spd$user_id %in% clickers, ]
+
+save(clickers.acc, file = "./data/envs/1_desc_stat/clickers.acc.RData")
+save(clickers.spd, file = "./data/envs/1_desc_stat/clickers.spd.RData")
 ```
+
+```{r}
+# # Очень продолжительное выполнение теста
+# longduration.acc <- df.acc[df.acc$time_total %in% boxplot.stats(df.acc$time_total, coef = 1)$out, ]
+# longduration.spd <- df.spd[df.spd$time_total %in% boxplot.stats(df.spd$time_total, coef = 1)$out, ]
+# longduration <- unique(c(longduration.acc$user_id, longduration.spd$user_id))
+# 
+# 
+# df.acc <- df.acc[!df.acc$user_id %in% longduration, ]
+# df.spd <- df.spd[!df.spd$user_id %in% longduration, ]
+
+# save(longduration.acc, file = "./data/envs/1_desc_stat/longduration.acc.RData")
+# save(longduration.spd, file = "./data/envs/1_desc_stat/longduration.spd.RData")
+```
+
+
+```{r}
+# # Парадоксальные
+# paradox.acc <- df.acc[df.acc$corr_sat < 0, ]
+# paradox.spd <- df.spd[df.spd$corr_sat < 0, ]
+# paradox <- unique(c(paradox.acc$user_id, paradox.spd$user_id))
+# 
+# 
+# df.acc <- df.acc[!df.acc$user_id %in% paradox, ]
+# df.spd <- df.spd[!df.spd$user_id %in% paradox, ]
+
+# save(paradox.acc, file = "./data/envs/1_desc_stat/paradox.acc.RData")
+# save(paradox.spd, file = "./data/envs/1_desc_stat/paradox.spd.RData")
+```
+
 
 
 ```{r}
@@ -58,43 +105,23 @@ df.spd <- df.spd[!df.spd$user_id %in% long_stops, ]
 ```
 
 ```{r}
-## Данные тестов психодиагностики
-sp_results <- read_xlsx("../../Все тесты/data/results/sp_results_impersonal.xlsx")
-science_types <- read.csv("../../Все тесты/data/results/science_types.csv")
-
-sp_results$science_type[sp_results$direction %in% science_types$direction[science_types$knowledge_field == "Natural Sciences"]] <- "Natural Sciences"
-sp_results$science_type[sp_results$direction %in% science_types$direction[science_types$knowledge_field == "Social and Humanitarian Sciences"]] <- "Social and Humanitarian Sciences"
-sp_results$science_type[sp_results$direction %in% science_types$direction[science_types$knowledge_field == "Technical Sciences"]] <- "Technical Sciences"
-
-df.acc <- merge(df.acc, select(sp_results, userid, gender, science_type, direction), by.x = "user_id", by.y = "userid", all.x = T)
-df.acc <- select(df.acc, 1:4, gender, science_type, direction, everything())
-df.acc <- df.acc[!is.na(df.acc$gender),]
-
-df.spd <- merge(df.spd, select(sp_results, userid, gender, science_type, direction), by.x = "user_id", by.y = "userid", all.x = T)
-df.spd <- select(df.spd, 1:4, gender, science_type, direction, everything())
-df.spd <- df.spd[!is.na(df.spd$gender),]
-```
-
-```{r}
 ## Длинный формат данных
 df <- rbind(df.acc, df.spd)
 
 df$gender <- factor(df$gender, labels = c("F", "M"))
-df$direction <- factor(df$direction)
 df$stage <- factor(df$stage, levels = c("accuracy", "speed"))
 df$user_id <- factor(df$user_id)
 ```
+
 
 ```{r}
 save(df, file = "./data/envs/1_desc_stat/df.RData")
 save(df.acc, file = "./data/envs/1_desc_stat/df.acc.RData")
 save(df.spd, file = "./data/envs/1_desc_stat/df.spd.RData")
 save(sp_results, file = "./data/envs/1_desc_stat/sp_results.RData")
-save(clickers, file = "./data/envs/1_desc_stat/clickers.RData")
-
 ```
-
 
 ```{r}
 sign_differences <- vector()
 ```
+
