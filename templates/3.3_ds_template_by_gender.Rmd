@@ -87,9 +87,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.{{stage}}${{feature.short_name}}[df.{{stage}}$gender == "Мужской"], df.{{stage}}${{feature.short_name}}[df.{{stage}}$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.{{stage}}${{feature.short_name}}[df.{{stage}}$gender == "M"], df.{{stage}}${{feature.short_name}}[df.{{stage}}$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.{{stage}}${{feature.short_name}}[df.{{stage}}$gender == "Мужской"], df.{{stage}}${{feature.short_name}}[df.{{stage}}$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.{{stage}}${{feature.short_name}}[df.{{stage}}$gender == "M"], df.{{stage}}${{feature.short_name}}[df.{{stage}}$gender == "F"]);wilcox_test_results
 ```
 
 

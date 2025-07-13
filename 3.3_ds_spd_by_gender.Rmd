@@ -275,9 +275,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$time_total[df.spd$gender == "Мужской"], df.spd$time_total[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$time_total[df.spd$gender == "M"], df.spd$time_total[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$time_total[df.spd$gender == "Мужской"], df.spd$time_total[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$time_total[df.spd$gender == "M"], df.spd$time_total[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -342,9 +342,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$velocity_mean[df.spd$gender == "Мужской"], df.spd$velocity_mean[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$velocity_mean[df.spd$gender == "M"], df.spd$velocity_mean[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$velocity_mean[df.spd$gender == "Мужской"], df.spd$velocity_mean[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$velocity_mean[df.spd$gender == "M"], df.spd$velocity_mean[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -409,9 +409,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$missings_distance[df.spd$gender == "Мужской"], df.spd$missings_distance[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$missings_distance[df.spd$gender == "M"], df.spd$missings_distance[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$missings_distance[df.spd$gender == "Мужской"], df.spd$missings_distance[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$missings_distance[df.spd$gender == "M"], df.spd$missings_distance[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -476,9 +476,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$distance_total[df.spd$gender == "Мужской"], df.spd$distance_total[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$distance_total[df.spd$gender == "M"], df.spd$distance_total[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$distance_total[df.spd$gender == "Мужской"], df.spd$distance_total[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$distance_total[df.spd$gender == "M"], df.spd$distance_total[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -543,9 +543,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$pause_total[df.spd$gender == "Мужской"], df.spd$pause_total[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$pause_total[df.spd$gender == "M"], df.spd$pause_total[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$pause_total[df.spd$gender == "Мужской"], df.spd$pause_total[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$pause_total[df.spd$gender == "M"], df.spd$pause_total[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -610,9 +610,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$time_total[df.spd$gender == "Мужской"], df.spd$time_total[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$time_total[df.spd$gender == "M"], df.spd$time_total[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$time_total[df.spd$gender == "Мужской"], df.spd$time_total[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$time_total[df.spd$gender == "M"], df.spd$time_total[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -677,9 +677,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$time_mean[df.spd$gender == "Мужской"], df.spd$time_mean[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$time_mean[df.spd$gender == "M"], df.spd$time_mean[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$time_mean[df.spd$gender == "Мужской"], df.spd$time_mean[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$time_mean[df.spd$gender == "M"], df.spd$time_mean[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -744,9 +744,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$time_sd[df.spd$gender == "Мужской"], df.spd$time_sd[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$time_sd[df.spd$gender == "M"], df.spd$time_sd[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$time_sd[df.spd$gender == "Мужской"], df.spd$time_sd[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$time_sd[df.spd$gender == "M"], df.spd$time_sd[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -811,9 +811,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$time_median[df.spd$gender == "Мужской"], df.spd$time_median[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$time_median[df.spd$gender == "M"], df.spd$time_median[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$time_median[df.spd$gender == "Мужской"], df.spd$time_median[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$time_median[df.spd$gender == "M"], df.spd$time_median[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -878,9 +878,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$time_trimmed[df.spd$gender == "Мужской"], df.spd$time_trimmed[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$time_trimmed[df.spd$gender == "M"], df.spd$time_trimmed[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$time_trimmed[df.spd$gender == "Мужской"], df.spd$time_trimmed[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$time_trimmed[df.spd$gender == "M"], df.spd$time_trimmed[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -945,9 +945,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$time_mad[df.spd$gender == "Мужской"], df.spd$time_mad[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$time_mad[df.spd$gender == "M"], df.spd$time_mad[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$time_mad[df.spd$gender == "Мужской"], df.spd$time_mad[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$time_mad[df.spd$gender == "M"], df.spd$time_mad[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -1012,9 +1012,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$time_min[df.spd$gender == "Мужской"], df.spd$time_min[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$time_min[df.spd$gender == "M"], df.spd$time_min[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$time_min[df.spd$gender == "Мужской"], df.spd$time_min[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$time_min[df.spd$gender == "M"], df.spd$time_min[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -1079,9 +1079,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$time_max[df.spd$gender == "Мужской"], df.spd$time_max[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$time_max[df.spd$gender == "M"], df.spd$time_max[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$time_max[df.spd$gender == "Мужской"], df.spd$time_max[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$time_max[df.spd$gender == "M"], df.spd$time_max[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -1146,9 +1146,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$time_range[df.spd$gender == "Мужской"], df.spd$time_range[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$time_range[df.spd$gender == "M"], df.spd$time_range[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$time_range[df.spd$gender == "Мужской"], df.spd$time_range[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$time_range[df.spd$gender == "M"], df.spd$time_range[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -1213,9 +1213,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$time_skew[df.spd$gender == "Мужской"], df.spd$time_skew[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$time_skew[df.spd$gender == "M"], df.spd$time_skew[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$time_skew[df.spd$gender == "Мужской"], df.spd$time_skew[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$time_skew[df.spd$gender == "M"], df.spd$time_skew[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -1280,9 +1280,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$time_kurtosis[df.spd$gender == "Мужской"], df.spd$time_kurtosis[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$time_kurtosis[df.spd$gender == "M"], df.spd$time_kurtosis[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$time_kurtosis[df.spd$gender == "Мужской"], df.spd$time_kurtosis[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$time_kurtosis[df.spd$gender == "M"], df.spd$time_kurtosis[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -1347,9 +1347,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$time_se[df.spd$gender == "Мужской"], df.spd$time_se[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$time_se[df.spd$gender == "M"], df.spd$time_se[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$time_se[df.spd$gender == "Мужской"], df.spd$time_se[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$time_se[df.spd$gender == "M"], df.spd$time_se[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -1414,9 +1414,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$time_q0.25[df.spd$gender == "Мужской"], df.spd$time_q0.25[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$time_q0.25[df.spd$gender == "M"], df.spd$time_q0.25[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$time_q0.25[df.spd$gender == "Мужской"], df.spd$time_q0.25[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$time_q0.25[df.spd$gender == "M"], df.spd$time_q0.25[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -1481,9 +1481,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$time_q0.75[df.spd$gender == "Мужской"], df.spd$time_q0.75[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$time_q0.75[df.spd$gender == "M"], df.spd$time_q0.75[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$time_q0.75[df.spd$gender == "Мужской"], df.spd$time_q0.75[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$time_q0.75[df.spd$gender == "M"], df.spd$time_q0.75[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -1548,9 +1548,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$time_trend[df.spd$gender == "Мужской"], df.spd$time_trend[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$time_trend[df.spd$gender == "M"], df.spd$time_trend[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$time_trend[df.spd$gender == "Мужской"], df.spd$time_trend[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$time_trend[df.spd$gender == "M"], df.spd$time_trend[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -1615,9 +1615,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$fitts_a[df.spd$gender == "Мужской"], df.spd$fitts_a[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$fitts_a[df.spd$gender == "M"], df.spd$fitts_a[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$fitts_a[df.spd$gender == "Мужской"], df.spd$fitts_a[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$fitts_a[df.spd$gender == "M"], df.spd$fitts_a[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -1682,9 +1682,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$fitts_b[df.spd$gender == "Мужской"], df.spd$fitts_b[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$fitts_b[df.spd$gender == "M"], df.spd$fitts_b[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$fitts_b[df.spd$gender == "Мужской"], df.spd$fitts_b[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$fitts_b[df.spd$gender == "M"], df.spd$fitts_b[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -1749,9 +1749,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$distance_total[df.spd$gender == "Мужской"], df.spd$distance_total[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$distance_total[df.spd$gender == "M"], df.spd$distance_total[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$distance_total[df.spd$gender == "Мужской"], df.spd$distance_total[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$distance_total[df.spd$gender == "M"], df.spd$distance_total[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -1816,9 +1816,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$distance_mean[df.spd$gender == "Мужской"], df.spd$distance_mean[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$distance_mean[df.spd$gender == "M"], df.spd$distance_mean[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$distance_mean[df.spd$gender == "Мужской"], df.spd$distance_mean[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$distance_mean[df.spd$gender == "M"], df.spd$distance_mean[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -1883,9 +1883,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$distance_sd[df.spd$gender == "Мужской"], df.spd$distance_sd[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$distance_sd[df.spd$gender == "M"], df.spd$distance_sd[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$distance_sd[df.spd$gender == "Мужской"], df.spd$distance_sd[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$distance_sd[df.spd$gender == "M"], df.spd$distance_sd[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -1950,9 +1950,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$distance_median[df.spd$gender == "Мужской"], df.spd$distance_median[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$distance_median[df.spd$gender == "M"], df.spd$distance_median[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$distance_median[df.spd$gender == "Мужской"], df.spd$distance_median[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$distance_median[df.spd$gender == "M"], df.spd$distance_median[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -2017,9 +2017,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$distance_trimmed[df.spd$gender == "Мужской"], df.spd$distance_trimmed[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$distance_trimmed[df.spd$gender == "M"], df.spd$distance_trimmed[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$distance_trimmed[df.spd$gender == "Мужской"], df.spd$distance_trimmed[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$distance_trimmed[df.spd$gender == "M"], df.spd$distance_trimmed[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -2084,9 +2084,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$distance_mad[df.spd$gender == "Мужской"], df.spd$distance_mad[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$distance_mad[df.spd$gender == "M"], df.spd$distance_mad[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$distance_mad[df.spd$gender == "Мужской"], df.spd$distance_mad[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$distance_mad[df.spd$gender == "M"], df.spd$distance_mad[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -2151,9 +2151,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$distance_min[df.spd$gender == "Мужской"], df.spd$distance_min[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$distance_min[df.spd$gender == "M"], df.spd$distance_min[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$distance_min[df.spd$gender == "Мужской"], df.spd$distance_min[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$distance_min[df.spd$gender == "M"], df.spd$distance_min[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -2218,9 +2218,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$distance_max[df.spd$gender == "Мужской"], df.spd$distance_max[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$distance_max[df.spd$gender == "M"], df.spd$distance_max[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$distance_max[df.spd$gender == "Мужской"], df.spd$distance_max[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$distance_max[df.spd$gender == "M"], df.spd$distance_max[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -2285,9 +2285,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$distance_range[df.spd$gender == "Мужской"], df.spd$distance_range[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$distance_range[df.spd$gender == "M"], df.spd$distance_range[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$distance_range[df.spd$gender == "Мужской"], df.spd$distance_range[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$distance_range[df.spd$gender == "M"], df.spd$distance_range[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -2352,9 +2352,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$distance_skew[df.spd$gender == "Мужской"], df.spd$distance_skew[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$distance_skew[df.spd$gender == "M"], df.spd$distance_skew[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$distance_skew[df.spd$gender == "Мужской"], df.spd$distance_skew[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$distance_skew[df.spd$gender == "M"], df.spd$distance_skew[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -2419,9 +2419,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$distance_kurtosis[df.spd$gender == "Мужской"], df.spd$distance_kurtosis[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$distance_kurtosis[df.spd$gender == "M"], df.spd$distance_kurtosis[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$distance_kurtosis[df.spd$gender == "Мужской"], df.spd$distance_kurtosis[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$distance_kurtosis[df.spd$gender == "M"], df.spd$distance_kurtosis[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -2486,9 +2486,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$distance_se[df.spd$gender == "Мужской"], df.spd$distance_se[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$distance_se[df.spd$gender == "M"], df.spd$distance_se[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$distance_se[df.spd$gender == "Мужской"], df.spd$distance_se[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$distance_se[df.spd$gender == "M"], df.spd$distance_se[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -2553,9 +2553,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$distance_q0.25[df.spd$gender == "Мужской"], df.spd$distance_q0.25[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$distance_q0.25[df.spd$gender == "M"], df.spd$distance_q0.25[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$distance_q0.25[df.spd$gender == "Мужской"], df.spd$distance_q0.25[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$distance_q0.25[df.spd$gender == "M"], df.spd$distance_q0.25[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -2620,9 +2620,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$distance_q0.75[df.spd$gender == "Мужской"], df.spd$distance_q0.75[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$distance_q0.75[df.spd$gender == "M"], df.spd$distance_q0.75[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$distance_q0.75[df.spd$gender == "Мужской"], df.spd$distance_q0.75[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$distance_q0.75[df.spd$gender == "M"], df.spd$distance_q0.75[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -2687,9 +2687,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$distance_trend[df.spd$gender == "Мужской"], df.spd$distance_trend[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$distance_trend[df.spd$gender == "M"], df.spd$distance_trend[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$distance_trend[df.spd$gender == "Мужской"], df.spd$distance_trend[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$distance_trend[df.spd$gender == "M"], df.spd$distance_trend[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -2754,9 +2754,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$pause_total[df.spd$gender == "Мужской"], df.spd$pause_total[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$pause_total[df.spd$gender == "M"], df.spd$pause_total[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$pause_total[df.spd$gender == "Мужской"], df.spd$pause_total[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$pause_total[df.spd$gender == "M"], df.spd$pause_total[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -2821,9 +2821,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$pause_number[df.spd$gender == "Мужской"], df.spd$pause_number[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$pause_number[df.spd$gender == "M"], df.spd$pause_number[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$pause_number[df.spd$gender == "Мужской"], df.spd$pause_number[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$pause_number[df.spd$gender == "M"], df.spd$pause_number[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -2888,9 +2888,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$pause_mean[df.spd$gender == "Мужской"], df.spd$pause_mean[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$pause_mean[df.spd$gender == "M"], df.spd$pause_mean[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$pause_mean[df.spd$gender == "Мужской"], df.spd$pause_mean[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$pause_mean[df.spd$gender == "M"], df.spd$pause_mean[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -2955,9 +2955,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$pause_sd[df.spd$gender == "Мужской"], df.spd$pause_sd[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$pause_sd[df.spd$gender == "M"], df.spd$pause_sd[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$pause_sd[df.spd$gender == "Мужской"], df.spd$pause_sd[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$pause_sd[df.spd$gender == "M"], df.spd$pause_sd[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -3022,9 +3022,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$pause_median[df.spd$gender == "Мужской"], df.spd$pause_median[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$pause_median[df.spd$gender == "M"], df.spd$pause_median[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$pause_median[df.spd$gender == "Мужской"], df.spd$pause_median[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$pause_median[df.spd$gender == "M"], df.spd$pause_median[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -3089,9 +3089,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$pause_trimmed[df.spd$gender == "Мужской"], df.spd$pause_trimmed[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$pause_trimmed[df.spd$gender == "M"], df.spd$pause_trimmed[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$pause_trimmed[df.spd$gender == "Мужской"], df.spd$pause_trimmed[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$pause_trimmed[df.spd$gender == "M"], df.spd$pause_trimmed[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -3156,9 +3156,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$pause_mad[df.spd$gender == "Мужской"], df.spd$pause_mad[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$pause_mad[df.spd$gender == "M"], df.spd$pause_mad[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$pause_mad[df.spd$gender == "Мужской"], df.spd$pause_mad[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$pause_mad[df.spd$gender == "M"], df.spd$pause_mad[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -3223,9 +3223,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$pause_min[df.spd$gender == "Мужской"], df.spd$pause_min[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$pause_min[df.spd$gender == "M"], df.spd$pause_min[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$pause_min[df.spd$gender == "Мужской"], df.spd$pause_min[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$pause_min[df.spd$gender == "M"], df.spd$pause_min[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -3290,9 +3290,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$pause_max[df.spd$gender == "Мужской"], df.spd$pause_max[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$pause_max[df.spd$gender == "M"], df.spd$pause_max[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$pause_max[df.spd$gender == "Мужской"], df.spd$pause_max[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$pause_max[df.spd$gender == "M"], df.spd$pause_max[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -3357,9 +3357,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$pause_range[df.spd$gender == "Мужской"], df.spd$pause_range[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$pause_range[df.spd$gender == "M"], df.spd$pause_range[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$pause_range[df.spd$gender == "Мужской"], df.spd$pause_range[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$pause_range[df.spd$gender == "M"], df.spd$pause_range[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -3424,9 +3424,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$pause_skew[df.spd$gender == "Мужской"], df.spd$pause_skew[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$pause_skew[df.spd$gender == "M"], df.spd$pause_skew[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$pause_skew[df.spd$gender == "Мужской"], df.spd$pause_skew[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$pause_skew[df.spd$gender == "M"], df.spd$pause_skew[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -3491,9 +3491,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$pause_kurtosis[df.spd$gender == "Мужской"], df.spd$pause_kurtosis[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$pause_kurtosis[df.spd$gender == "M"], df.spd$pause_kurtosis[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$pause_kurtosis[df.spd$gender == "Мужской"], df.spd$pause_kurtosis[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$pause_kurtosis[df.spd$gender == "M"], df.spd$pause_kurtosis[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -3558,9 +3558,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$pause_se[df.spd$gender == "Мужской"], df.spd$pause_se[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$pause_se[df.spd$gender == "M"], df.spd$pause_se[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$pause_se[df.spd$gender == "Мужской"], df.spd$pause_se[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$pause_se[df.spd$gender == "M"], df.spd$pause_se[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -3625,9 +3625,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$pause_q0.25[df.spd$gender == "Мужской"], df.spd$pause_q0.25[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$pause_q0.25[df.spd$gender == "M"], df.spd$pause_q0.25[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$pause_q0.25[df.spd$gender == "Мужской"], df.spd$pause_q0.25[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$pause_q0.25[df.spd$gender == "M"], df.spd$pause_q0.25[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -3692,9 +3692,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$pause_q0.75[df.spd$gender == "Мужской"], df.spd$pause_q0.75[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$pause_q0.75[df.spd$gender == "M"], df.spd$pause_q0.75[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$pause_q0.75[df.spd$gender == "Мужской"], df.spd$pause_q0.75[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$pause_q0.75[df.spd$gender == "M"], df.spd$pause_q0.75[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -3759,9 +3759,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$pause_trend[df.spd$gender == "Мужской"], df.spd$pause_trend[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$pause_trend[df.spd$gender == "M"], df.spd$pause_trend[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$pause_trend[df.spd$gender == "Мужской"], df.spd$pause_trend[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$pause_trend[df.spd$gender == "M"], df.spd$pause_trend[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -3826,9 +3826,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$stops[df.spd$gender == "Мужской"], df.spd$stops[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$stops[df.spd$gender == "M"], df.spd$stops[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$stops[df.spd$gender == "Мужской"], df.spd$stops[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$stops[df.spd$gender == "M"], df.spd$stops[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -3893,9 +3893,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$velocity_mean[df.spd$gender == "Мужской"], df.spd$velocity_mean[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$velocity_mean[df.spd$gender == "M"], df.spd$velocity_mean[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$velocity_mean[df.spd$gender == "Мужской"], df.spd$velocity_mean[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$velocity_mean[df.spd$gender == "M"], df.spd$velocity_mean[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -3960,9 +3960,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$velocity_sd[df.spd$gender == "Мужской"], df.spd$velocity_sd[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$velocity_sd[df.spd$gender == "M"], df.spd$velocity_sd[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$velocity_sd[df.spd$gender == "Мужской"], df.spd$velocity_sd[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$velocity_sd[df.spd$gender == "M"], df.spd$velocity_sd[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -4027,9 +4027,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$velocity_mad[df.spd$gender == "Мужской"], df.spd$velocity_mad[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$velocity_mad[df.spd$gender == "M"], df.spd$velocity_mad[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$velocity_mad[df.spd$gender == "Мужской"], df.spd$velocity_mad[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$velocity_mad[df.spd$gender == "M"], df.spd$velocity_mad[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -4094,9 +4094,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$velocity_min[df.spd$gender == "Мужской"], df.spd$velocity_min[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$velocity_min[df.spd$gender == "M"], df.spd$velocity_min[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$velocity_min[df.spd$gender == "Мужской"], df.spd$velocity_min[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$velocity_min[df.spd$gender == "M"], df.spd$velocity_min[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -4161,9 +4161,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$velocity_max[df.spd$gender == "Мужской"], df.spd$velocity_max[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$velocity_max[df.spd$gender == "M"], df.spd$velocity_max[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$velocity_max[df.spd$gender == "Мужской"], df.spd$velocity_max[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$velocity_max[df.spd$gender == "M"], df.spd$velocity_max[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -4228,9 +4228,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$velocity_range[df.spd$gender == "Мужской"], df.spd$velocity_range[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$velocity_range[df.spd$gender == "M"], df.spd$velocity_range[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$velocity_range[df.spd$gender == "Мужской"], df.spd$velocity_range[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$velocity_range[df.spd$gender == "M"], df.spd$velocity_range[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -4295,9 +4295,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$velocity_skew[df.spd$gender == "Мужской"], df.spd$velocity_skew[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$velocity_skew[df.spd$gender == "M"], df.spd$velocity_skew[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$velocity_skew[df.spd$gender == "Мужской"], df.spd$velocity_skew[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$velocity_skew[df.spd$gender == "M"], df.spd$velocity_skew[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -4362,9 +4362,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$velocity_kurtosis[df.spd$gender == "Мужской"], df.spd$velocity_kurtosis[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$velocity_kurtosis[df.spd$gender == "M"], df.spd$velocity_kurtosis[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$velocity_kurtosis[df.spd$gender == "Мужской"], df.spd$velocity_kurtosis[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$velocity_kurtosis[df.spd$gender == "M"], df.spd$velocity_kurtosis[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -4429,9 +4429,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$velocity_se[df.spd$gender == "Мужской"], df.spd$velocity_se[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$velocity_se[df.spd$gender == "M"], df.spd$velocity_se[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$velocity_se[df.spd$gender == "Мужской"], df.spd$velocity_se[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$velocity_se[df.spd$gender == "M"], df.spd$velocity_se[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -4496,9 +4496,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$velocity_q0.25[df.spd$gender == "Мужской"], df.spd$velocity_q0.25[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$velocity_q0.25[df.spd$gender == "M"], df.spd$velocity_q0.25[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$velocity_q0.25[df.spd$gender == "Мужской"], df.spd$velocity_q0.25[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$velocity_q0.25[df.spd$gender == "M"], df.spd$velocity_q0.25[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -4563,9 +4563,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$velocity_q0.75[df.spd$gender == "Мужской"], df.spd$velocity_q0.75[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$velocity_q0.75[df.spd$gender == "M"], df.spd$velocity_q0.75[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$velocity_q0.75[df.spd$gender == "Мужской"], df.spd$velocity_q0.75[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$velocity_q0.75[df.spd$gender == "M"], df.spd$velocity_q0.75[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -4630,9 +4630,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$velocity_trend[df.spd$gender == "Мужской"], df.spd$velocity_trend[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$velocity_trend[df.spd$gender == "M"], df.spd$velocity_trend[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$velocity_trend[df.spd$gender == "Мужской"], df.spd$velocity_trend[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$velocity_trend[df.spd$gender == "M"], df.spd$velocity_trend[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -4697,9 +4697,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_n[df.spd$gender == "Мужской"], df.spd$acc_n[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_n[df.spd$gender == "M"], df.spd$acc_n[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_n[df.spd$gender == "Мужской"], df.spd$acc_n[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_n[df.spd$gender == "M"], df.spd$acc_n[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -4769,9 +4769,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_sd[df.spd$gender == "Мужской"], df.spd$acc_sd[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_sd[df.spd$gender == "M"], df.spd$acc_sd[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_sd[df.spd$gender == "Мужской"], df.spd$acc_sd[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_sd[df.spd$gender == "M"], df.spd$acc_sd[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -4836,9 +4836,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_median[df.spd$gender == "Мужской"], df.spd$acc_median[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_median[df.spd$gender == "M"], df.spd$acc_median[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_median[df.spd$gender == "Мужской"], df.spd$acc_median[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_median[df.spd$gender == "M"], df.spd$acc_median[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -4903,9 +4903,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_trimmed[df.spd$gender == "Мужской"], df.spd$acc_trimmed[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_trimmed[df.spd$gender == "M"], df.spd$acc_trimmed[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_trimmed[df.spd$gender == "Мужской"], df.spd$acc_trimmed[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_trimmed[df.spd$gender == "M"], df.spd$acc_trimmed[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -4970,9 +4970,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_mad[df.spd$gender == "Мужской"], df.spd$acc_mad[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_mad[df.spd$gender == "M"], df.spd$acc_mad[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_mad[df.spd$gender == "Мужской"], df.spd$acc_mad[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_mad[df.spd$gender == "M"], df.spd$acc_mad[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -5037,9 +5037,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_min[df.spd$gender == "Мужской"], df.spd$acc_min[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_min[df.spd$gender == "M"], df.spd$acc_min[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_min[df.spd$gender == "Мужской"], df.spd$acc_min[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_min[df.spd$gender == "M"], df.spd$acc_min[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -5104,9 +5104,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_max[df.spd$gender == "Мужской"], df.spd$acc_max[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_max[df.spd$gender == "M"], df.spd$acc_max[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_max[df.spd$gender == "Мужской"], df.spd$acc_max[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_max[df.spd$gender == "M"], df.spd$acc_max[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -5171,9 +5171,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_range[df.spd$gender == "Мужской"], df.spd$acc_range[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_range[df.spd$gender == "M"], df.spd$acc_range[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_range[df.spd$gender == "Мужской"], df.spd$acc_range[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_range[df.spd$gender == "M"], df.spd$acc_range[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -5238,9 +5238,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_skew[df.spd$gender == "Мужской"], df.spd$acc_skew[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_skew[df.spd$gender == "M"], df.spd$acc_skew[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_skew[df.spd$gender == "Мужской"], df.spd$acc_skew[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_skew[df.spd$gender == "M"], df.spd$acc_skew[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -5305,9 +5305,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_kurtosis[df.spd$gender == "Мужской"], df.spd$acc_kurtosis[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_kurtosis[df.spd$gender == "M"], df.spd$acc_kurtosis[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_kurtosis[df.spd$gender == "Мужской"], df.spd$acc_kurtosis[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_kurtosis[df.spd$gender == "M"], df.spd$acc_kurtosis[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -5372,9 +5372,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_se[df.spd$gender == "Мужской"], df.spd$acc_se[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_se[df.spd$gender == "M"], df.spd$acc_se[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_se[df.spd$gender == "Мужской"], df.spd$acc_se[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_se[df.spd$gender == "M"], df.spd$acc_se[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -5439,9 +5439,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_q0.25[df.spd$gender == "Мужской"], df.spd$acc_q0.25[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_q0.25[df.spd$gender == "M"], df.spd$acc_q0.25[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_q0.25[df.spd$gender == "Мужской"], df.spd$acc_q0.25[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_q0.25[df.spd$gender == "M"], df.spd$acc_q0.25[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -5506,9 +5506,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_q0.75[df.spd$gender == "Мужской"], df.spd$acc_q0.75[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_q0.75[df.spd$gender == "M"], df.spd$acc_q0.75[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_q0.75[df.spd$gender == "Мужской"], df.spd$acc_q0.75[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_q0.75[df.spd$gender == "M"], df.spd$acc_q0.75[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -5573,9 +5573,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$jerk_line[df.spd$gender == "Мужской"], df.spd$jerk_line[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$jerk_line[df.spd$gender == "M"], df.spd$jerk_line[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$jerk_line[df.spd$gender == "Мужской"], df.spd$jerk_line[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$jerk_line[df.spd$gender == "M"], df.spd$jerk_line[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -5640,9 +5640,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$n_jerk[df.spd$gender == "Мужской"], df.spd$n_jerk[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$n_jerk[df.spd$gender == "M"], df.spd$n_jerk[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$n_jerk[df.spd$gender == "Мужской"], df.spd$n_jerk[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$n_jerk[df.spd$gender == "M"], df.spd$n_jerk[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -5707,9 +5707,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$dec_n[df.spd$gender == "Мужской"], df.spd$dec_n[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$dec_n[df.spd$gender == "M"], df.spd$dec_n[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$dec_n[df.spd$gender == "Мужской"], df.spd$dec_n[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$dec_n[df.spd$gender == "M"], df.spd$dec_n[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -5774,9 +5774,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$dec_mean[df.spd$gender == "Мужской"], df.spd$dec_mean[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$dec_mean[df.spd$gender == "M"], df.spd$dec_mean[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$dec_mean[df.spd$gender == "Мужской"], df.spd$dec_mean[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$dec_mean[df.spd$gender == "M"], df.spd$dec_mean[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -5841,9 +5841,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$dec_sd[df.spd$gender == "Мужской"], df.spd$dec_sd[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$dec_sd[df.spd$gender == "M"], df.spd$dec_sd[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$dec_sd[df.spd$gender == "Мужской"], df.spd$dec_sd[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$dec_sd[df.spd$gender == "M"], df.spd$dec_sd[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -5908,9 +5908,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$dec_median[df.spd$gender == "Мужской"], df.spd$dec_median[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$dec_median[df.spd$gender == "M"], df.spd$dec_median[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$dec_median[df.spd$gender == "Мужской"], df.spd$dec_median[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$dec_median[df.spd$gender == "M"], df.spd$dec_median[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -5975,9 +5975,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$dec_trimmed[df.spd$gender == "Мужской"], df.spd$dec_trimmed[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$dec_trimmed[df.spd$gender == "M"], df.spd$dec_trimmed[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$dec_trimmed[df.spd$gender == "Мужской"], df.spd$dec_trimmed[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$dec_trimmed[df.spd$gender == "M"], df.spd$dec_trimmed[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -6042,9 +6042,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$dec_mad[df.spd$gender == "Мужской"], df.spd$dec_mad[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$dec_mad[df.spd$gender == "M"], df.spd$dec_mad[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$dec_mad[df.spd$gender == "Мужской"], df.spd$dec_mad[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$dec_mad[df.spd$gender == "M"], df.spd$dec_mad[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -6109,9 +6109,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$dec_min[df.spd$gender == "Мужской"], df.spd$dec_min[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$dec_min[df.spd$gender == "M"], df.spd$dec_min[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$dec_min[df.spd$gender == "Мужской"], df.spd$dec_min[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$dec_min[df.spd$gender == "M"], df.spd$dec_min[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -6176,9 +6176,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$dec_max[df.spd$gender == "Мужской"], df.spd$dec_max[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$dec_max[df.spd$gender == "M"], df.spd$dec_max[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$dec_max[df.spd$gender == "Мужской"], df.spd$dec_max[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$dec_max[df.spd$gender == "M"], df.spd$dec_max[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -6243,9 +6243,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$dec_range[df.spd$gender == "Мужской"], df.spd$dec_range[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$dec_range[df.spd$gender == "M"], df.spd$dec_range[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$dec_range[df.spd$gender == "Мужской"], df.spd$dec_range[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$dec_range[df.spd$gender == "M"], df.spd$dec_range[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -6310,9 +6310,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$dec_skew[df.spd$gender == "Мужской"], df.spd$dec_skew[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$dec_skew[df.spd$gender == "M"], df.spd$dec_skew[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$dec_skew[df.spd$gender == "Мужской"], df.spd$dec_skew[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$dec_skew[df.spd$gender == "M"], df.spd$dec_skew[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -6377,9 +6377,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$dec_kurtosis[df.spd$gender == "Мужской"], df.spd$dec_kurtosis[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$dec_kurtosis[df.spd$gender == "M"], df.spd$dec_kurtosis[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$dec_kurtosis[df.spd$gender == "Мужской"], df.spd$dec_kurtosis[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$dec_kurtosis[df.spd$gender == "M"], df.spd$dec_kurtosis[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -6444,9 +6444,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$dec_se[df.spd$gender == "Мужской"], df.spd$dec_se[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$dec_se[df.spd$gender == "M"], df.spd$dec_se[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$dec_se[df.spd$gender == "Мужской"], df.spd$dec_se[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$dec_se[df.spd$gender == "M"], df.spd$dec_se[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -6511,9 +6511,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$dec_q0.25[df.spd$gender == "Мужской"], df.spd$dec_q0.25[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$dec_q0.25[df.spd$gender == "M"], df.spd$dec_q0.25[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$dec_q0.25[df.spd$gender == "Мужской"], df.spd$dec_q0.25[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$dec_q0.25[df.spd$gender == "M"], df.spd$dec_q0.25[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -6578,9 +6578,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$dec_q0.75[df.spd$gender == "Мужской"], df.spd$dec_q0.75[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$dec_q0.75[df.spd$gender == "M"], df.spd$dec_q0.75[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$dec_q0.75[df.spd$gender == "Мужской"], df.spd$dec_q0.75[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$dec_q0.75[df.spd$gender == "M"], df.spd$dec_q0.75[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -6645,9 +6645,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$braking_line[df.spd$gender == "Мужской"], df.spd$braking_line[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$braking_line[df.spd$gender == "M"], df.spd$braking_line[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$braking_line[df.spd$gender == "Мужской"], df.spd$braking_line[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$braking_line[df.spd$gender == "M"], df.spd$braking_line[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -6712,9 +6712,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$n_braking[df.spd$gender == "Мужской"], df.spd$n_braking[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$n_braking[df.spd$gender == "M"], df.spd$n_braking[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$n_braking[df.spd$gender == "Мужской"], df.spd$n_braking[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$n_braking[df.spd$gender == "M"], df.spd$n_braking[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -6779,9 +6779,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_per_sec_mean[df.spd$gender == "Мужской"], df.spd$acc_per_sec_mean[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_per_sec_mean[df.spd$gender == "M"], df.spd$acc_per_sec_mean[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_mean[df.spd$gender == "Мужской"], df.spd$acc_per_sec_mean[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_mean[df.spd$gender == "M"], df.spd$acc_per_sec_mean[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -6846,9 +6846,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_per_sec_sd[df.spd$gender == "Мужской"], df.spd$acc_per_sec_sd[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_per_sec_sd[df.spd$gender == "M"], df.spd$acc_per_sec_sd[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_sd[df.spd$gender == "Мужской"], df.spd$acc_per_sec_sd[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_sd[df.spd$gender == "M"], df.spd$acc_per_sec_sd[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -6913,9 +6913,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_per_sec_median[df.spd$gender == "Мужской"], df.spd$acc_per_sec_median[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_per_sec_median[df.spd$gender == "M"], df.spd$acc_per_sec_median[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_median[df.spd$gender == "Мужской"], df.spd$acc_per_sec_median[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_median[df.spd$gender == "M"], df.spd$acc_per_sec_median[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -6980,9 +6980,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_per_sec_trimmed[df.spd$gender == "Мужской"], df.spd$acc_per_sec_trimmed[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_per_sec_trimmed[df.spd$gender == "M"], df.spd$acc_per_sec_trimmed[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_trimmed[df.spd$gender == "Мужской"], df.spd$acc_per_sec_trimmed[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_trimmed[df.spd$gender == "M"], df.spd$acc_per_sec_trimmed[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -7047,9 +7047,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_per_sec_mad[df.spd$gender == "Мужской"], df.spd$acc_per_sec_mad[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_per_sec_mad[df.spd$gender == "M"], df.spd$acc_per_sec_mad[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_mad[df.spd$gender == "Мужской"], df.spd$acc_per_sec_mad[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_mad[df.spd$gender == "M"], df.spd$acc_per_sec_mad[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -7114,9 +7114,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_per_sec_min[df.spd$gender == "Мужской"], df.spd$acc_per_sec_min[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_per_sec_min[df.spd$gender == "M"], df.spd$acc_per_sec_min[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_min[df.spd$gender == "Мужской"], df.spd$acc_per_sec_min[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_min[df.spd$gender == "M"], df.spd$acc_per_sec_min[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -7181,9 +7181,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_per_sec_max[df.spd$gender == "Мужской"], df.spd$acc_per_sec_max[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_per_sec_max[df.spd$gender == "M"], df.spd$acc_per_sec_max[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_max[df.spd$gender == "Мужской"], df.spd$acc_per_sec_max[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_max[df.spd$gender == "M"], df.spd$acc_per_sec_max[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -7248,9 +7248,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_per_sec_range[df.spd$gender == "Мужской"], df.spd$acc_per_sec_range[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_per_sec_range[df.spd$gender == "M"], df.spd$acc_per_sec_range[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_range[df.spd$gender == "Мужской"], df.spd$acc_per_sec_range[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_range[df.spd$gender == "M"], df.spd$acc_per_sec_range[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -7315,9 +7315,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_per_sec_skew[df.spd$gender == "Мужской"], df.spd$acc_per_sec_skew[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_per_sec_skew[df.spd$gender == "M"], df.spd$acc_per_sec_skew[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_skew[df.spd$gender == "Мужской"], df.spd$acc_per_sec_skew[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_skew[df.spd$gender == "M"], df.spd$acc_per_sec_skew[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -7382,9 +7382,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_per_sec_kurtosis[df.spd$gender == "Мужской"], df.spd$acc_per_sec_kurtosis[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_per_sec_kurtosis[df.spd$gender == "M"], df.spd$acc_per_sec_kurtosis[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_kurtosis[df.spd$gender == "Мужской"], df.spd$acc_per_sec_kurtosis[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_kurtosis[df.spd$gender == "M"], df.spd$acc_per_sec_kurtosis[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -7449,9 +7449,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_per_sec_se[df.spd$gender == "Мужской"], df.spd$acc_per_sec_se[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_per_sec_se[df.spd$gender == "M"], df.spd$acc_per_sec_se[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_se[df.spd$gender == "Мужской"], df.spd$acc_per_sec_se[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_se[df.spd$gender == "M"], df.spd$acc_per_sec_se[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -7516,9 +7516,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_per_sec_q0.25[df.spd$gender == "Мужской"], df.spd$acc_per_sec_q0.25[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_per_sec_q0.25[df.spd$gender == "M"], df.spd$acc_per_sec_q0.25[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_q0.25[df.spd$gender == "Мужской"], df.spd$acc_per_sec_q0.25[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_q0.25[df.spd$gender == "M"], df.spd$acc_per_sec_q0.25[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -7583,9 +7583,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_per_sec_q0.75[df.spd$gender == "Мужской"], df.spd$acc_per_sec_q0.75[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_per_sec_q0.75[df.spd$gender == "M"], df.spd$acc_per_sec_q0.75[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_q0.75[df.spd$gender == "Мужской"], df.spd$acc_per_sec_q0.75[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_q0.75[df.spd$gender == "M"], df.spd$acc_per_sec_q0.75[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -7650,9 +7650,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_per_sec_max_pos[df.spd$gender == "Мужской"], df.spd$acc_per_sec_max_pos[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_per_sec_max_pos[df.spd$gender == "M"], df.spd$acc_per_sec_max_pos[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_max_pos[df.spd$gender == "Мужской"], df.spd$acc_per_sec_max_pos[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_max_pos[df.spd$gender == "M"], df.spd$acc_per_sec_max_pos[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -7717,9 +7717,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$acc_per_sec_min_pos[df.spd$gender == "Мужской"], df.spd$acc_per_sec_min_pos[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$acc_per_sec_min_pos[df.spd$gender == "M"], df.spd$acc_per_sec_min_pos[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_min_pos[df.spd$gender == "Мужской"], df.spd$acc_per_sec_min_pos[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$acc_per_sec_min_pos[df.spd$gender == "M"], df.spd$acc_per_sec_min_pos[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -7784,9 +7784,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$missings_distance[df.spd$gender == "Мужской"], df.spd$missings_distance[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$missings_distance[df.spd$gender == "M"], df.spd$missings_distance[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$missings_distance[df.spd$gender == "Мужской"], df.spd$missings_distance[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$missings_distance[df.spd$gender == "M"], df.spd$missings_distance[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -7851,9 +7851,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$missings_mean[df.spd$gender == "Мужской"], df.spd$missings_mean[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$missings_mean[df.spd$gender == "M"], df.spd$missings_mean[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$missings_mean[df.spd$gender == "Мужской"], df.spd$missings_mean[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$missings_mean[df.spd$gender == "M"], df.spd$missings_mean[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -7918,9 +7918,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$missings_sd[df.spd$gender == "Мужской"], df.spd$missings_sd[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$missings_sd[df.spd$gender == "M"], df.spd$missings_sd[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$missings_sd[df.spd$gender == "Мужской"], df.spd$missings_sd[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$missings_sd[df.spd$gender == "M"], df.spd$missings_sd[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -7985,9 +7985,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$missings_median[df.spd$gender == "Мужской"], df.spd$missings_median[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$missings_median[df.spd$gender == "M"], df.spd$missings_median[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$missings_median[df.spd$gender == "Мужской"], df.spd$missings_median[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$missings_median[df.spd$gender == "M"], df.spd$missings_median[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -8052,9 +8052,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$missings_trimmed[df.spd$gender == "Мужской"], df.spd$missings_trimmed[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$missings_trimmed[df.spd$gender == "M"], df.spd$missings_trimmed[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$missings_trimmed[df.spd$gender == "Мужской"], df.spd$missings_trimmed[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$missings_trimmed[df.spd$gender == "M"], df.spd$missings_trimmed[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -8119,9 +8119,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$missings_mad[df.spd$gender == "Мужской"], df.spd$missings_mad[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$missings_mad[df.spd$gender == "M"], df.spd$missings_mad[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$missings_mad[df.spd$gender == "Мужской"], df.spd$missings_mad[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$missings_mad[df.spd$gender == "M"], df.spd$missings_mad[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -8186,9 +8186,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$missings_min[df.spd$gender == "Мужской"], df.spd$missings_min[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$missings_min[df.spd$gender == "M"], df.spd$missings_min[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$missings_min[df.spd$gender == "Мужской"], df.spd$missings_min[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$missings_min[df.spd$gender == "M"], df.spd$missings_min[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -8253,9 +8253,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$missings_max[df.spd$gender == "Мужской"], df.spd$missings_max[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$missings_max[df.spd$gender == "M"], df.spd$missings_max[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$missings_max[df.spd$gender == "Мужской"], df.spd$missings_max[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$missings_max[df.spd$gender == "M"], df.spd$missings_max[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -8320,9 +8320,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$missings_range[df.spd$gender == "Мужской"], df.spd$missings_range[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$missings_range[df.spd$gender == "M"], df.spd$missings_range[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$missings_range[df.spd$gender == "Мужской"], df.spd$missings_range[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$missings_range[df.spd$gender == "M"], df.spd$missings_range[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -8387,9 +8387,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$missings_skew[df.spd$gender == "Мужской"], df.spd$missings_skew[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$missings_skew[df.spd$gender == "M"], df.spd$missings_skew[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$missings_skew[df.spd$gender == "Мужской"], df.spd$missings_skew[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$missings_skew[df.spd$gender == "M"], df.spd$missings_skew[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -8454,9 +8454,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$missings_kurtosis[df.spd$gender == "Мужской"], df.spd$missings_kurtosis[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$missings_kurtosis[df.spd$gender == "M"], df.spd$missings_kurtosis[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$missings_kurtosis[df.spd$gender == "Мужской"], df.spd$missings_kurtosis[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$missings_kurtosis[df.spd$gender == "M"], df.spd$missings_kurtosis[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -8521,9 +8521,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$missings_se[df.spd$gender == "Мужской"], df.spd$missings_se[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$missings_se[df.spd$gender == "M"], df.spd$missings_se[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$missings_se[df.spd$gender == "Мужской"], df.spd$missings_se[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$missings_se[df.spd$gender == "M"], df.spd$missings_se[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -8588,9 +8588,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$missings_q0.25[df.spd$gender == "Мужской"], df.spd$missings_q0.25[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$missings_q0.25[df.spd$gender == "M"], df.spd$missings_q0.25[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$missings_q0.25[df.spd$gender == "Мужской"], df.spd$missings_q0.25[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$missings_q0.25[df.spd$gender == "M"], df.spd$missings_q0.25[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -8655,9 +8655,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$missings_q0.75[df.spd$gender == "Мужской"], df.spd$missings_q0.75[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$missings_q0.75[df.spd$gender == "M"], df.spd$missings_q0.75[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$missings_q0.75[df.spd$gender == "Мужской"], df.spd$missings_q0.75[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$missings_q0.75[df.spd$gender == "M"], df.spd$missings_q0.75[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -8722,9 +8722,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$missings[df.spd$gender == "Мужской"], df.spd$missings[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$missings[df.spd$gender == "M"], df.spd$missings[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$missings[df.spd$gender == "Мужской"], df.spd$missings[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$missings[df.spd$gender == "M"], df.spd$missings[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -8789,9 +8789,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$hits[df.spd$gender == "Мужской"], df.spd$hits[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$hits[df.spd$gender == "M"], df.spd$hits[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$hits[df.spd$gender == "Мужской"], df.spd$hits[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$hits[df.spd$gender == "M"], df.spd$hits[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -8856,9 +8856,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$missings_trend[df.spd$gender == "Мужской"], df.spd$missings_trend[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$missings_trend[df.spd$gender == "M"], df.spd$missings_trend[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$missings_trend[df.spd$gender == "Мужской"], df.spd$missings_trend[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$missings_trend[df.spd$gender == "M"], df.spd$missings_trend[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -8923,9 +8923,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$accuracy_rate[df.spd$gender == "Мужской"], df.spd$accuracy_rate[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$accuracy_rate[df.spd$gender == "M"], df.spd$accuracy_rate[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$accuracy_rate[df.spd$gender == "Мужской"], df.spd$accuracy_rate[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$accuracy_rate[df.spd$gender == "M"], df.spd$accuracy_rate[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -8990,9 +8990,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$combo_hits[df.spd$gender == "Мужской"], df.spd$combo_hits[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$combo_hits[df.spd$gender == "M"], df.spd$combo_hits[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$combo_hits[df.spd$gender == "Мужской"], df.spd$combo_hits[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$combo_hits[df.spd$gender == "M"], df.spd$combo_hits[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -9057,9 +9057,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$combo_missings[df.spd$gender == "Мужской"], df.spd$combo_missings[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$combo_missings[df.spd$gender == "M"], df.spd$combo_missings[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$combo_missings[df.spd$gender == "Мужской"], df.spd$combo_missings[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$combo_missings[df.spd$gender == "M"], df.spd$combo_missings[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
@@ -9134,9 +9134,9 @@ create_tabs(list(p1))
 #### Сравнение групп
 
 ```{r}
-t_test_results <- t.test(df.spd$corr_sat[df.spd$gender == "Мужской"], df.spd$corr_sat[df.spd$gender == "Женский"]);t_test_results
+t_test_results <- t.test(df.spd$corr_sat[df.spd$gender == "M"], df.spd$corr_sat[df.spd$gender == "F"]);t_test_results
 
-wilcox_test_results <- wilcox.test(df.spd$corr_sat[df.spd$gender == "Мужской"], df.spd$corr_sat[df.spd$gender == "Женский"]);wilcox_test_results
+wilcox_test_results <- wilcox.test(df.spd$corr_sat[df.spd$gender == "M"], df.spd$corr_sat[df.spd$gender == "F"]);wilcox_test_results
 ```
 
 
