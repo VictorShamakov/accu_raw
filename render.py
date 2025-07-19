@@ -15,7 +15,7 @@ def get_template(filepath):
 
 def render_and_save_pages(template, data_dictionary, dataset, file_name, cluster_name, number):
     for n in range(2, 6):
-        rendered_page = template.render(data_dictionary=data_dictionary, group=cluster_name + str(n), dataset=dataset)
+        rendered_page = template.render(data_dictionary=data_dictionary, group=cluster_name + str(n), dataset=dataset, filename=f"{number}.{n - 1}_{file_name}_{cluster_name}{n}")
         filename = f"./{number}.{n - 1}_{file_name}_{cluster_name}{n}.Rmd"
         with open(filename, 'w', encoding="utf8") as file:
             file.write(rendered_page)
@@ -145,6 +145,94 @@ def main():
     render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd_male, "ds_spd_male_by", "pauses_hclust", 4.6)
 
 
+    # DS kmclusters acc
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc, "ds_acc_by", "all_kmclust", 4.7)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc, "ds_acc_by", "notcorr_kmclust", 4.7)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc, "ds_acc_by", "tdm_kmclust", 4.7)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc, "ds_acc_by", "pauses_kmclust", 4.7)
+
+    ## Female acc
+    dataset_ca_acc_female = open("./templates/4_dataset_ca_acc_female.Rmd", "r", encoding="utf8").read()
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_female, "ds_acc_female_by", "all_kmclust", 4.8)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_female, "ds_acc_female_by", "notcorr_kmclust", 4.8)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_female, "ds_acc_female_by", "tdm_kmclust", 4.8)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_female, "ds_acc_female_by", "pauses_kmclust", 4.8)
+
+    ## Male acc
+    dataset_ca_acc_male = open("./templates/4_dataset_ca_acc_male.Rmd", "r", encoding="utf8").read()
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_male, "ds_acc_male_by", "all_kmclust", 4.9)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_male, "ds_acc_male_by", "notcorr_kmclust", 4.9)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_male, "ds_acc_male_by", "tdm_kmclust", 4.9)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_male, "ds_acc_male_by", "pauses_kmclust", 4.9)
+
+
+    # DS kmclusters spd
+    dataset_ca_spd = open("./templates/4_dataset_ca_spd.Rmd", "r", encoding="utf8").read()
+
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd, "ds_spd_by", "all_kmclust", "4.10")
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd, "ds_spd_by", "notcorr_kmclust", "4.10")
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd, "ds_spd_by", "tdm_kmclust", "4.10")
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd, "ds_spd_by", "pauses_kmclust", "4.10")
+
+    ## Female spd
+    dataset_ca_spd_female = open("./templates/4_dataset_ca_spd_female.Rmd", "r", encoding="utf8").read()
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd_female, "ds_spd_female_by", "all_kmclust", 4.11)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd_female, "ds_spd_female_by", "notcorr_kmclust", 4.11)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd_female, "ds_spd_female_by", "tdm_kmclust", 4.11)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd_female, "ds_spd_female_by", "pauses_kmclust", 4.11)
+
+    ## Male spd
+    dataset_ca_spd_male = open("./templates/4_dataset_ca_spd_male.Rmd", "r", encoding="utf8").read()
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd_male, "ds_spd_male_by", "all_kmclust", 4.12)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd_male, "ds_spd_male_by", "notcorr_kmclust", 4.12)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd_male, "ds_spd_male_by", "tdm_kmclust", 4.12)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd_male, "ds_spd_male_by", "pauses_kmclust", 4.12)
+
+
+    # DS kmdclusters acc
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc, "ds_acc_by", "all_kmdclust", 4.13)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc, "ds_acc_by", "notcorr_kmdclust", 4.13)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc, "ds_acc_by", "tdm_kmdclust", 4.13)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc, "ds_acc_by", "pauses_kmdclust", 4.13)
+
+    ## Female acc
+    dataset_ca_acc_female = open("./templates/4_dataset_ca_acc_female.Rmd", "r", encoding="utf8").read()
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_female, "ds_acc_female_by", "all_kmdclust", 4.14)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_female, "ds_acc_female_by", "notcorr_kmdclust", 4.14)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_female, "ds_acc_female_by", "tdm_kmdclust", 4.14)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_female, "ds_acc_female_by", "pauses_kmdclust", 4.14)
+
+    ## Male acc
+    dataset_ca_acc_male = open("./templates/4_dataset_ca_acc_male.Rmd", "r", encoding="utf8").read()
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_male, "ds_acc_male_by", "all_kmdclust", 4.15)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_male, "ds_acc_male_by", "notcorr_kmdclust", 4.15)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_male, "ds_acc_male_by", "tdm_kmdclust", 4.15)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_male, "ds_acc_male_by", "pauses_kmdclust", 4.15)
+
+
+    # DS kmdclusters spd
+    dataset_ca_spd = open("./templates/4_dataset_ca_spd.Rmd", "r", encoding="utf8").read()
+
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd, "ds_spd_by", "all_kmdclust", "4.16")
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd, "ds_spd_by", "notcorr_kmdclust", "4.16")
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd, "ds_spd_by", "tdm_kmdclust", "4.16")
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd, "ds_spd_by", "pauses_kmdclust", "4.16")
+
+    ## Female spd
+    dataset_ca_spd_female = open("./templates/4_dataset_ca_spd_female.Rmd", "r", encoding="utf8").read()
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd_female, "ds_spd_female_by", "all_kmdclust", 4.17)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd_female, "ds_spd_female_by", "notcorr_kmdclust", 4.17)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd_female, "ds_spd_female_by", "tdm_kmdclust", 4.17)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd_female, "ds_spd_female_by", "pauses_kmdclust", 4.17)
+
+    ## Male spd
+    dataset_ca_spd_male = open("./templates/4_dataset_ca_spd_male.Rmd", "r", encoding="utf8").read()
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd_male, "ds_spd_male_by", "all_kmdclust", 4.18)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd_male, "ds_spd_male_by", "notcorr_kmdclust", 4.18)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd_male, "ds_spd_male_by", "tdm_kmdclust", 4.18)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd_male, "ds_spd_male_by", "pauses_kmdclust", 4.18)
+
+
     ## Psy.test and AST clusters
     ### acc
     sp_data_dictionary = pd.read_excel("./data/sp_data_dictionary.xlsx").to_dict(orient='records')
@@ -193,6 +281,100 @@ def main():
     render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_male, "sp_ds_spd_male_by", "notcorr_hclust", 5.6)
     render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_male, "sp_ds_spd_male_by", "tdm_hclust", 5.6)
     render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_male, "sp_ds_spd_male_by", "pauses_hclust", 5.6)
+
+    ## Psy.test and AST clusters kmeans
+    ### acc
+    dataset_sp_acc = open("./templates/5_dataset_sp_acc.Rmd", "r", encoding="utf8").read()
+
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc, "sp_ds_acc_by", "all_kmclust", 5.7)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc, "sp_ds_acc_by", "notcorr_kmclust", 5.7)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc, "sp_ds_acc_by", "tdm_kmclust", 5.7)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc, "sp_ds_acc_by", "pauses_kmclust", 5.7)
+
+    ### Female acc
+    dataset_sp_acc_female = open("./templates/5_dataset_sp_acc_female.Rmd", "r", encoding="utf8").read()
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_female, "sp_ds_acc_female_by", "all_kmclust", 5.8)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_female, "sp_ds_acc_female_by", "notcorr_kmclust", 5.8)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_female, "sp_ds_acc_female_by", "tdm_kmclust", 5.8)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_female, "sp_ds_acc_female_by", "pauses_kmclust", 5.8)
+
+    ### Male acc
+    dataset_sp_acc_male = open("./templates/5_dataset_sp_acc_male.Rmd", "r", encoding="utf8").read()
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_male, "sp_ds_acc_male_by", "all_kmclust", 5.9)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_male, "sp_ds_acc_male_by", "notcorr_kmclust", 5.9)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_male, "sp_ds_acc_male_by", "tdm_kmclust", 5.9)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_male, "sp_ds_acc_male_by", "pauses_kmclust", 5.9)
+
+    ### spd
+    sp_data_dictionary = pd.read_excel("./data/sp_data_dictionary.xlsx").to_dict(orient='records')
+    sp_template = get_template('./templates/5_sp_template.Rmd')
+    dataset_sp_spd = open("./templates/5_dataset_sp_spd.Rmd", "r", encoding="utf8").read()
+
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd, "sp_ds_spd_by", "all_kmclust", "5.10")
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd, "sp_ds_spd_by", "notcorr_kmclust", "5.10")
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd, "sp_ds_spd_by", "tdm_kmclust", "5.10")
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd, "sp_ds_spd_by", "pauses_kmclust", "5.10")
+
+    ### Female spd
+    dataset_sp_spd_female = open("./templates/5_dataset_sp_spd_female.Rmd", "r", encoding="utf8").read()
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_female, "sp_ds_spd_female_by", "all_kmclust", 5.11)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_female, "sp_ds_spd_female_by", "notcorr_kmclust", 5.11)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_female, "sp_ds_spd_female_by", "tdm_kmclust", 5.11)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_female, "sp_ds_spd_female_by", "pauses_kmclust", 5.11)
+
+    ### Male spd
+    dataset_sp_spd_male = open("./templates/5_dataset_sp_spd_male.Rmd", "r", encoding="utf8").read()
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_male, "sp_ds_spd_male_by", "all_kmclust", 5.12)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_male, "sp_ds_spd_male_by", "notcorr_kmclust", 5.12)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_male, "sp_ds_spd_male_by", "tdm_kmclust", 5.12)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_male, "sp_ds_spd_male_by", "pauses_kmclust", 5.12)
+
+    ## Psy.test and AST clusters kmedoids
+    ### acc
+    dataset_sp_acc = open("./templates/5_dataset_sp_acc.Rmd", "r", encoding="utf8").read()
+
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc, "sp_ds_acc_by", "all_kmdclust", 5.13)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc, "sp_ds_acc_by", "notcorr_kmdclust", 5.13)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc, "sp_ds_acc_by", "tdm_kmdclust", 5.13)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc, "sp_ds_acc_by", "pauses_kmdclust", 5.13)
+
+    ### Female acc
+    dataset_sp_acc_female = open("./templates/5_dataset_sp_acc_female.Rmd", "r", encoding="utf8").read()
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_female, "sp_ds_acc_female_by", "all_kmdclust", 5.14)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_female, "sp_ds_acc_female_by", "notcorr_kmdclust", 5.14)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_female, "sp_ds_acc_female_by", "tdm_kmdclust", 5.14)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_female, "sp_ds_acc_female_by", "pauses_kmdclust", 5.14)
+
+    ### Male acc
+    dataset_sp_acc_male = open("./templates/5_dataset_sp_acc_male.Rmd", "r", encoding="utf8").read()
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_male, "sp_ds_acc_male_by", "all_kmdclust", 5.15)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_male, "sp_ds_acc_male_by", "notcorr_kmdclust", 5.15)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_male, "sp_ds_acc_male_by", "tdm_kmdclust", 5.15)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_male, "sp_ds_acc_male_by", "pauses_kmdclust", 5.15)
+
+    ### spd
+    sp_data_dictionary = pd.read_excel("./data/sp_data_dictionary.xlsx").to_dict(orient='records')
+    sp_template = get_template('./templates/5_sp_template.Rmd')
+    dataset_sp_spd = open("./templates/5_dataset_sp_spd.Rmd", "r", encoding="utf8").read()
+
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd, "sp_ds_spd_by", "all_kmdclust", 5.16)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd, "sp_ds_spd_by", "notcorr_kmdclust", 5.16)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd, "sp_ds_spd_by", "tdm_kmdclust", 5.16)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd, "sp_ds_spd_by", "pauses_kmdclust", 5.16)
+
+    ### Female spd
+    dataset_sp_spd_female = open("./templates/5_dataset_sp_spd_female.Rmd", "r", encoding="utf8").read()
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_female, "sp_ds_spd_female_by", "all_kmdclust", 5.17)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_female, "sp_ds_spd_female_by", "notcorr_kmdclust", 5.17)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_female, "sp_ds_spd_female_by", "tdm_kmdclust", 5.17)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_female, "sp_ds_spd_female_by", "pauses_kmdclust", 5.17)
+
+    ### Male spd
+    dataset_sp_spd_male = open("./templates/5_dataset_sp_spd_male.Rmd", "r", encoding="utf8").read()
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_male, "sp_ds_spd_male_by", "all_kmdclust", 5.18)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_male, "sp_ds_spd_male_by", "notcorr_kmdclust", 5.18)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_male, "sp_ds_spd_male_by", "tdm_kmdclust", 5.18)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_male, "sp_ds_spd_male_by", "pauses_kmdclust", 5.18)
 
 if __name__ == '__main__':
     main()

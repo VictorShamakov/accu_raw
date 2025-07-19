@@ -43,6 +43,7 @@ source("functions.R")
 library("factoextra")
 library("ggdendro")
 library(cluster)
+set.seed(10)
 ```
 
 ```{r}
@@ -75,7 +76,7 @@ df <- df.{{stage}}
 ## Иерархический кластерный анализ
 
 ```{r}
-set.seed(11)
+
 ```
 
 ```{r}
@@ -277,7 +278,7 @@ ggplot(elbow_df, aes(x = k, y = wss)) +
 
 ### Все переменные
 ```{r}
-set.seed(11)
+
 km_results <- list()
 
 for (k in 2:5) {
@@ -302,7 +303,7 @@ for (k in 2:5) {
 ### Все некоррелированные переменные
 
 ```{r}
-set.seed(11)
+
 km_results <- list()
 
 for (k in 2:5) {
@@ -326,7 +327,7 @@ for (k in 2:5) {
 ### Время, расстояние, точность
 
 ```{r}
-set.seed(11)
+
 km_results <- list()
 
 for (k in 2:5) {
@@ -349,7 +350,7 @@ for (k in 2:5) {
 ### Паузы
 
 ```{r}
-set.seed(11)
+
 km_results <- list()
 
 for (k in 2:5) {
@@ -368,8 +369,95 @@ for (k in 2:5) {
 }
 ```
 
-{% if custom %}
 
+## K-medoids
+### Все переменные
+```{r}
+
+
+for (k in 2:5) {
+  kmd.res <- pam(df.num.scaled, k = k)
+  df[, paste0("all_kmdclust", k)] <- kmd.res$cluster
+  
+  sil <- silhouette(kmd.res$cluster, dist(df.num.scaled))
+  print(fviz_silhouette(sil))
+  
+  print(fviz_cluster(kmd.res, data = na.omit(df.num.scaled),
+               ggtheme = theme_minimal(),
+               main = "Partitioning Clustering Plot",
+               geom = c("point")
+               ))
+}
+
+
+```
+
+### Все некоррелированные переменные
+
+```{r}
+
+
+for (k in 2:5) {
+  kmd.res <- pam(df.not_corr, k)
+  df[, paste0("notcorr_kmdclust", k)] <- kmd.res$cluster
+  
+  sil <- silhouette(kmd.res$cluster, dist(df.not_corr))
+  print(fviz_silhouette(sil))
+  
+  print(fviz_cluster(kmd.res, data = na.omit(df.not_corr),
+               ggtheme = theme_minimal(),
+               main = "Partitioning Clustering Plot",
+               geom = c("point")
+               ))
+}
+
+```
+
+
+### Время, расстояние, точность
+
+```{r}
+
+
+for (k in 2:5) {
+  kmd.res <- pam(df.tdm, k)
+  df[, paste0("tdm_kmdclust", k)] <- kmd.res$cluster
+  
+  sil <- silhouette(kmd.res$cluster, dist(df.tdm))
+  print(fviz_silhouette(sil))
+  
+  print(fviz_cluster(kmd.res, data = na.omit(df.tdm),
+               ggtheme = theme_minimal(),
+               main = "Partitioning Clustering Plot",
+               geom = c("point")
+               ))
+}
+
+```
+
+### Паузы
+
+```{r}
+
+
+for (k in 2:5) {
+  kmd.res <- pam(df.pauses, k)
+  df[, paste0("pauses_kmdclust", k)] <- kmd.res$cluster
+  
+  sil <- silhouette(kmd.res$cluster, dist(df.pauses))
+  print(fviz_silhouette(sil))
+  
+  print(fviz_cluster(kmd.res, data = na.omit(df.pauses),
+               ggtheme = theme_minimal(),
+               main = "Partitioning Clustering Plot",
+               geom = c("point")
+               ))
+}
+```
+
+
+
+{% if custom %}
 ## Ручная кластеризация
 ### Кликеры
 ```{r}
