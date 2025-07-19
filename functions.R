@@ -80,13 +80,38 @@ check_normal_distribution <- function(result, alpha_level=0.05) {
 }
 
 
-apa_post_hoc <- function(post_hoc, p_level=0.05) {
+apa_post_hoc <- function(post_hoc) {
   for (i in 1:nrow(post_hoc)) {
-    if (post_hoc$p.value[i] <= 0.05) {
-      cat(paste0(post_hoc$contrast[i], ": ", "[t(", post_hoc$df[i], ") = ", round(post_hoc$t.ratio[i], 2), ", p<=", p_level, "]", "\r\n"))
+    sig_code <- ""
+    p_label <- ""
+    
+    if (post_hoc$p.value[i] < 0.001) {
+      sig_code <- "***"
+      p_label <- "p < 0.001"
+    } else if (post_hoc$p.value[i] < 0.01) {
+      sig_code <- "**"
+      p_label <- "p < 0.01"
+    } else if (post_hoc$p.value[i] < 0.05) {
+      sig_code <- "*"
+      p_label <- "p < 0.05"
+    } else if (post_hoc$p.value[i] < 0.1) {
+      sig_code <- "."
+      p_label <- "p < 0.1"
+    }
+    
+    # Печатаем результат, если p < 0.1
+    if (sig_code != "") {
+      cat(paste0(
+        post_hoc$contrast[i], 
+        ": [t(", post_hoc$df[i], ") = ", 
+        round(post_hoc$t.ratio[i], 2), 
+        ", ", p_label, "] ", sig_code, "\n"
+      ))
     }
   }
 }
+
+
 
 
 corFn <- function(data, mapping, ...) {
