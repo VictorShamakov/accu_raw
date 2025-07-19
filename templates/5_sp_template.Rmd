@@ -49,7 +49,9 @@ function addClassToTitle(containerId, className) {
 {{dataset}}
 
 
-
+```{r}
+sign_differences <- list()
+```
 
 ## Описательная статистика 
 
@@ -150,7 +152,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test({{feature.short_name}} ~ {{group}}, df)
+kruskal_test <- kruskal.test({{feature.short_name}} ~ {{group}}, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -171,7 +174,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test${{feature.short_name}}, df.t
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "{{feature.short_name}}")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "{{feature.short_name}}")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('{{feature.short_name}}', 'highlight');});</script>")
 }
 ```
@@ -193,5 +197,22 @@ ggplot(df, aes(x={{group}}, y={{feature.short_name}}, color={{group}})) +
 
 ### Значимые различия
 ```{r results='asis'}
-cat(paste0('<a href="#', sign_differences, '">', sign_differences, "</a><br>"))
+cat(paste0('<a href="#', sign_differences$feature, '">', sign_differences$feature, "</a><br>"))
 ```
+
+```{r}
+if (length(sign_differences) != 0) {
+  df.sign_differences <- data.frame(sign_differences, analysis="{{group}}", filename = "{{filename}}")
+} else {
+  stop("В {{group}} нет значимых различий!")
+}
+
+if (!"sign_differences.csv" %in% list.files("reports/")) {
+  write.table(df.sign_differences, "./reports/sign_differences.csv", sep = ",", 
+              append = F, row.names = F, col.names = T, quote = F)
+} else {
+  write.table(df.sign_differences, "./reports/sign_differences.csv", sep = ",",
+              append = T, row.names = F, col.names = F, quote = F)
+}
+```
+

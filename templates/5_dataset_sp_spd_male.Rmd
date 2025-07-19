@@ -16,6 +16,3 @@ names(sp_results) <- tolower(names(sp_results))
 df <- merge(df, sp_results, by.x = "user_id", by.y = "userid")
 ```
 
-```{r}
-sign_differences <- vector()
-```

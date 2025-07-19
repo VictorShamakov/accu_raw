@@ -1,0 +1,18 @@
+
+```{r}
+# sd1 <- read.csv("./reports/Кластеризация 1/sign_differences.csv")
+sd <- read.csv("./reports/sign_differences.csv")
+```
+
+
+```{r}
+sort(table(sd$feature), decreasing = T)
+
+sd[order(sd$p), ]
+sd[sd$feature == "bfst_neuroticism",]
+
+length(sd[grep("hclust", sd$analysis), ]$feature)
+length(sd[grep("kmclust", sd$analysis), ]$feature)
+length(sd[grep("kmdclust", sd$analysis), ]$feature)
+```
+

@@ -58,12 +58,11 @@ names(sp_results) <- tolower(names(sp_results))
 df <- merge(df, sp_results, by.x = "user_id", by.y = "userid")
 ```
 
+
+
 ```{r}
-sign_differences <- vector()
+sign_differences <- list()
 ```
-
-
-
 
 ## Описательная статистика 
 
@@ -190,7 +189,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(bfst_extraversion ~ all_hclust3, df)
+kruskal_test <- kruskal.test(bfst_extraversion ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -211,7 +211,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_extraversion, df.test$a
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "bfst_extraversion")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "bfst_extraversion")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('bfst_extraversion', 'highlight');});</script>")
 }
 ```
@@ -312,7 +313,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(bfst_benevolence ~ all_hclust3, df)
+kruskal_test <- kruskal.test(bfst_benevolence ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -333,7 +335,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_benevolence, df.test$al
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "bfst_benevolence")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "bfst_benevolence")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('bfst_benevolence', 'highlight');});</script>")
 }
 ```
@@ -434,7 +437,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(bfst_conscientiousness ~ all_hclust3, df)
+kruskal_test <- kruskal.test(bfst_conscientiousness ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -455,7 +459,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_conscientiousness, df.t
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "bfst_conscientiousness")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "bfst_conscientiousness")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('bfst_conscientiousness', 'highlight');});</script>")
 }
 ```
@@ -556,7 +561,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(bfst_neuroticism ~ all_hclust3, df)
+kruskal_test <- kruskal.test(bfst_neuroticism ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -577,7 +583,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_neuroticism, df.test$al
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "bfst_neuroticism")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "bfst_neuroticism")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('bfst_neuroticism', 'highlight');});</script>")
 }
 ```
@@ -678,7 +685,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(bfst_openness ~ all_hclust3, df)
+kruskal_test <- kruskal.test(bfst_openness ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -699,7 +707,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_openness, df.test$all_h
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "bfst_openness")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "bfst_openness")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('bfst_openness', 'highlight');});</script>")
 }
 ```
@@ -800,7 +809,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(bfst_sociability ~ all_hclust3, df)
+kruskal_test <- kruskal.test(bfst_sociability ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -821,7 +831,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_sociability, df.test$al
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "bfst_sociability")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "bfst_sociability")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('bfst_sociability', 'highlight');});</script>")
 }
 ```
@@ -922,7 +933,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(bfst_persistence ~ all_hclust3, df)
+kruskal_test <- kruskal.test(bfst_persistence ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -943,7 +955,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_persistence, df.test$al
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "bfst_persistence")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "bfst_persistence")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('bfst_persistence', 'highlight');});</script>")
 }
 ```
@@ -1044,7 +1057,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(bfst_energy ~ all_hclust3, df)
+kruskal_test <- kruskal.test(bfst_energy ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -1065,7 +1079,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_energy, df.test$all_hcl
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "bfst_energy")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "bfst_energy")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('bfst_energy', 'highlight');});</script>")
 }
 ```
@@ -1166,7 +1181,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(bfst_empathy ~ all_hclust3, df)
+kruskal_test <- kruskal.test(bfst_empathy ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -1187,7 +1203,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_empathy, df.test$all_hc
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "bfst_empathy")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "bfst_empathy")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('bfst_empathy', 'highlight');});</script>")
 }
 ```
@@ -1288,7 +1305,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(bfst_respect ~ all_hclust3, df)
+kruskal_test <- kruskal.test(bfst_respect ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -1309,7 +1327,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_respect, df.test$all_hc
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "bfst_respect")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "bfst_respect")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('bfst_respect', 'highlight');});</script>")
 }
 ```
@@ -1410,7 +1429,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(bfst_confidence ~ all_hclust3, df)
+kruskal_test <- kruskal.test(bfst_confidence ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -1431,7 +1451,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_confidence, df.test$all
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "bfst_confidence")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "bfst_confidence")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('bfst_confidence', 'highlight');});</script>")
 }
 ```
@@ -1532,7 +1553,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(bfst_organization ~ all_hclust3, df)
+kruskal_test <- kruskal.test(bfst_organization ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -1553,7 +1575,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_organization, df.test$a
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "bfst_organization")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "bfst_organization")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('bfst_organization', 'highlight');});</script>")
 }
 ```
@@ -1654,7 +1677,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(bfst_productivity ~ all_hclust3, df)
+kruskal_test <- kruskal.test(bfst_productivity ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -1675,7 +1699,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_productivity, df.test$a
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "bfst_productivity")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "bfst_productivity")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('bfst_productivity', 'highlight');});</script>")
 }
 ```
@@ -1776,7 +1801,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(bfst_responsibility ~ all_hclust3, df)
+kruskal_test <- kruskal.test(bfst_responsibility ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -1797,7 +1823,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_responsibility, df.test
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "bfst_responsibility")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "bfst_responsibility")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('bfst_responsibility', 'highlight');});</script>")
 }
 ```
@@ -1898,7 +1925,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(bfst_anxiety ~ all_hclust3, df)
+kruskal_test <- kruskal.test(bfst_anxiety ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -1919,7 +1947,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_anxiety, df.test$all_hc
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "bfst_anxiety")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "bfst_anxiety")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('bfst_anxiety', 'highlight');});</script>")
 }
 ```
@@ -2020,7 +2049,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(bfst_depression ~ all_hclust3, df)
+kruskal_test <- kruskal.test(bfst_depression ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -2041,7 +2071,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_depression, df.test$all
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "bfst_depression")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "bfst_depression")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('bfst_depression', 'highlight');});</script>")
 }
 ```
@@ -2142,7 +2173,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(bfst_emotional_volatility ~ all_hclust3, df)
+kruskal_test <- kruskal.test(bfst_emotional_volatility ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -2163,7 +2195,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_emotional_volatility, d
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "bfst_emotional_volatility")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "bfst_emotional_volatility")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('bfst_emotional_volatility', 'highlight');});</script>")
 }
 ```
@@ -2264,7 +2297,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(bfst_aesthetics ~ all_hclust3, df)
+kruskal_test <- kruskal.test(bfst_aesthetics ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -2285,7 +2319,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_aesthetics, df.test$all
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "bfst_aesthetics")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "bfst_aesthetics")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('bfst_aesthetics', 'highlight');});</script>")
 }
 ```
@@ -2386,7 +2421,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(bfst_curiosity ~ all_hclust3, df)
+kruskal_test <- kruskal.test(bfst_curiosity ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -2407,7 +2443,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_curiosity, df.test$all_
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "bfst_curiosity")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "bfst_curiosity")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('bfst_curiosity', 'highlight');});</script>")
 }
 ```
@@ -2508,7 +2545,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(bfst_personal_creativity ~ all_hclust3, df)
+kruskal_test <- kruskal.test(bfst_personal_creativity ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -2529,7 +2567,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_personal_creativity, df
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "bfst_personal_creativity")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "bfst_personal_creativity")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('bfst_personal_creativity', 'highlight');});</script>")
 }
 ```
@@ -2632,7 +2671,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(mrot_time_all ~ all_hclust3, df)
+kruskal_test <- kruskal.test(mrot_time_all ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -2653,7 +2693,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_all, df.test$all_h
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "mrot_time_all")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "mrot_time_all")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('mrot_time_all', 'highlight');});</script>")
 }
 ```
@@ -2754,7 +2795,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(mrot_time_all_mean ~ all_hclust3, df)
+kruskal_test <- kruskal.test(mrot_time_all_mean ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -2775,7 +2817,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_all_mean, df.test$
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "mrot_time_all_mean")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "mrot_time_all_mean")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('mrot_time_all_mean', 'highlight');});</script>")
 }
 ```
@@ -2876,7 +2919,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(mrot_time_all_sd ~ all_hclust3, df)
+kruskal_test <- kruskal.test(mrot_time_all_sd ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -2897,7 +2941,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_all_sd, df.test$al
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "mrot_time_all_sd")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "mrot_time_all_sd")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('mrot_time_all_sd', 'highlight');});</script>")
 }
 ```
@@ -2998,7 +3043,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(mrot_time_static ~ all_hclust3, df)
+kruskal_test <- kruskal.test(mrot_time_static ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -3019,7 +3065,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_static, df.test$al
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "mrot_time_static")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "mrot_time_static")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('mrot_time_static', 'highlight');});</script>")
 }
 ```
@@ -3120,7 +3167,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(mrot_time_static_mean ~ all_hclust3, df)
+kruskal_test <- kruskal.test(mrot_time_static_mean ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -3141,7 +3189,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_static_mean, df.te
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "mrot_time_static_mean")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "mrot_time_static_mean")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('mrot_time_static_mean', 'highlight');});</script>")
 }
 ```
@@ -3242,7 +3291,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(mrot_time_static_sd ~ all_hclust3, df)
+kruskal_test <- kruskal.test(mrot_time_static_sd ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -3263,7 +3313,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_static_sd, df.test
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "mrot_time_static_sd")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "mrot_time_static_sd")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('mrot_time_static_sd', 'highlight');});</script>")
 }
 ```
@@ -3364,7 +3415,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(mrot_time_animation ~ all_hclust3, df)
+kruskal_test <- kruskal.test(mrot_time_animation ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -3385,7 +3437,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_animation, df.test
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "mrot_time_animation")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "mrot_time_animation")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('mrot_time_animation', 'highlight');});</script>")
 }
 ```
@@ -3486,7 +3539,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(mrot_time_animation_mean ~ all_hclust3, df)
+kruskal_test <- kruskal.test(mrot_time_animation_mean ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -3507,7 +3561,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_animation_mean, df
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "mrot_time_animation_mean")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "mrot_time_animation_mean")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('mrot_time_animation_mean', 'highlight');});</script>")
 }
 ```
@@ -3608,7 +3663,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(mrot_time_animation_sd ~ all_hclust3, df)
+kruskal_test <- kruskal.test(mrot_time_animation_sd ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -3629,7 +3685,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_animation_sd, df.t
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "mrot_time_animation_sd")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "mrot_time_animation_sd")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('mrot_time_animation_sd', 'highlight');});</script>")
 }
 ```
@@ -3730,7 +3787,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(mrot_right_all ~ all_hclust3, df)
+kruskal_test <- kruskal.test(mrot_right_all ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -3751,7 +3809,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_right_all, df.test$all_
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "mrot_right_all")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "mrot_right_all")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('mrot_right_all', 'highlight');});</script>")
 }
 ```
@@ -3852,7 +3911,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(mrot_right_static ~ all_hclust3, df)
+kruskal_test <- kruskal.test(mrot_right_static ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -3873,7 +3933,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_right_static, df.test$a
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "mrot_right_static")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "mrot_right_static")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('mrot_right_static', 'highlight');});</script>")
 }
 ```
@@ -3974,7 +4035,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(mrot_right_animation ~ all_hclust3, df)
+kruskal_test <- kruskal.test(mrot_right_animation ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -3995,7 +4057,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_right_animation, df.tes
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "mrot_right_animation")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "mrot_right_animation")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('mrot_right_animation', 'highlight');});</script>")
 }
 ```
@@ -4096,7 +4159,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(mrot_error_all ~ all_hclust3, df)
+kruskal_test <- kruskal.test(mrot_error_all ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -4117,7 +4181,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_error_all, df.test$all_
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "mrot_error_all")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "mrot_error_all")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('mrot_error_all', 'highlight');});</script>")
 }
 ```
@@ -4218,7 +4283,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(mrot_error_static ~ all_hclust3, df)
+kruskal_test <- kruskal.test(mrot_error_static ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -4239,7 +4305,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_error_static, df.test$a
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "mrot_error_static")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "mrot_error_static")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('mrot_error_static', 'highlight');});</script>")
 }
 ```
@@ -4340,7 +4407,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(mrot_error_animation ~ all_hclust3, df)
+kruskal_test <- kruskal.test(mrot_error_animation ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -4361,7 +4429,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_error_animation, df.tes
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "mrot_error_animation")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "mrot_error_animation")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('mrot_error_animation', 'highlight');});</script>")
 }
 ```
@@ -4464,7 +4533,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(vit_total ~ all_hclust3, df)
+kruskal_test <- kruskal.test(vit_total ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -4485,7 +4555,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$vit_total, df.test$all_hclus
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "vit_total")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "vit_total")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('vit_total', 'highlight');});</script>")
 }
 ```
@@ -4586,7 +4657,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(vit_involvement ~ all_hclust3, df)
+kruskal_test <- kruskal.test(vit_involvement ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -4607,7 +4679,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$vit_involvement, df.test$all
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "vit_involvement")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "vit_involvement")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('vit_involvement', 'highlight');});</script>")
 }
 ```
@@ -4708,7 +4781,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(vit_control ~ all_hclust3, df)
+kruskal_test <- kruskal.test(vit_control ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -4729,7 +4803,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$vit_control, df.test$all_hcl
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "vit_control")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "vit_control")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('vit_control', 'highlight');});</script>")
 }
 ```
@@ -4830,7 +4905,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(vit_risk ~ all_hclust3, df)
+kruskal_test <- kruskal.test(vit_risk ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -4851,7 +4927,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$vit_risk, df.test$all_hclust
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "vit_risk")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "vit_risk")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('vit_risk', 'highlight');});</script>")
 }
 ```
@@ -4952,7 +5029,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(lc ~ all_hclust3, df)
+kruskal_test <- kruskal.test(lc ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -4973,7 +5051,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$lc, df.test$all_hclust3, p.a
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "lc")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "lc")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('lc', 'highlight');});</script>")
 }
 ```
@@ -5074,7 +5153,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(soa_planfulness ~ all_hclust3, df)
+kruskal_test <- kruskal.test(soa_planfulness ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -5095,7 +5175,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$soa_planfulness, df.test$all
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "soa_planfulness")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "soa_planfulness")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('soa_planfulness', 'highlight');});</script>")
 }
 ```
@@ -5196,7 +5277,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(soa_purposefulness ~ all_hclust3, df)
+kruskal_test <- kruskal.test(soa_purposefulness ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -5217,7 +5299,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$soa_purposefulness, df.test$
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "soa_purposefulness")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "soa_purposefulness")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('soa_purposefulness', 'highlight');});</script>")
 }
 ```
@@ -5318,7 +5401,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(soa_persistence ~ all_hclust3, df)
+kruskal_test <- kruskal.test(soa_persistence ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -5339,7 +5423,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$soa_persistence, df.test$all
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "soa_persistence")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "soa_persistence")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('soa_persistence', 'highlight');});</script>")
 }
 ```
@@ -5440,7 +5525,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(soa_fixation ~ all_hclust3, df)
+kruskal_test <- kruskal.test(soa_fixation ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -5461,7 +5547,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$soa_fixation, df.test$all_hc
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "soa_fixation")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "soa_fixation")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('soa_fixation', 'highlight');});</script>")
 }
 ```
@@ -5562,7 +5649,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(soa_organization ~ all_hclust3, df)
+kruskal_test <- kruskal.test(soa_organization ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -5583,7 +5671,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$soa_organization, df.test$al
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "soa_organization")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "soa_organization")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('soa_organization', 'highlight');});</script>")
 }
 ```
@@ -5684,7 +5773,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(soa_present ~ all_hclust3, df)
+kruskal_test <- kruskal.test(soa_present ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -5705,7 +5795,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$soa_present, df.test$all_hcl
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "soa_present")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "soa_present")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('soa_present', 'highlight');});</script>")
 }
 ```
@@ -5808,7 +5899,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(kot_total ~ all_hclust3, df)
+kruskal_test <- kruskal.test(kot_total ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -5829,7 +5921,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$kot_total, df.test$all_hclus
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "kot_total")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "kot_total")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('kot_total', 'highlight');});</script>")
 }
 ```
@@ -5930,7 +6023,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(kot_verbal ~ all_hclust3, df)
+kruskal_test <- kruskal.test(kot_verbal ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -5951,7 +6045,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$kot_verbal, df.test$all_hclu
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "kot_verbal")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "kot_verbal")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('kot_verbal', 'highlight');});</script>")
 }
 ```
@@ -6052,7 +6147,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(kot_number ~ all_hclust3, df)
+kruskal_test <- kruskal.test(kot_number ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -6073,7 +6169,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$kot_number, df.test$all_hclu
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "kot_number")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "kot_number")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('kot_number', 'highlight');});</script>")
 }
 ```
@@ -6174,7 +6271,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(kot_attention ~ all_hclust3, df)
+kruskal_test <- kruskal.test(kot_attention ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -6195,7 +6293,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$kot_attention, df.test$all_h
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "kot_attention")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "kot_attention")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('kot_attention', 'highlight');});</script>")
 }
 ```
@@ -6296,7 +6395,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(kot_spatial ~ all_hclust3, df)
+kruskal_test <- kruskal.test(kot_spatial ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -6317,7 +6417,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$kot_spatial, df.test$all_hcl
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "kot_spatial")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "kot_spatial")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('kot_spatial', 'highlight');});</script>")
 }
 ```
@@ -6418,7 +6519,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(kot_general ~ all_hclust3, df)
+kruskal_test <- kruskal.test(kot_general ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -6439,7 +6541,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$kot_general, df.test$all_hcl
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "kot_general")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "kot_general")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('kot_general', 'highlight');});</script>")
 }
 ```
@@ -6540,7 +6643,8 @@ apa_post_hoc(post_hoc)
 #### Kruskal-Wallis Test
 
 ```{r}
-kruskal.test(kot_logic ~ all_hclust3, df)
+kruskal_test <- kruskal.test(kot_logic ~ all_hclust3, df)
+kruskal_test
 ```
 
 **Effect size**
@@ -6561,7 +6665,8 @@ wilcox_test_results <- pairwise.wilcox.test(df.test$kot_logic, df.test$all_hclus
 
 ```{r results='asis'}
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
-  sign_differences <- c(sign_differences, "kot_logic")
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "kot_logic")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('kot_logic', 'highlight');});</script>")
 }
 ```
@@ -6587,5 +6692,21 @@ ggplot(df, aes(x=all_hclust3, y=kot_logic, color=all_hclust3)) +
 
 ### Значимые различия
 ```{r results='asis'}
-cat(paste0('<a href="#', sign_differences, '">', sign_differences, "</a><br>"))
+cat(paste0('<a href="#', sign_differences$feature, '">', sign_differences$feature, "</a><br>"))
+```
+
+```{r}
+if (length(sign_differences) != 0) {
+  df.sign_differences <- data.frame(sign_differences, analysis="all_hclust3", filename = "5.1.2_sp_ds_acc_by_all_hclust3")
+} else {
+  stop("В all_hclust3 нет значимых различий!")
+}
+
+if (!"sign_differences.csv" %in% list.files("reports/")) {
+  write.table(df.sign_differences, "./reports/sign_differences.csv", sep = ",", 
+              append = F, row.names = F, col.names = T, quote = F)
+} else {
+  write.table(df.sign_differences, "./reports/sign_differences.csv", sep = ",",
+              append = T, row.names = F, col.names = F, quote = F)
+}
 ```
