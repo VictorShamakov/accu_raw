@@ -44,6 +44,7 @@ library("factoextra")
 library("ggdendro")
 library(cluster)
 set.seed(10)
+n_clusters <- 7
 ```
 
 ```{r}
@@ -80,7 +81,7 @@ df.num.scaled <- scale(df.num)
 dist <- dist(df.num.scaled)
 hc <- hclust(dist, method = "ward.D2")
 
-for (k in 2:5) {
+for (k in 2:n_clusters) {
   plot(hc, cex = 0.3, hang = -1)
   rect.hclust(hc, k = k, border = 2:10)
   
@@ -187,7 +188,7 @@ df.not_corr <- scale(select(df.num, -corr_vars))
 dist <- dist(df.not_corr)
 hc <- hclust(dist, method = "ward.D2")
 
-for (k in 2:5) {
+for (k in 2:n_clusters) {
   plot(hc, cex = 0.3, hang = -1)
   rect.hclust(hc, k = k, border = 2:9)
   
@@ -205,7 +206,7 @@ df.tdm <- scale(select(df.num, time_total, distance_total, missings_distance))
 dist <- dist(df.tdm)
 hc <- hclust(dist, method = "ward.D2")
 
-for (k in 2:5) {
+for (k in 2:n_clusters) {
   plot(hc, cex = 0.3, hang = -1)
   rect.hclust(hc, k = k, border = 2:10)
   
@@ -222,7 +223,7 @@ df.pauses <- scale(select(df.num, starts_with("pause")))
 dist <- dist(df.pauses)
 hc <- hclust(dist, method = "ward.D2")
 
-for (k in 2:5) {
+for (k in 2:n_clusters) {
   plot(hc, cex = 0.3, hang = -1)
   rect.hclust(hc, k = k, border = 2:10)
   
@@ -240,7 +241,7 @@ df.tdmp <- scale(select(df.num, time_total, distance_total, missings_distance, s
 dist <- dist(df.tdmp)
 hc <- hclust(dist, method = "ward.D2")
 
-for (k in 2:5) {
+for (k in 2:n_clusters) {
   plot(hc, cex = 0.3, hang = -1)
   rect.hclust(hc, k = k, border = 2:10)
   
@@ -285,7 +286,7 @@ ggplot(elbow_df, aes(x = k, y = wss)) +
 
 ### Все переменные
 ```{r}
-for (k in 2:5) {
+for (k in 2:n_clusters) {
   km.res <- kmeans(df.num.scaled, k, nstart = 25)
   df[, paste0("all_kmclust", k)] <- km.res$cluster
   
@@ -306,7 +307,7 @@ for (k in 2:5) {
 ### Все некоррелированные переменные
 
 ```{r}
-for (k in 2:5) {
+for (k in 2:n_clusters) {
   km.res <- kmeans(df.not_corr, k, nstart = 25)
   df[, paste0("notcorr_kmclust", k)] <- km.res$cluster
   
@@ -326,7 +327,7 @@ for (k in 2:5) {
 ### Время, расстояние, точность
 
 ```{r}
-for (k in 2:5) {
+for (k in 2:n_clusters) {
   km.res <- kmeans(df.tdm, k, nstart = 25)
   df[, paste0("tdm_kmclust", k)] <- km.res$cluster
   
@@ -344,7 +345,7 @@ for (k in 2:5) {
 ### Паузы
 
 ```{r}
-for (k in 2:5) {
+for (k in 2:n_clusters) {
   km.res <- kmeans(df.pauses, k, nstart = 25)
   df[, paste0("pauses_kmclust", k)] <- km.res$cluster
   
@@ -362,7 +363,7 @@ for (k in 2:5) {
 
 ### Время, расстояние, точность и паузы
 ```{r}
-for (k in 2:5) {
+for (k in 2:n_clusters) {
   km.res <- kmeans(df.tdmp, k, nstart = 25)
   df[, paste0("tdmp_kmclust", k)] <- km.res$cluster
   
@@ -381,7 +382,7 @@ for (k in 2:5) {
 ## K-medoids
 ### Все переменные
 ```{r}
-for (k in 2:5) {
+for (k in 2:n_clusters) {
   kmd.res <- pam(df.num.scaled, k = k)
   df[, paste0("all_kmdclust", k)] <- kmd.res$cluster
   
@@ -399,7 +400,7 @@ for (k in 2:5) {
 ### Все некоррелированные переменные
 
 ```{r}
-for (k in 2:5) {
+for (k in 2:n_clusters) {
   kmd.res <- pam(df.not_corr, k)
   df[, paste0("notcorr_kmdclust", k)] <- kmd.res$cluster
   
@@ -419,7 +420,7 @@ for (k in 2:5) {
 ### Время, расстояние, точность
 
 ```{r}
-for (k in 2:5) {
+for (k in 2:n_clusters) {
   kmd.res <- pam(df.tdm, k)
   df[, paste0("tdm_kmdclust", k)] <- kmd.res$cluster
   
@@ -438,7 +439,7 @@ for (k in 2:5) {
 ### Паузы
 
 ```{r}
-for (k in 2:5) {
+for (k in 2:n_clusters) {
   kmd.res <- pam(df.pauses, k)
   df[, paste0("pauses_kmdclust", k)] <- kmd.res$cluster
   
@@ -456,7 +457,7 @@ for (k in 2:5) {
 
 ### Время, расстояние, точность и паузы
 ```{r}
-for (k in 2:5) {
+for (k in 2:n_clusters) {
   kmd.res <- pam(df.tdmp, k)
   df[, paste0("tdmp_kmdclust", k)] <- kmd.res$cluster
   

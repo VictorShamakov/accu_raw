@@ -14,7 +14,7 @@ def get_template(filepath):
 
 
 def render_and_save_pages(template, data_dictionary, dataset, file_name, cluster_name, number):
-    for n in range(2, 6):
+    for n in range(2, 8):
         rendered_page = template.render(data_dictionary=data_dictionary, group=cluster_name + str(n), dataset=dataset, filename=f"{number}.{n - 1}_{file_name}_{cluster_name}{n}")
         filename = f"./{number}.{n - 1}_{file_name}_{cluster_name}{n}.Rmd"
         with open(filename, 'w', encoding="utf8") as file:
