@@ -1,18 +1,52 @@
 
 ```{r}
+rm(list=ls())
+
 # sd1 <- read.csv("./reports/Кластеризация 1/sign_differences.csv")
 sd <- read.csv("./reports/sign_differences.csv")
 ```
 
 
 ```{r}
+sd.diff <- sd[order(sd$feature, sd$diff, decreasing = T), ]
+sd.diff
+
+
+sd.diff[!duplicated(sd.diff$feature),]
+
+```
+
+
+```{r}
 sort(table(sd$feature), decreasing = T)
 
-sd[order(sd$p), ]
+
 sd[sd$feature == "bfst_neuroticism",]
 
 length(sd[grep("hclust", sd$analysis), ]$feature)
 length(sd[grep("kmclust", sd$analysis), ]$feature)
 length(sd[grep("kmdclust", sd$analysis), ]$feature)
+```
+
+```{r}
+hclust <- sd[grep("hclust", sd$analysis), ]
+kmclust <- sd[grep("kmclust", sd$analysis), ]
+kmdclust <- sd[grep("kmdclust", sd$analysis), ]
+
+hclust.all <- hclust[grep("all", hclust$analysis), ]
+hclust.all <- hclust.all[order(hclust.all$analysis), ]
+hclust.notcorr <- hclust[grep("notcorr", hclust$analysis), ]
+hclust.notcorr <- hclust.notcorr[order(hclust.notcorr$analysis), ]
+hclust.tdm <- hclust[grep("tdm", hclust$analysis), ]
+hclust.tdm <- hclust.tdm[order(hclust.tdm$analysis), ]
+hclust.pauses <- hclust[grep("pauses", hclust$analysis), ]
+hclust.pauses <- hclust.pauses[order(hclust.pauses$analysis), ]
+hclust.tdmp <- hclust[grep("tdmp", hclust$analysis), ]
+hclust.tdmp <- hclust.tdmp[order(hclust.tdmp$analysis), ]
+```
+
+```{r}
+hclust.all[grep("clust2", hclust.all$analysis), ]
+hclust.notcorr[grep("clust2", hclust.notcorr$analysis), ]
 ```
 

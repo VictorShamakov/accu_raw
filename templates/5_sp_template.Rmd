@@ -11,6 +11,7 @@ output:
     toc_depth: 4
     toc_float:
       collapsed: no
+    self_contained: no
   word_document:
     toc: yes
     toc_depth: '4'
@@ -76,7 +77,8 @@ ggplot(df, aes({{group}}, fill={{group}})) + geom_bar()
 #### Descriptive stat by {{group}}
 ```{r}
 desc_by_group <- describeBy(df${{feature.short_name}}, df${{group}}, mat = T)
-desc_by_group[order(desc_by_group$mean, decreasing = T),]
+desc_by_group <- desc_by_group[order(desc_by_group$mean, decreasing = T),]
+desc_by_group
 ```
 
 ```{r fig.width=7, fig.height=4, results='asis'}
@@ -176,6 +178,7 @@ wilcox_test_results <- pairwise.wilcox.test(df.test${{feature.short_name}}, df.t
 if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
   sign_differences[["feature"]] <- c(sign_differences[["feature"]], "{{feature.short_name}}")
   sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
+  sign_differences[["diff"]] <- c(sign_differences[["diff"]], desc_by_group$mean[1] - desc_by_group$mean[nrow(desc_by_group)])
   cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('{{feature.short_name}}', 'highlight');});</script>")
 }
 ```

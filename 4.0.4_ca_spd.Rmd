@@ -68,10 +68,6 @@ df <- df.spd
 ## Иерархический кластерный анализ
 
 ```{r}
-
-```
-
-```{r}
 vars_class <- lapply(df, class)
 df.num <- df[, vars_class == "numeric" | vars_class == "integer"]
 df.num <- select(df.num, -user_id, -test_id, -ratio, -clicked_through_targets, -combo_clicked_through_targets)
@@ -237,6 +233,25 @@ for (k in 2:5) {
 }
 ```
 
+
+### Время, расстояние, точность и паузы
+```{r}
+df.tdmp <- scale(select(df.num, time_total, distance_total, missings_distance, starts_with("pause")))
+dist <- dist(df.tdmp)
+hc <- hclust(dist, method = "ward.D2")
+
+for (k in 2:5) {
+  plot(hc, cex = 0.3, hang = -1)
+  rect.hclust(hc, k = k, border = 2:10)
+  
+  df[, paste0("tdmp_hclust", k)] <- cutree(hc, k = k)
+  
+  sil <- silhouette(cutree(hc, k = k), dist)
+  print(fviz_silhouette(sil))
+}
+```
+
+
 ### Все кластеры
 ```{r}
 df[, grep("hclust", names(df))]
@@ -270,12 +285,8 @@ ggplot(elbow_df, aes(x = k, y = wss)) +
 
 ### Все переменные
 ```{r}
-
-km_results <- list()
-
 for (k in 2:5) {
   km.res <- kmeans(df.num.scaled, k, nstart = 25)
-  km_results[[paste0("km.res", k)]] <- km.res
   df[, paste0("all_kmclust", k)] <- km.res$cluster
   
   sil <- silhouette(km.res$cluster, dist(df.num.scaled))
@@ -295,12 +306,8 @@ for (k in 2:5) {
 ### Все некоррелированные переменные
 
 ```{r}
-
-km_results <- list()
-
 for (k in 2:5) {
   km.res <- kmeans(df.not_corr, k, nstart = 25)
-  km_results[[paste0("km.res", k)]] <- km.res
   df[, paste0("notcorr_kmclust", k)] <- km.res$cluster
   
   sil <- silhouette(km.res$cluster, dist(df.not_corr))
@@ -319,12 +326,8 @@ for (k in 2:5) {
 ### Время, расстояние, точность
 
 ```{r}
-
-km_results <- list()
-
 for (k in 2:5) {
   km.res <- kmeans(df.tdm, k, nstart = 25)
-  km_results[[paste0("km.res", k)]] <- km.res
   df[, paste0("tdm_kmclust", k)] <- km.res$cluster
   
   sil <- silhouette(km.res$cluster, dist(df.tdm))
@@ -336,18 +339,13 @@ for (k in 2:5) {
                geom = c("point")
                ))
 }
-
 ```
 
 ### Паузы
 
 ```{r}
-
-km_results <- list()
-
 for (k in 2:5) {
   km.res <- kmeans(df.pauses, k, nstart = 25)
-  km_results[[paste0("km.res", k)]] <- km.res
   df[, paste0("pauses_kmclust", k)] <- km.res$cluster
   
   sil <- silhouette(km.res$cluster, dist(df.pauses))
@@ -362,11 +360,27 @@ for (k in 2:5) {
 ```
 
 
+### Время, расстояние, точность и паузы
+```{r}
+for (k in 2:5) {
+  km.res <- kmeans(df.tdmp, k, nstart = 25)
+  df[, paste0("tdmp_kmclust", k)] <- km.res$cluster
+  
+  sil <- silhouette(km.res$cluster, dist(df.tdmp))
+  print(fviz_silhouette(sil))
+  
+  print(fviz_cluster(km.res, data = na.omit(df.tdmp),
+               ggtheme = theme_minimal(),
+               main = "Partitioning Clustering Plot",
+               geom = c("point")
+               ))
+}
+```
+
+
 ## K-medoids
 ### Все переменные
 ```{r}
-
-
 for (k in 2:5) {
   kmd.res <- pam(df.num.scaled, k = k)
   df[, paste0("all_kmdclust", k)] <- kmd.res$cluster
@@ -380,15 +394,11 @@ for (k in 2:5) {
                geom = c("point")
                ))
 }
-
-
 ```
 
 ### Все некоррелированные переменные
 
 ```{r}
-
-
 for (k in 2:5) {
   kmd.res <- pam(df.not_corr, k)
   df[, paste0("notcorr_kmdclust", k)] <- kmd.res$cluster
@@ -409,8 +419,6 @@ for (k in 2:5) {
 ### Время, расстояние, точность
 
 ```{r}
-
-
 for (k in 2:5) {
   kmd.res <- pam(df.tdm, k)
   df[, paste0("tdm_kmdclust", k)] <- kmd.res$cluster
@@ -430,8 +438,6 @@ for (k in 2:5) {
 ### Паузы
 
 ```{r}
-
-
 for (k in 2:5) {
   kmd.res <- pam(df.pauses, k)
   df[, paste0("pauses_kmdclust", k)] <- kmd.res$cluster
@@ -447,6 +453,24 @@ for (k in 2:5) {
 }
 ```
 
+
+### Время, расстояние, точность и паузы
+```{r}
+for (k in 2:5) {
+  kmd.res <- pam(df.tdmp, k)
+  df[, paste0("tdmp_kmdclust", k)] <- kmd.res$cluster
+  
+  sil <- silhouette(kmd.res$cluster, dist(df.tdmp))
+  print(fviz_silhouette(sil))
+  
+  print(fviz_cluster(kmd.res, data = na.omit(df.tdmp),
+               ggtheme = theme_minimal(),
+               main = "Partitioning Clustering Plot",
+               geom = c("point")
+               ))
+}
+
+```
 
 
 
