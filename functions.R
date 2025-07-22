@@ -49,6 +49,7 @@ ggplot <- function(...) ggplot2::ggplot(...)
 create_tabs <- function(list, names=NULL) {
   if (is.null(names)) {
     for (p in list) {
+      cat("\n\n")
       cat("####", p$labels$tabname, "\n\n")
       print(p)
       cat("\n\n")
@@ -205,7 +206,7 @@ draw_plots_ordinal <- function(data, var, group = NULL, group_lab = NULL, x_lab 
 
 
 
-draw_plots_continuous <- function(data, var, x_lab = NULL, title = NULL, legend_title = NULL, filename = NULL, binwidth = NULL, bins = NULL, alpha = 0.5, angle = 0) {
+draw_plots_continuous <- function(data, var, x_lab = NULL, title = NULL, legend_title = NULL, filename = NULL, binwidth = NULL, bins = NULL, alpha = 0.5, angle = 0, tabname = NULL) {
   
   if (!is.null(title)) {
     filename <- title
@@ -213,17 +214,17 @@ draw_plots_continuous <- function(data, var, x_lab = NULL, title = NULL, legend_
   
   p1 <- ggplot(data, aes({{var}})) + 
     geom_histogram(binwidth = binwidth, bins = bins, fill = main_color, alpha = alpha) + 
-    labs(title = ifelse(!is.null(title), title, ""), filename = paste0(filename, ", Histogram"), x = x_lab, y = "Частота", tabname = "Histogram") + 
+    labs(title = ifelse(!is.null(title), title, ""), filename = paste0(filename, ", Histogram"), x = x_lab, y = "Частота", tabname = paste0(tabname, "Histogram")) + 
     theme(axis.text.x = element_text(angle = angle))
   
   p2 <- ggplot(data, aes({{var}})) + 
     geom_density(fill = main_color, alpha = alpha) + 
-    labs(title = ifelse(!is.null(title), title, ""), filename = paste0(filename, ", Density"), x = x_lab, y = "Плотность", tabname = "Density") + 
+    labs(title = ifelse(!is.null(title), title, ""), filename = paste0(filename, ", Density"), x = x_lab, y = "Плотность", tabname = paste0(tabname, "Density")) + 
     theme(axis.text.x = element_text(angle = angle))
   
   p3 <- ggplot(data, aes({{var}})) + 
     geom_boxplot(fill = main_color, alpha = alpha) + 
-    labs(title = ifelse(!is.null(title), title, ""), filename = paste0(filename, ", Boxplot"), x = x_lab, tabname = "Boxplot") + 
+    labs(title = ifelse(!is.null(title), title, ""), filename = paste0(filename, ", Boxplot"), x = x_lab, tabname = paste0(tabname, "Boxplot")) + 
     coord_flip() + 
     theme(axis.text.x = element_text(angle = angle))
 

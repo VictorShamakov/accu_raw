@@ -6,11 +6,12 @@ output:
   html_document:
     css: "styles.css"
     code_folding: hide
-    df_print: paged
+    self_contained: no
     toc: yes
     toc_depth: 4
     toc_float:
       collapsed: no
+    df_print: paged
   word_document:
     toc: yes
     toc_depth: '4'
@@ -258,6 +259,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$time_total <= 0, na.rm = T) > 0) {
+  df.acc$time_total_log <- log1p(df.acc$time_total)
+} else {
+  df.acc$time_total_log <- log(df.acc$time_total)
+}
+
+plot_title <- "time_total_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_total_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$time_total);print(st)
@@ -300,6 +316,21 @@ data.frame(describe(df.acc$velocity_mean, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "velocity_mean"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_mean, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$velocity_mean <= 0, na.rm = T) > 0) {
+  df.acc$velocity_mean_log <- log1p(df.acc$velocity_mean)
+} else {
+  df.acc$velocity_mean_log <- log(df.acc$velocity_mean)
+}
+
+plot_title <- "velocity_mean_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_mean_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -352,6 +383,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$missings_distance <= 0, na.rm = T) > 0) {
+  df.acc$missings_distance_log <- log1p(df.acc$missings_distance)
+} else {
+  df.acc$missings_distance_log <- log(df.acc$missings_distance)
+}
+
+plot_title <- "missings_distance_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_distance_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$missings_distance);print(st)
@@ -399,6 +445,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$distance_total <= 0, na.rm = T) > 0) {
+  df.acc$distance_total_log <- log1p(df.acc$distance_total)
+} else {
+  df.acc$distance_total_log <- log(df.acc$distance_total)
+}
+
+plot_title <- "distance_total_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_total_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$distance_total);print(st)
@@ -441,6 +502,21 @@ data.frame(describe(df.acc$pause_total, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "pause_total"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_total, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$pause_total <= 0, na.rm = T) > 0) {
+  df.acc$pause_total_log <- log1p(df.acc$pause_total)
+} else {
+  df.acc$pause_total_log <- log(df.acc$pause_total)
+}
+
+plot_title <- "pause_total_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_total_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -493,6 +569,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$time_total <= 0, na.rm = T) > 0) {
+  df.acc$time_total_log <- log1p(df.acc$time_total)
+} else {
+  df.acc$time_total_log <- log(df.acc$time_total)
+}
+
+plot_title <- "time_total_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_total_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$time_total);print(st)
@@ -535,6 +626,21 @@ data.frame(describe(df.acc$time_mean, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "time_mean"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_mean, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$time_mean <= 0, na.rm = T) > 0) {
+  df.acc$time_mean_log <- log1p(df.acc$time_mean)
+} else {
+  df.acc$time_mean_log <- log(df.acc$time_mean)
+}
+
+plot_title <- "time_mean_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_mean_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -587,6 +693,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$time_sd <= 0, na.rm = T) > 0) {
+  df.acc$time_sd_log <- log1p(df.acc$time_sd)
+} else {
+  df.acc$time_sd_log <- log(df.acc$time_sd)
+}
+
+plot_title <- "time_sd_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_sd_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$time_sd);print(st)
@@ -629,6 +750,21 @@ data.frame(describe(df.acc$time_median, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "time_median"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_median, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$time_median <= 0, na.rm = T) > 0) {
+  df.acc$time_median_log <- log1p(df.acc$time_median)
+} else {
+  df.acc$time_median_log <- log(df.acc$time_median)
+}
+
+plot_title <- "time_median_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_median_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -681,6 +817,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$time_trimmed <= 0, na.rm = T) > 0) {
+  df.acc$time_trimmed_log <- log1p(df.acc$time_trimmed)
+} else {
+  df.acc$time_trimmed_log <- log(df.acc$time_trimmed)
+}
+
+plot_title <- "time_trimmed_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_trimmed_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$time_trimmed);print(st)
@@ -723,6 +874,21 @@ data.frame(describe(df.acc$time_mad, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "time_mad"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_mad, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$time_mad <= 0, na.rm = T) > 0) {
+  df.acc$time_mad_log <- log1p(df.acc$time_mad)
+} else {
+  df.acc$time_mad_log <- log(df.acc$time_mad)
+}
+
+plot_title <- "time_mad_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_mad_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -775,6 +941,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$time_min <= 0, na.rm = T) > 0) {
+  df.acc$time_min_log <- log1p(df.acc$time_min)
+} else {
+  df.acc$time_min_log <- log(df.acc$time_min)
+}
+
+plot_title <- "time_min_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_min_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$time_min);print(st)
@@ -817,6 +998,21 @@ data.frame(describe(df.acc$time_max, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "time_max"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_max, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$time_max <= 0, na.rm = T) > 0) {
+  df.acc$time_max_log <- log1p(df.acc$time_max)
+} else {
+  df.acc$time_max_log <- log(df.acc$time_max)
+}
+
+plot_title <- "time_max_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_max_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -869,6 +1065,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$time_range <= 0, na.rm = T) > 0) {
+  df.acc$time_range_log <- log1p(df.acc$time_range)
+} else {
+  df.acc$time_range_log <- log(df.acc$time_range)
+}
+
+plot_title <- "time_range_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_range_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$time_range);print(st)
@@ -911,6 +1122,21 @@ data.frame(describe(df.acc$time_skew, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "time_skew"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_skew, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$time_skew <= 0, na.rm = T) > 0) {
+  df.acc$time_skew_log <- log1p(df.acc$time_skew)
+} else {
+  df.acc$time_skew_log <- log(df.acc$time_skew)
+}
+
+plot_title <- "time_skew_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_skew_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -963,6 +1189,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$time_kurtosis <= 0, na.rm = T) > 0) {
+  df.acc$time_kurtosis_log <- log1p(df.acc$time_kurtosis)
+} else {
+  df.acc$time_kurtosis_log <- log(df.acc$time_kurtosis)
+}
+
+plot_title <- "time_kurtosis_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_kurtosis_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$time_kurtosis);print(st)
@@ -1005,6 +1246,21 @@ data.frame(describe(df.acc$time_se, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "time_se"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_se, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$time_se <= 0, na.rm = T) > 0) {
+  df.acc$time_se_log <- log1p(df.acc$time_se)
+} else {
+  df.acc$time_se_log <- log(df.acc$time_se)
+}
+
+plot_title <- "time_se_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_se_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -1057,6 +1313,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$time_q0.25 <= 0, na.rm = T) > 0) {
+  df.acc$time_q0.25_log <- log1p(df.acc$time_q0.25)
+} else {
+  df.acc$time_q0.25_log <- log(df.acc$time_q0.25)
+}
+
+plot_title <- "time_q0.25_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_q0.25_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$time_q0.25);print(st)
@@ -1099,6 +1370,21 @@ data.frame(describe(df.acc$time_q0.75, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "time_q0.75"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$time_q0.75 <= 0, na.rm = T) > 0) {
+  df.acc$time_q0.75_log <- log1p(df.acc$time_q0.75)
+} else {
+  df.acc$time_q0.75_log <- log(df.acc$time_q0.75)
+}
+
+plot_title <- "time_q0.75_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_q0.75_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -1151,6 +1437,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$time_trend <= 0, na.rm = T) > 0) {
+  df.acc$time_trend_log <- log1p(df.acc$time_trend)
+} else {
+  df.acc$time_trend_log <- log(df.acc$time_trend)
+}
+
+plot_title <- "time_trend_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$time_trend_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$time_trend);print(st)
@@ -1193,6 +1494,21 @@ data.frame(describe(df.acc$fitts_a, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "fitts_a"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$fitts_a, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$fitts_a <= 0, na.rm = T) > 0) {
+  df.acc$fitts_a_log <- log1p(df.acc$fitts_a)
+} else {
+  df.acc$fitts_a_log <- log(df.acc$fitts_a)
+}
+
+plot_title <- "fitts_a_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$fitts_a_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -1245,6 +1561,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$fitts_b <= 0, na.rm = T) > 0) {
+  df.acc$fitts_b_log <- log1p(df.acc$fitts_b)
+} else {
+  df.acc$fitts_b_log <- log(df.acc$fitts_b)
+}
+
+plot_title <- "fitts_b_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$fitts_b_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$fitts_b);print(st)
@@ -1287,6 +1618,21 @@ data.frame(describe(df.acc$distance_total, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "distance_total"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_total, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$distance_total <= 0, na.rm = T) > 0) {
+  df.acc$distance_total_log <- log1p(df.acc$distance_total)
+} else {
+  df.acc$distance_total_log <- log(df.acc$distance_total)
+}
+
+plot_title <- "distance_total_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_total_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -1339,6 +1685,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$distance_mean <= 0, na.rm = T) > 0) {
+  df.acc$distance_mean_log <- log1p(df.acc$distance_mean)
+} else {
+  df.acc$distance_mean_log <- log(df.acc$distance_mean)
+}
+
+plot_title <- "distance_mean_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_mean_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$distance_mean);print(st)
@@ -1381,6 +1742,21 @@ data.frame(describe(df.acc$distance_sd, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "distance_sd"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_sd, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$distance_sd <= 0, na.rm = T) > 0) {
+  df.acc$distance_sd_log <- log1p(df.acc$distance_sd)
+} else {
+  df.acc$distance_sd_log <- log(df.acc$distance_sd)
+}
+
+plot_title <- "distance_sd_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_sd_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -1433,6 +1809,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$distance_median <= 0, na.rm = T) > 0) {
+  df.acc$distance_median_log <- log1p(df.acc$distance_median)
+} else {
+  df.acc$distance_median_log <- log(df.acc$distance_median)
+}
+
+plot_title <- "distance_median_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_median_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$distance_median);print(st)
@@ -1475,6 +1866,21 @@ data.frame(describe(df.acc$distance_trimmed, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "distance_trimmed"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_trimmed, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$distance_trimmed <= 0, na.rm = T) > 0) {
+  df.acc$distance_trimmed_log <- log1p(df.acc$distance_trimmed)
+} else {
+  df.acc$distance_trimmed_log <- log(df.acc$distance_trimmed)
+}
+
+plot_title <- "distance_trimmed_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_trimmed_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -1527,6 +1933,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$distance_mad <= 0, na.rm = T) > 0) {
+  df.acc$distance_mad_log <- log1p(df.acc$distance_mad)
+} else {
+  df.acc$distance_mad_log <- log(df.acc$distance_mad)
+}
+
+plot_title <- "distance_mad_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_mad_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$distance_mad);print(st)
@@ -1569,6 +1990,21 @@ data.frame(describe(df.acc$distance_min, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "distance_min"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_min, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$distance_min <= 0, na.rm = T) > 0) {
+  df.acc$distance_min_log <- log1p(df.acc$distance_min)
+} else {
+  df.acc$distance_min_log <- log(df.acc$distance_min)
+}
+
+plot_title <- "distance_min_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_min_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -1621,6 +2057,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$distance_max <= 0, na.rm = T) > 0) {
+  df.acc$distance_max_log <- log1p(df.acc$distance_max)
+} else {
+  df.acc$distance_max_log <- log(df.acc$distance_max)
+}
+
+plot_title <- "distance_max_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_max_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$distance_max);print(st)
@@ -1663,6 +2114,21 @@ data.frame(describe(df.acc$distance_range, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "distance_range"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_range, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$distance_range <= 0, na.rm = T) > 0) {
+  df.acc$distance_range_log <- log1p(df.acc$distance_range)
+} else {
+  df.acc$distance_range_log <- log(df.acc$distance_range)
+}
+
+plot_title <- "distance_range_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_range_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -1715,6 +2181,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$distance_skew <= 0, na.rm = T) > 0) {
+  df.acc$distance_skew_log <- log1p(df.acc$distance_skew)
+} else {
+  df.acc$distance_skew_log <- log(df.acc$distance_skew)
+}
+
+plot_title <- "distance_skew_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_skew_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$distance_skew);print(st)
@@ -1757,6 +2238,21 @@ data.frame(describe(df.acc$distance_kurtosis, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "distance_kurtosis"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_kurtosis, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$distance_kurtosis <= 0, na.rm = T) > 0) {
+  df.acc$distance_kurtosis_log <- log1p(df.acc$distance_kurtosis)
+} else {
+  df.acc$distance_kurtosis_log <- log(df.acc$distance_kurtosis)
+}
+
+plot_title <- "distance_kurtosis_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_kurtosis_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -1809,6 +2305,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$distance_se <= 0, na.rm = T) > 0) {
+  df.acc$distance_se_log <- log1p(df.acc$distance_se)
+} else {
+  df.acc$distance_se_log <- log(df.acc$distance_se)
+}
+
+plot_title <- "distance_se_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_se_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$distance_se);print(st)
@@ -1851,6 +2362,21 @@ data.frame(describe(df.acc$distance_q0.25, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "distance_q0.25"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$distance_q0.25 <= 0, na.rm = T) > 0) {
+  df.acc$distance_q0.25_log <- log1p(df.acc$distance_q0.25)
+} else {
+  df.acc$distance_q0.25_log <- log(df.acc$distance_q0.25)
+}
+
+plot_title <- "distance_q0.25_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_q0.25_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -1903,6 +2429,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$distance_q0.75 <= 0, na.rm = T) > 0) {
+  df.acc$distance_q0.75_log <- log1p(df.acc$distance_q0.75)
+} else {
+  df.acc$distance_q0.75_log <- log(df.acc$distance_q0.75)
+}
+
+plot_title <- "distance_q0.75_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_q0.75_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$distance_q0.75);print(st)
@@ -1945,6 +2486,21 @@ data.frame(describe(df.acc$distance_trend, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "distance_trend"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_trend, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$distance_trend <= 0, na.rm = T) > 0) {
+  df.acc$distance_trend_log <- log1p(df.acc$distance_trend)
+} else {
+  df.acc$distance_trend_log <- log(df.acc$distance_trend)
+}
+
+plot_title <- "distance_trend_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$distance_trend_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -1997,6 +2553,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$pause_total <= 0, na.rm = T) > 0) {
+  df.acc$pause_total_log <- log1p(df.acc$pause_total)
+} else {
+  df.acc$pause_total_log <- log(df.acc$pause_total)
+}
+
+plot_title <- "pause_total_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_total_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$pause_total);print(st)
@@ -2039,6 +2610,21 @@ data.frame(describe(df.acc$pause_number, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "pause_number"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_number, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$pause_number <= 0, na.rm = T) > 0) {
+  df.acc$pause_number_log <- log1p(df.acc$pause_number)
+} else {
+  df.acc$pause_number_log <- log(df.acc$pause_number)
+}
+
+plot_title <- "pause_number_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_number_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -2091,6 +2677,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$pause_mean <= 0, na.rm = T) > 0) {
+  df.acc$pause_mean_log <- log1p(df.acc$pause_mean)
+} else {
+  df.acc$pause_mean_log <- log(df.acc$pause_mean)
+}
+
+plot_title <- "pause_mean_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_mean_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$pause_mean);print(st)
@@ -2133,6 +2734,21 @@ data.frame(describe(df.acc$pause_sd, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "pause_sd"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_sd, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$pause_sd <= 0, na.rm = T) > 0) {
+  df.acc$pause_sd_log <- log1p(df.acc$pause_sd)
+} else {
+  df.acc$pause_sd_log <- log(df.acc$pause_sd)
+}
+
+plot_title <- "pause_sd_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_sd_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -2185,6 +2801,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$pause_median <= 0, na.rm = T) > 0) {
+  df.acc$pause_median_log <- log1p(df.acc$pause_median)
+} else {
+  df.acc$pause_median_log <- log(df.acc$pause_median)
+}
+
+plot_title <- "pause_median_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_median_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$pause_median);print(st)
@@ -2227,6 +2858,21 @@ data.frame(describe(df.acc$pause_trimmed, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "pause_trimmed"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_trimmed, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$pause_trimmed <= 0, na.rm = T) > 0) {
+  df.acc$pause_trimmed_log <- log1p(df.acc$pause_trimmed)
+} else {
+  df.acc$pause_trimmed_log <- log(df.acc$pause_trimmed)
+}
+
+plot_title <- "pause_trimmed_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_trimmed_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -2279,6 +2925,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$pause_mad <= 0, na.rm = T) > 0) {
+  df.acc$pause_mad_log <- log1p(df.acc$pause_mad)
+} else {
+  df.acc$pause_mad_log <- log(df.acc$pause_mad)
+}
+
+plot_title <- "pause_mad_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_mad_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$pause_mad);print(st)
@@ -2321,6 +2982,21 @@ data.frame(describe(df.acc$pause_min, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "pause_min"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_min, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$pause_min <= 0, na.rm = T) > 0) {
+  df.acc$pause_min_log <- log1p(df.acc$pause_min)
+} else {
+  df.acc$pause_min_log <- log(df.acc$pause_min)
+}
+
+plot_title <- "pause_min_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_min_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -2373,6 +3049,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$pause_max <= 0, na.rm = T) > 0) {
+  df.acc$pause_max_log <- log1p(df.acc$pause_max)
+} else {
+  df.acc$pause_max_log <- log(df.acc$pause_max)
+}
+
+plot_title <- "pause_max_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_max_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$pause_max);print(st)
@@ -2415,6 +3106,21 @@ data.frame(describe(df.acc$pause_range, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "pause_range"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_range, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$pause_range <= 0, na.rm = T) > 0) {
+  df.acc$pause_range_log <- log1p(df.acc$pause_range)
+} else {
+  df.acc$pause_range_log <- log(df.acc$pause_range)
+}
+
+plot_title <- "pause_range_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_range_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -2467,6 +3173,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$pause_skew <= 0, na.rm = T) > 0) {
+  df.acc$pause_skew_log <- log1p(df.acc$pause_skew)
+} else {
+  df.acc$pause_skew_log <- log(df.acc$pause_skew)
+}
+
+plot_title <- "pause_skew_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_skew_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$pause_skew);print(st)
@@ -2509,6 +3230,21 @@ data.frame(describe(df.acc$pause_kurtosis, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "pause_kurtosis"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_kurtosis, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$pause_kurtosis <= 0, na.rm = T) > 0) {
+  df.acc$pause_kurtosis_log <- log1p(df.acc$pause_kurtosis)
+} else {
+  df.acc$pause_kurtosis_log <- log(df.acc$pause_kurtosis)
+}
+
+plot_title <- "pause_kurtosis_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_kurtosis_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -2561,6 +3297,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$pause_se <= 0, na.rm = T) > 0) {
+  df.acc$pause_se_log <- log1p(df.acc$pause_se)
+} else {
+  df.acc$pause_se_log <- log(df.acc$pause_se)
+}
+
+plot_title <- "pause_se_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_se_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$pause_se);print(st)
@@ -2603,6 +3354,21 @@ data.frame(describe(df.acc$pause_q0.25, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "pause_q0.25"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$pause_q0.25 <= 0, na.rm = T) > 0) {
+  df.acc$pause_q0.25_log <- log1p(df.acc$pause_q0.25)
+} else {
+  df.acc$pause_q0.25_log <- log(df.acc$pause_q0.25)
+}
+
+plot_title <- "pause_q0.25_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_q0.25_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -2655,6 +3421,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$pause_q0.75 <= 0, na.rm = T) > 0) {
+  df.acc$pause_q0.75_log <- log1p(df.acc$pause_q0.75)
+} else {
+  df.acc$pause_q0.75_log <- log(df.acc$pause_q0.75)
+}
+
+plot_title <- "pause_q0.75_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_q0.75_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$pause_q0.75);print(st)
@@ -2697,6 +3478,21 @@ data.frame(describe(df.acc$pause_trend, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "pause_trend"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_trend, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$pause_trend <= 0, na.rm = T) > 0) {
+  df.acc$pause_trend_log <- log1p(df.acc$pause_trend)
+} else {
+  df.acc$pause_trend_log <- log(df.acc$pause_trend)
+}
+
+plot_title <- "pause_trend_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$pause_trend_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -2749,6 +3545,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$stops <= 0, na.rm = T) > 0) {
+  df.acc$stops_log <- log1p(df.acc$stops)
+} else {
+  df.acc$stops_log <- log(df.acc$stops)
+}
+
+plot_title <- "stops_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$stops_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$stops);print(st)
@@ -2791,6 +3602,21 @@ data.frame(describe(df.acc$velocity_mean, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "velocity_mean"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_mean, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$velocity_mean <= 0, na.rm = T) > 0) {
+  df.acc$velocity_mean_log <- log1p(df.acc$velocity_mean)
+} else {
+  df.acc$velocity_mean_log <- log(df.acc$velocity_mean)
+}
+
+plot_title <- "velocity_mean_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_mean_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -2843,6 +3669,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$velocity_sd <= 0, na.rm = T) > 0) {
+  df.acc$velocity_sd_log <- log1p(df.acc$velocity_sd)
+} else {
+  df.acc$velocity_sd_log <- log(df.acc$velocity_sd)
+}
+
+plot_title <- "velocity_sd_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_sd_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$velocity_sd);print(st)
@@ -2885,6 +3726,21 @@ data.frame(describe(df.acc$velocity_mad, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "velocity_mad"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_mad, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$velocity_mad <= 0, na.rm = T) > 0) {
+  df.acc$velocity_mad_log <- log1p(df.acc$velocity_mad)
+} else {
+  df.acc$velocity_mad_log <- log(df.acc$velocity_mad)
+}
+
+plot_title <- "velocity_mad_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_mad_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -2937,6 +3793,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$velocity_min <= 0, na.rm = T) > 0) {
+  df.acc$velocity_min_log <- log1p(df.acc$velocity_min)
+} else {
+  df.acc$velocity_min_log <- log(df.acc$velocity_min)
+}
+
+plot_title <- "velocity_min_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_min_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$velocity_min);print(st)
@@ -2979,6 +3850,21 @@ data.frame(describe(df.acc$velocity_max, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "velocity_max"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_max, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$velocity_max <= 0, na.rm = T) > 0) {
+  df.acc$velocity_max_log <- log1p(df.acc$velocity_max)
+} else {
+  df.acc$velocity_max_log <- log(df.acc$velocity_max)
+}
+
+plot_title <- "velocity_max_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_max_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -3031,6 +3917,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$velocity_range <= 0, na.rm = T) > 0) {
+  df.acc$velocity_range_log <- log1p(df.acc$velocity_range)
+} else {
+  df.acc$velocity_range_log <- log(df.acc$velocity_range)
+}
+
+plot_title <- "velocity_range_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_range_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$velocity_range);print(st)
@@ -3073,6 +3974,21 @@ data.frame(describe(df.acc$velocity_skew, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "velocity_skew"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_skew, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$velocity_skew <= 0, na.rm = T) > 0) {
+  df.acc$velocity_skew_log <- log1p(df.acc$velocity_skew)
+} else {
+  df.acc$velocity_skew_log <- log(df.acc$velocity_skew)
+}
+
+plot_title <- "velocity_skew_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_skew_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -3125,6 +4041,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$velocity_kurtosis <= 0, na.rm = T) > 0) {
+  df.acc$velocity_kurtosis_log <- log1p(df.acc$velocity_kurtosis)
+} else {
+  df.acc$velocity_kurtosis_log <- log(df.acc$velocity_kurtosis)
+}
+
+plot_title <- "velocity_kurtosis_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_kurtosis_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$velocity_kurtosis);print(st)
@@ -3167,6 +4098,21 @@ data.frame(describe(df.acc$velocity_se, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "velocity_se"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_se, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$velocity_se <= 0, na.rm = T) > 0) {
+  df.acc$velocity_se_log <- log1p(df.acc$velocity_se)
+} else {
+  df.acc$velocity_se_log <- log(df.acc$velocity_se)
+}
+
+plot_title <- "velocity_se_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_se_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -3219,6 +4165,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$velocity_q0.25 <= 0, na.rm = T) > 0) {
+  df.acc$velocity_q0.25_log <- log1p(df.acc$velocity_q0.25)
+} else {
+  df.acc$velocity_q0.25_log <- log(df.acc$velocity_q0.25)
+}
+
+plot_title <- "velocity_q0.25_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_q0.25_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$velocity_q0.25);print(st)
@@ -3261,6 +4222,21 @@ data.frame(describe(df.acc$velocity_q0.75, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "velocity_q0.75"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$velocity_q0.75 <= 0, na.rm = T) > 0) {
+  df.acc$velocity_q0.75_log <- log1p(df.acc$velocity_q0.75)
+} else {
+  df.acc$velocity_q0.75_log <- log(df.acc$velocity_q0.75)
+}
+
+plot_title <- "velocity_q0.75_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_q0.75_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -3313,6 +4289,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$velocity_trend <= 0, na.rm = T) > 0) {
+  df.acc$velocity_trend_log <- log1p(df.acc$velocity_trend)
+} else {
+  df.acc$velocity_trend_log <- log(df.acc$velocity_trend)
+}
+
+plot_title <- "velocity_trend_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$velocity_trend_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$velocity_trend);print(st)
@@ -3355,6 +4346,21 @@ data.frame(describe(df.acc$acc_n, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "acc_n"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_n, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_n <= 0, na.rm = T) > 0) {
+  df.acc$acc_n_log <- log1p(df.acc$acc_n)
+} else {
+  df.acc$acc_n_log <- log(df.acc$acc_n)
+}
+
+plot_title <- "acc_n_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_n_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -3412,6 +4418,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_sd <= 0, na.rm = T) > 0) {
+  df.acc$acc_sd_log <- log1p(df.acc$acc_sd)
+} else {
+  df.acc$acc_sd_log <- log(df.acc$acc_sd)
+}
+
+plot_title <- "acc_sd_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_sd_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$acc_sd);print(st)
@@ -3454,6 +4475,21 @@ data.frame(describe(df.acc$acc_median, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "acc_median"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_median, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_median <= 0, na.rm = T) > 0) {
+  df.acc$acc_median_log <- log1p(df.acc$acc_median)
+} else {
+  df.acc$acc_median_log <- log(df.acc$acc_median)
+}
+
+plot_title <- "acc_median_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_median_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -3506,6 +4542,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_trimmed <= 0, na.rm = T) > 0) {
+  df.acc$acc_trimmed_log <- log1p(df.acc$acc_trimmed)
+} else {
+  df.acc$acc_trimmed_log <- log(df.acc$acc_trimmed)
+}
+
+plot_title <- "acc_trimmed_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_trimmed_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$acc_trimmed);print(st)
@@ -3548,6 +4599,21 @@ data.frame(describe(df.acc$acc_mad, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "acc_mad"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_mad, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_mad <= 0, na.rm = T) > 0) {
+  df.acc$acc_mad_log <- log1p(df.acc$acc_mad)
+} else {
+  df.acc$acc_mad_log <- log(df.acc$acc_mad)
+}
+
+plot_title <- "acc_mad_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_mad_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -3600,6 +4666,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_min <= 0, na.rm = T) > 0) {
+  df.acc$acc_min_log <- log1p(df.acc$acc_min)
+} else {
+  df.acc$acc_min_log <- log(df.acc$acc_min)
+}
+
+plot_title <- "acc_min_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_min_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$acc_min);print(st)
@@ -3642,6 +4723,21 @@ data.frame(describe(df.acc$acc_max, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "acc_max"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_max, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_max <= 0, na.rm = T) > 0) {
+  df.acc$acc_max_log <- log1p(df.acc$acc_max)
+} else {
+  df.acc$acc_max_log <- log(df.acc$acc_max)
+}
+
+plot_title <- "acc_max_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_max_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -3694,6 +4790,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_range <= 0, na.rm = T) > 0) {
+  df.acc$acc_range_log <- log1p(df.acc$acc_range)
+} else {
+  df.acc$acc_range_log <- log(df.acc$acc_range)
+}
+
+plot_title <- "acc_range_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_range_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$acc_range);print(st)
@@ -3736,6 +4847,21 @@ data.frame(describe(df.acc$acc_skew, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "acc_skew"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_skew, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_skew <= 0, na.rm = T) > 0) {
+  df.acc$acc_skew_log <- log1p(df.acc$acc_skew)
+} else {
+  df.acc$acc_skew_log <- log(df.acc$acc_skew)
+}
+
+plot_title <- "acc_skew_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_skew_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -3788,6 +4914,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_kurtosis <= 0, na.rm = T) > 0) {
+  df.acc$acc_kurtosis_log <- log1p(df.acc$acc_kurtosis)
+} else {
+  df.acc$acc_kurtosis_log <- log(df.acc$acc_kurtosis)
+}
+
+plot_title <- "acc_kurtosis_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_kurtosis_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$acc_kurtosis);print(st)
@@ -3830,6 +4971,21 @@ data.frame(describe(df.acc$acc_se, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "acc_se"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_se, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_se <= 0, na.rm = T) > 0) {
+  df.acc$acc_se_log <- log1p(df.acc$acc_se)
+} else {
+  df.acc$acc_se_log <- log(df.acc$acc_se)
+}
+
+plot_title <- "acc_se_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_se_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -3882,6 +5038,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_q0.25 <= 0, na.rm = T) > 0) {
+  df.acc$acc_q0.25_log <- log1p(df.acc$acc_q0.25)
+} else {
+  df.acc$acc_q0.25_log <- log(df.acc$acc_q0.25)
+}
+
+plot_title <- "acc_q0.25_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_q0.25_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$acc_q0.25);print(st)
@@ -3924,6 +5095,21 @@ data.frame(describe(df.acc$acc_q0.75, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "acc_q0.75"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_q0.75 <= 0, na.rm = T) > 0) {
+  df.acc$acc_q0.75_log <- log1p(df.acc$acc_q0.75)
+} else {
+  df.acc$acc_q0.75_log <- log(df.acc$acc_q0.75)
+}
+
+plot_title <- "acc_q0.75_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_q0.75_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -3976,6 +5162,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$jerk_line <= 0, na.rm = T) > 0) {
+  df.acc$jerk_line_log <- log1p(df.acc$jerk_line)
+} else {
+  df.acc$jerk_line_log <- log(df.acc$jerk_line)
+}
+
+plot_title <- "jerk_line_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$jerk_line_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$jerk_line);print(st)
@@ -4018,6 +5219,21 @@ data.frame(describe(df.acc$n_jerk, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "n_jerk"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$n_jerk, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$n_jerk <= 0, na.rm = T) > 0) {
+  df.acc$n_jerk_log <- log1p(df.acc$n_jerk)
+} else {
+  df.acc$n_jerk_log <- log(df.acc$n_jerk)
+}
+
+plot_title <- "n_jerk_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$n_jerk_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -4070,6 +5286,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$dec_n <= 0, na.rm = T) > 0) {
+  df.acc$dec_n_log <- log1p(df.acc$dec_n)
+} else {
+  df.acc$dec_n_log <- log(df.acc$dec_n)
+}
+
+plot_title <- "dec_n_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_n_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$dec_n);print(st)
@@ -4112,6 +5343,21 @@ data.frame(describe(df.acc$dec_mean, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "dec_mean"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_mean, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$dec_mean <= 0, na.rm = T) > 0) {
+  df.acc$dec_mean_log <- log1p(df.acc$dec_mean)
+} else {
+  df.acc$dec_mean_log <- log(df.acc$dec_mean)
+}
+
+plot_title <- "dec_mean_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_mean_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -4164,6 +5410,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$dec_sd <= 0, na.rm = T) > 0) {
+  df.acc$dec_sd_log <- log1p(df.acc$dec_sd)
+} else {
+  df.acc$dec_sd_log <- log(df.acc$dec_sd)
+}
+
+plot_title <- "dec_sd_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_sd_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$dec_sd);print(st)
@@ -4206,6 +5467,21 @@ data.frame(describe(df.acc$dec_median, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "dec_median"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_median, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$dec_median <= 0, na.rm = T) > 0) {
+  df.acc$dec_median_log <- log1p(df.acc$dec_median)
+} else {
+  df.acc$dec_median_log <- log(df.acc$dec_median)
+}
+
+plot_title <- "dec_median_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_median_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -4258,6 +5534,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$dec_trimmed <= 0, na.rm = T) > 0) {
+  df.acc$dec_trimmed_log <- log1p(df.acc$dec_trimmed)
+} else {
+  df.acc$dec_trimmed_log <- log(df.acc$dec_trimmed)
+}
+
+plot_title <- "dec_trimmed_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_trimmed_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$dec_trimmed);print(st)
@@ -4300,6 +5591,21 @@ data.frame(describe(df.acc$dec_mad, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "dec_mad"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_mad, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$dec_mad <= 0, na.rm = T) > 0) {
+  df.acc$dec_mad_log <- log1p(df.acc$dec_mad)
+} else {
+  df.acc$dec_mad_log <- log(df.acc$dec_mad)
+}
+
+plot_title <- "dec_mad_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_mad_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -4352,6 +5658,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$dec_min <= 0, na.rm = T) > 0) {
+  df.acc$dec_min_log <- log1p(df.acc$dec_min)
+} else {
+  df.acc$dec_min_log <- log(df.acc$dec_min)
+}
+
+plot_title <- "dec_min_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_min_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$dec_min);print(st)
@@ -4394,6 +5715,21 @@ data.frame(describe(df.acc$dec_max, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "dec_max"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_max, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$dec_max <= 0, na.rm = T) > 0) {
+  df.acc$dec_max_log <- log1p(df.acc$dec_max)
+} else {
+  df.acc$dec_max_log <- log(df.acc$dec_max)
+}
+
+plot_title <- "dec_max_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_max_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -4446,6 +5782,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$dec_range <= 0, na.rm = T) > 0) {
+  df.acc$dec_range_log <- log1p(df.acc$dec_range)
+} else {
+  df.acc$dec_range_log <- log(df.acc$dec_range)
+}
+
+plot_title <- "dec_range_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_range_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$dec_range);print(st)
@@ -4488,6 +5839,21 @@ data.frame(describe(df.acc$dec_skew, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "dec_skew"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_skew, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$dec_skew <= 0, na.rm = T) > 0) {
+  df.acc$dec_skew_log <- log1p(df.acc$dec_skew)
+} else {
+  df.acc$dec_skew_log <- log(df.acc$dec_skew)
+}
+
+plot_title <- "dec_skew_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_skew_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -4540,6 +5906,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$dec_kurtosis <= 0, na.rm = T) > 0) {
+  df.acc$dec_kurtosis_log <- log1p(df.acc$dec_kurtosis)
+} else {
+  df.acc$dec_kurtosis_log <- log(df.acc$dec_kurtosis)
+}
+
+plot_title <- "dec_kurtosis_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_kurtosis_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$dec_kurtosis);print(st)
@@ -4582,6 +5963,21 @@ data.frame(describe(df.acc$dec_se, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "dec_se"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_se, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$dec_se <= 0, na.rm = T) > 0) {
+  df.acc$dec_se_log <- log1p(df.acc$dec_se)
+} else {
+  df.acc$dec_se_log <- log(df.acc$dec_se)
+}
+
+plot_title <- "dec_se_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_se_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -4634,6 +6030,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$dec_q0.25 <= 0, na.rm = T) > 0) {
+  df.acc$dec_q0.25_log <- log1p(df.acc$dec_q0.25)
+} else {
+  df.acc$dec_q0.25_log <- log(df.acc$dec_q0.25)
+}
+
+plot_title <- "dec_q0.25_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_q0.25_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$dec_q0.25);print(st)
@@ -4676,6 +6087,21 @@ data.frame(describe(df.acc$dec_q0.75, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "dec_q0.75"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_q0.75, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$dec_q0.75 <= 0, na.rm = T) > 0) {
+  df.acc$dec_q0.75_log <- log1p(df.acc$dec_q0.75)
+} else {
+  df.acc$dec_q0.75_log <- log(df.acc$dec_q0.75)
+}
+
+plot_title <- "dec_q0.75_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$dec_q0.75_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -4728,6 +6154,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$braking_line <= 0, na.rm = T) > 0) {
+  df.acc$braking_line_log <- log1p(df.acc$braking_line)
+} else {
+  df.acc$braking_line_log <- log(df.acc$braking_line)
+}
+
+plot_title <- "braking_line_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$braking_line_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$braking_line);print(st)
@@ -4770,6 +6211,21 @@ data.frame(describe(df.acc$n_braking, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "n_braking"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$n_braking, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$n_braking <= 0, na.rm = T) > 0) {
+  df.acc$n_braking_log <- log1p(df.acc$n_braking)
+} else {
+  df.acc$n_braking_log <- log(df.acc$n_braking)
+}
+
+plot_title <- "n_braking_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$n_braking_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -4822,6 +6278,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_per_sec_mean <= 0, na.rm = T) > 0) {
+  df.acc$acc_per_sec_mean_log <- log1p(df.acc$acc_per_sec_mean)
+} else {
+  df.acc$acc_per_sec_mean_log <- log(df.acc$acc_per_sec_mean)
+}
+
+plot_title <- "acc_per_sec_mean_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_mean_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$acc_per_sec_mean);print(st)
@@ -4864,6 +6335,21 @@ data.frame(describe(df.acc$acc_per_sec_sd, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "acc_per_sec_sd"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_sd, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_per_sec_sd <= 0, na.rm = T) > 0) {
+  df.acc$acc_per_sec_sd_log <- log1p(df.acc$acc_per_sec_sd)
+} else {
+  df.acc$acc_per_sec_sd_log <- log(df.acc$acc_per_sec_sd)
+}
+
+plot_title <- "acc_per_sec_sd_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_sd_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -4916,6 +6402,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_per_sec_median <= 0, na.rm = T) > 0) {
+  df.acc$acc_per_sec_median_log <- log1p(df.acc$acc_per_sec_median)
+} else {
+  df.acc$acc_per_sec_median_log <- log(df.acc$acc_per_sec_median)
+}
+
+plot_title <- "acc_per_sec_median_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_median_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$acc_per_sec_median);print(st)
@@ -4958,6 +6459,21 @@ data.frame(describe(df.acc$acc_per_sec_trimmed, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "acc_per_sec_trimmed"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_trimmed, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_per_sec_trimmed <= 0, na.rm = T) > 0) {
+  df.acc$acc_per_sec_trimmed_log <- log1p(df.acc$acc_per_sec_trimmed)
+} else {
+  df.acc$acc_per_sec_trimmed_log <- log(df.acc$acc_per_sec_trimmed)
+}
+
+plot_title <- "acc_per_sec_trimmed_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_trimmed_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -5010,6 +6526,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_per_sec_mad <= 0, na.rm = T) > 0) {
+  df.acc$acc_per_sec_mad_log <- log1p(df.acc$acc_per_sec_mad)
+} else {
+  df.acc$acc_per_sec_mad_log <- log(df.acc$acc_per_sec_mad)
+}
+
+plot_title <- "acc_per_sec_mad_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_mad_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$acc_per_sec_mad);print(st)
@@ -5052,6 +6583,21 @@ data.frame(describe(df.acc$acc_per_sec_min, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "acc_per_sec_min"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_min, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_per_sec_min <= 0, na.rm = T) > 0) {
+  df.acc$acc_per_sec_min_log <- log1p(df.acc$acc_per_sec_min)
+} else {
+  df.acc$acc_per_sec_min_log <- log(df.acc$acc_per_sec_min)
+}
+
+plot_title <- "acc_per_sec_min_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_min_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -5104,6 +6650,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_per_sec_max <= 0, na.rm = T) > 0) {
+  df.acc$acc_per_sec_max_log <- log1p(df.acc$acc_per_sec_max)
+} else {
+  df.acc$acc_per_sec_max_log <- log(df.acc$acc_per_sec_max)
+}
+
+plot_title <- "acc_per_sec_max_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_max_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$acc_per_sec_max);print(st)
@@ -5146,6 +6707,21 @@ data.frame(describe(df.acc$acc_per_sec_range, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "acc_per_sec_range"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_range, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_per_sec_range <= 0, na.rm = T) > 0) {
+  df.acc$acc_per_sec_range_log <- log1p(df.acc$acc_per_sec_range)
+} else {
+  df.acc$acc_per_sec_range_log <- log(df.acc$acc_per_sec_range)
+}
+
+plot_title <- "acc_per_sec_range_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_range_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -5198,6 +6774,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_per_sec_skew <= 0, na.rm = T) > 0) {
+  df.acc$acc_per_sec_skew_log <- log1p(df.acc$acc_per_sec_skew)
+} else {
+  df.acc$acc_per_sec_skew_log <- log(df.acc$acc_per_sec_skew)
+}
+
+plot_title <- "acc_per_sec_skew_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_skew_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$acc_per_sec_skew);print(st)
@@ -5240,6 +6831,21 @@ data.frame(describe(df.acc$acc_per_sec_kurtosis, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "acc_per_sec_kurtosis"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_kurtosis, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_per_sec_kurtosis <= 0, na.rm = T) > 0) {
+  df.acc$acc_per_sec_kurtosis_log <- log1p(df.acc$acc_per_sec_kurtosis)
+} else {
+  df.acc$acc_per_sec_kurtosis_log <- log(df.acc$acc_per_sec_kurtosis)
+}
+
+plot_title <- "acc_per_sec_kurtosis_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_kurtosis_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -5292,6 +6898,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_per_sec_se <= 0, na.rm = T) > 0) {
+  df.acc$acc_per_sec_se_log <- log1p(df.acc$acc_per_sec_se)
+} else {
+  df.acc$acc_per_sec_se_log <- log(df.acc$acc_per_sec_se)
+}
+
+plot_title <- "acc_per_sec_se_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_se_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$acc_per_sec_se);print(st)
@@ -5334,6 +6955,21 @@ data.frame(describe(df.acc$acc_per_sec_q0.25, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "acc_per_sec_q0.25"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_per_sec_q0.25 <= 0, na.rm = T) > 0) {
+  df.acc$acc_per_sec_q0.25_log <- log1p(df.acc$acc_per_sec_q0.25)
+} else {
+  df.acc$acc_per_sec_q0.25_log <- log(df.acc$acc_per_sec_q0.25)
+}
+
+plot_title <- "acc_per_sec_q0.25_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_q0.25_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -5386,6 +7022,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_per_sec_q0.75 <= 0, na.rm = T) > 0) {
+  df.acc$acc_per_sec_q0.75_log <- log1p(df.acc$acc_per_sec_q0.75)
+} else {
+  df.acc$acc_per_sec_q0.75_log <- log(df.acc$acc_per_sec_q0.75)
+}
+
+plot_title <- "acc_per_sec_q0.75_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_q0.75_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$acc_per_sec_q0.75);print(st)
@@ -5428,6 +7079,21 @@ data.frame(describe(df.acc$acc_per_sec_max_pos, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "acc_per_sec_max_pos"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_max_pos, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_per_sec_max_pos <= 0, na.rm = T) > 0) {
+  df.acc$acc_per_sec_max_pos_log <- log1p(df.acc$acc_per_sec_max_pos)
+} else {
+  df.acc$acc_per_sec_max_pos_log <- log(df.acc$acc_per_sec_max_pos)
+}
+
+plot_title <- "acc_per_sec_max_pos_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_max_pos_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -5480,6 +7146,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$acc_per_sec_min_pos <= 0, na.rm = T) > 0) {
+  df.acc$acc_per_sec_min_pos_log <- log1p(df.acc$acc_per_sec_min_pos)
+} else {
+  df.acc$acc_per_sec_min_pos_log <- log(df.acc$acc_per_sec_min_pos)
+}
+
+plot_title <- "acc_per_sec_min_pos_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$acc_per_sec_min_pos_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$acc_per_sec_min_pos);print(st)
@@ -5522,6 +7203,21 @@ data.frame(describe(df.acc$missings_distance, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "missings_distance"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_distance, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$missings_distance <= 0, na.rm = T) > 0) {
+  df.acc$missings_distance_log <- log1p(df.acc$missings_distance)
+} else {
+  df.acc$missings_distance_log <- log(df.acc$missings_distance)
+}
+
+plot_title <- "missings_distance_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_distance_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -5574,6 +7270,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$missings_mean <= 0, na.rm = T) > 0) {
+  df.acc$missings_mean_log <- log1p(df.acc$missings_mean)
+} else {
+  df.acc$missings_mean_log <- log(df.acc$missings_mean)
+}
+
+plot_title <- "missings_mean_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_mean_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$missings_mean);print(st)
@@ -5616,6 +7327,21 @@ data.frame(describe(df.acc$missings_sd, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "missings_sd"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_sd, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$missings_sd <= 0, na.rm = T) > 0) {
+  df.acc$missings_sd_log <- log1p(df.acc$missings_sd)
+} else {
+  df.acc$missings_sd_log <- log(df.acc$missings_sd)
+}
+
+plot_title <- "missings_sd_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_sd_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -5668,6 +7394,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$missings_median <= 0, na.rm = T) > 0) {
+  df.acc$missings_median_log <- log1p(df.acc$missings_median)
+} else {
+  df.acc$missings_median_log <- log(df.acc$missings_median)
+}
+
+plot_title <- "missings_median_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_median_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$missings_median);print(st)
@@ -5710,6 +7451,21 @@ data.frame(describe(df.acc$missings_trimmed, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "missings_trimmed"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_trimmed, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$missings_trimmed <= 0, na.rm = T) > 0) {
+  df.acc$missings_trimmed_log <- log1p(df.acc$missings_trimmed)
+} else {
+  df.acc$missings_trimmed_log <- log(df.acc$missings_trimmed)
+}
+
+plot_title <- "missings_trimmed_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_trimmed_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -5762,6 +7518,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$missings_mad <= 0, na.rm = T) > 0) {
+  df.acc$missings_mad_log <- log1p(df.acc$missings_mad)
+} else {
+  df.acc$missings_mad_log <- log(df.acc$missings_mad)
+}
+
+plot_title <- "missings_mad_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_mad_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$missings_mad);print(st)
@@ -5804,6 +7575,21 @@ data.frame(describe(df.acc$missings_min, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "missings_min"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_min, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$missings_min <= 0, na.rm = T) > 0) {
+  df.acc$missings_min_log <- log1p(df.acc$missings_min)
+} else {
+  df.acc$missings_min_log <- log(df.acc$missings_min)
+}
+
+plot_title <- "missings_min_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_min_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -5856,6 +7642,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$missings_max <= 0, na.rm = T) > 0) {
+  df.acc$missings_max_log <- log1p(df.acc$missings_max)
+} else {
+  df.acc$missings_max_log <- log(df.acc$missings_max)
+}
+
+plot_title <- "missings_max_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_max_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$missings_max);print(st)
@@ -5898,6 +7699,21 @@ data.frame(describe(df.acc$missings_range, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "missings_range"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_range, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$missings_range <= 0, na.rm = T) > 0) {
+  df.acc$missings_range_log <- log1p(df.acc$missings_range)
+} else {
+  df.acc$missings_range_log <- log(df.acc$missings_range)
+}
+
+plot_title <- "missings_range_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_range_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -5950,6 +7766,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$missings_skew <= 0, na.rm = T) > 0) {
+  df.acc$missings_skew_log <- log1p(df.acc$missings_skew)
+} else {
+  df.acc$missings_skew_log <- log(df.acc$missings_skew)
+}
+
+plot_title <- "missings_skew_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_skew_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$missings_skew);print(st)
@@ -5992,6 +7823,21 @@ data.frame(describe(df.acc$missings_kurtosis, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "missings_kurtosis"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_kurtosis, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$missings_kurtosis <= 0, na.rm = T) > 0) {
+  df.acc$missings_kurtosis_log <- log1p(df.acc$missings_kurtosis)
+} else {
+  df.acc$missings_kurtosis_log <- log(df.acc$missings_kurtosis)
+}
+
+plot_title <- "missings_kurtosis_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_kurtosis_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -6044,6 +7890,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$missings_se <= 0, na.rm = T) > 0) {
+  df.acc$missings_se_log <- log1p(df.acc$missings_se)
+} else {
+  df.acc$missings_se_log <- log(df.acc$missings_se)
+}
+
+plot_title <- "missings_se_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_se_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$missings_se);print(st)
@@ -6086,6 +7947,21 @@ data.frame(describe(df.acc$missings_q0.25, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "missings_q0.25"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_q0.25, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$missings_q0.25 <= 0, na.rm = T) > 0) {
+  df.acc$missings_q0.25_log <- log1p(df.acc$missings_q0.25)
+} else {
+  df.acc$missings_q0.25_log <- log(df.acc$missings_q0.25)
+}
+
+plot_title <- "missings_q0.25_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_q0.25_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -6138,6 +8014,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$missings_q0.75 <= 0, na.rm = T) > 0) {
+  df.acc$missings_q0.75_log <- log1p(df.acc$missings_q0.75)
+} else {
+  df.acc$missings_q0.75_log <- log(df.acc$missings_q0.75)
+}
+
+plot_title <- "missings_q0.75_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_q0.75_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$missings_q0.75);print(st)
@@ -6180,6 +8071,21 @@ data.frame(describe(df.acc$missings, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "missings"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$missings <= 0, na.rm = T) > 0) {
+  df.acc$missings_log <- log1p(df.acc$missings)
+} else {
+  df.acc$missings_log <- log(df.acc$missings)
+}
+
+plot_title <- "missings_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -6232,6 +8138,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$hits <= 0, na.rm = T) > 0) {
+  df.acc$hits_log <- log1p(df.acc$hits)
+} else {
+  df.acc$hits_log <- log(df.acc$hits)
+}
+
+plot_title <- "hits_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$hits_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$hits);print(st)
@@ -6274,6 +8195,21 @@ data.frame(describe(df.acc$missings_trend, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "missings_trend"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_trend, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$missings_trend <= 0, na.rm = T) > 0) {
+  df.acc$missings_trend_log <- log1p(df.acc$missings_trend)
+} else {
+  df.acc$missings_trend_log <- log(df.acc$missings_trend)
+}
+
+plot_title <- "missings_trend_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$missings_trend_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -6326,6 +8262,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$accuracy_rate <= 0, na.rm = T) > 0) {
+  df.acc$accuracy_rate_log <- log1p(df.acc$accuracy_rate)
+} else {
+  df.acc$accuracy_rate_log <- log(df.acc$accuracy_rate)
+}
+
+plot_title <- "accuracy_rate_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$accuracy_rate_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$accuracy_rate);print(st)
@@ -6373,6 +8324,21 @@ create_tabs(plot_list)
 ```
 
 
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$combo_hits <= 0, na.rm = T) > 0) {
+  df.acc$combo_hits_log <- log1p(df.acc$combo_hits)
+} else {
+  df.acc$combo_hits_log <- log(df.acc$combo_hits)
+}
+
+plot_title <- "combo_hits_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$combo_hits_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
+
+create_tabs(plot_list)
+```
+
+
 #### Normal test
 ```{r}
 st <- shapiro.test(df.acc$combo_hits);print(st)
@@ -6415,6 +8381,21 @@ data.frame(describe(df.acc$combo_missings, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "combo_missings"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$combo_missings, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$combo_missings <= 0, na.rm = T) > 0) {
+  df.acc$combo_missings_log <- log1p(df.acc$combo_missings)
+} else {
+  df.acc$combo_missings_log <- log(df.acc$combo_missings)
+}
+
+plot_title <- "combo_missings_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$combo_missings_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -6472,6 +8453,21 @@ data.frame(describe(df.acc$corr_sat, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "corr_sat"
 plot_list <- draw_plots_continuous(df.acc, var = df.acc$corr_sat, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.acc$corr_sat <= 0, na.rm = T) > 0) {
+  df.acc$corr_sat_log <- log1p(df.acc$corr_sat)
+} else {
+  df.acc$corr_sat_log <- log(df.acc$corr_sat)
+}
+
+plot_title <- "corr_sat_log"
+plot_list <- draw_plots_continuous(df.acc, var = df.acc$corr_sat_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -6594,7 +8590,7 @@ corr_vars <- c("distance_trimmed",
 ```{r}
 df.acc.num <- df.acc[, sapply(df.acc, typeof) == "double"]
 
-df.acc.num <- select(df.acc.num, -corr_vars)
+df.acc.num <- select(df.acc.num, -corr_vars, -ends_with("_log"))
 
 cor_matrix <- cor(df.acc.num, method = "spearman", use = "pairwise.complete.obs")
 

@@ -6,11 +6,12 @@ output:
   html_document:
     css: "styles.css"
     code_folding: hide
-    df_print: paged
+    self_contained: no
     toc: yes
     toc_depth: 4
     toc_float:
       collapsed: no
+    df_print: paged
   word_document:
     toc: yes
     toc_depth: '4'
@@ -65,6 +66,21 @@ data.frame(describe(df.{{stage}}${{feature.short_name}}, quant = c(0.25, 0.75)))
 ```{r fig.width=7, fig.height=4, results='asis'}
 plot_title <- "{{feature.short_name}}"
 plot_list <- draw_plots_continuous(df.{{stage}}, var = df.{{stage}}${{feature.short_name}}, title = plot_title, filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 0)
+
+create_tabs(plot_list)
+```
+
+
+
+```{r fig.width=7, fig.height=4, results='asis'}
+if (sum(df.{{stage}}${{feature.short_name}} <= 0, na.rm = T) > 0) {
+  df.{{stage}}${{feature.short_name}}_log <- log1p(df.{{stage}}${{feature.short_name}})
+} else {
+  df.{{stage}}${{feature.short_name}}_log <- log(df.{{stage}}${{feature.short_name}})
+}
+
+plot_title <- "{{feature.short_name}}_log"
+plot_list <- draw_plots_continuous(df.{{stage}}, var = df.{{stage}}${{feature.short_name}}_log, title = plot_title, filename = "log", binwidth = NULL, bins = 15, alpha = 0.5, angle = 0, tabname = "log_")
 
 create_tabs(plot_list)
 ```
@@ -221,7 +237,7 @@ corr_vars <- c("distance_trimmed",
 ```{r}
 df.{{stage}}.num <- df.{{stage}}[, sapply(df.{{stage}}, typeof) == "double"]
 
-df.{{stage}}.num <- select(df.{{stage}}.num, -corr_vars)
+df.{{stage}}.num <- select(df.{{stage}}.num, -corr_vars, -ends_with("_log"))
 
 cor_matrix <- cor(df.{{stage}}.num, method = "spearman", use = "pairwise.complete.obs")
 
