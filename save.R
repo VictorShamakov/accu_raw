@@ -59,9 +59,9 @@ for (user_id in ast_results$user_id[1:length(ast_results$user_id)]) {
 rmarkdown::render('./3.1_ds_acc.Rmd', output_file = './reports/3.1_ds_acc.html')
 rmarkdown::render('./3.1_ds_spd.Rmd', output_file = './reports/3.1_ds_spd.html')
 rmarkdown::render('./3.2_ds_by_stage.Rmd', output_file = './reports/3.2_ds_by_stage.html')
-rmarkdown::render('./3.3_ds_acc_by_gender.Rmd', output_file = './reports/3.3_ds_acc_by_gender.html')
-rmarkdown::render('./3.3_ds_spd_by_gender.Rmd', output_file = './reports/3.3_ds_spd_by_gender.html')
-rmarkdown::render('./3.4_ds_by_stage_and_gender.Rmd', output_file = './reports/3.4_ds_by_stage_and_gender.html')
+# rmarkdown::render('./3.3_ds_acc_by_gender.Rmd', output_file = './reports/3.3_ds_acc_by_gender.html')
+# rmarkdown::render('./3.3_ds_spd_by_gender.Rmd', output_file = './reports/3.3_ds_spd_by_gender.html')
+# rmarkdown::render('./3.4_ds_by_stage_and_gender.Rmd', output_file = './reports/3.4_ds_by_stage_and_gender.html')
 
 
 ## Кластерный анализ

@@ -110,6 +110,23 @@ save(clickers.acc, file = "./data/envs/1_desc_stat/clickers.acc.RData")
 save(clickers.spd, file = "./data/envs/1_desc_stat/clickers.spd.RData")
 ```
 
+
+```{r}
+## outliers
+## Выбросы найденные вручную с помощью кластеризации
+outliers.acc <- df.acc[df.acc$user_id %in% c(1264, 2700, 1121, 1915, 2045, 2637, 1359, 1717, 1855, 2358, 2676, 1182, 1747, 1981, 2992, 2633), ]
+outliers.spd <- df.spd[df.spd$user_id %in% c(), ]
+excluded_outliers <- unique(c(outliers.acc$user_id, outliers.spd$user_id))
+
+df.acc <- df.acc[!df.acc$user_id %in% excluded_outliers,]
+df.spd <- df.spd[!df.spd$user_id %in% excluded_outliers,]
+
+save(outliers.acc, file = "./data/envs/1_desc_stat/outliers.acc.RData")
+save(outliers.spd, file = "./data/envs/1_desc_stat/outliers.spd.RData")
+
+```
+
+
 ```{r}
 # # Очень продолжительное выполнение теста
 # longduration.acc <- df.acc[df.acc$time_total %in% boxplot.stats(df.acc$time_total, coef = 1)$out, ]
@@ -170,7 +187,10 @@ save(sp_results, file = "./data/envs/1_desc_stat/sp_results.RData")
 
 ```{r}
 sign_differences <- vector()
+outliers_list <- list()
 ```
+
+
 
 
 

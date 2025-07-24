@@ -108,6 +108,8 @@ outliers <- get_outliers(df.{{stage}}, df.{{stage}}${{feature.short_name}}, 1.5)
 outliers <- select(outliers, 1:4, {{feature.short_name}}, everything())
 outliers[order(outliers${{feature.short_name}}, decreasing = T),]
 outliers[order(outliers${{feature.short_name}}),]
+
+outliers_list${{feature.short_name}} <- outliers$user_id
 ```
 
 
@@ -148,6 +150,13 @@ data.frame(
 {% endif %}
 
 {% endfor %}
+
+### Outliers
+
+```{r}
+save(outliers_list, file = "./data/envs/1_desc_stat/outliers.{{stage}}.RData")
+```
+
 
 ### Корреляционный анализ {.tabset .tabset-fade .tabset-pills}
 

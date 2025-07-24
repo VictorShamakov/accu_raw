@@ -1,0 +1,31 @@
+
+```{r}
+rm(list=ls())
+```
+
+```{r}
+load("./data/envs/1_desc_stat/outliers.acc.RData")
+load("./data/envs/4_cluster_analysis/df.acc.RData")
+
+```
+
+
+Выбросы в кластерах
+
+```{r}
+cluster_outliers <- df[df$all_kmdclust6 %in% names(which(table(df$all_kmdclust6) <= 10)),]
+cluster_outliers$user_id
+```
+
+```{r}
+cluster_outliers$user_id
+```
+
+
+
+```{r}
+names(which(sapply(outliers_list, function(x) 1264 %in% x)))
+
+Filter(function(x) 1264 %in% x, outliers_list)
+```
+

@@ -9,6 +9,7 @@ output:
     toc_depth: 4
     toc_float:
       collapsed: no
+    self_contained: no
   word_document:
     toc: yes
     toc_depth: '4'
@@ -44,7 +45,7 @@ library("factoextra")
 library("ggdendro")
 library(cluster)
 set.seed(10)
-n_clusters <- 7
+n_clusters <- 5
 ```
 
 ```{r}

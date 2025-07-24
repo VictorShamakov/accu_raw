@@ -112,6 +112,23 @@ save(clickers.acc, file = "./data/envs/1_desc_stat/clickers.acc.RData")
 save(clickers.spd, file = "./data/envs/1_desc_stat/clickers.spd.RData")
 ```
 
+
+```{r}
+## outliers
+## Выбросы найденные вручную с помощью кластеризации
+outliers.acc <- df.acc[df.acc$user_id %in% c(1264, 2700, 1121, 1915, 2045, 2637, 1359, 1717, 1855, 2358, 2676, 1182, 1747, 1981, 2992, 2633), ]
+outliers.spd <- df.spd[df.spd$user_id %in% c(), ]
+excluded_outliers <- unique(c(outliers.acc$user_id, outliers.spd$user_id))
+
+df.acc <- df.acc[!df.acc$user_id %in% excluded_outliers,]
+df.spd <- df.spd[!df.spd$user_id %in% excluded_outliers,]
+
+save(outliers.acc, file = "./data/envs/1_desc_stat/outliers.acc.RData")
+save(outliers.spd, file = "./data/envs/1_desc_stat/outliers.spd.RData")
+
+```
+
+
 ```{r}
 # # Очень продолжительное выполнение теста
 # longduration.acc <- df.acc[df.acc$time_total %in% boxplot.stats(df.acc$time_total, coef = 1)$out, ]
@@ -172,7 +189,10 @@ save(sp_results, file = "./data/envs/1_desc_stat/sp_results.RData")
 
 ```{r}
 sign_differences <- vector()
+outliers_list <- list()
 ```
+
+
 
 
 
@@ -296,6 +316,8 @@ outliers <- get_outliers(df.acc, df.acc$time_total, 1.5)
 outliers <- select(outliers, 1:4, time_total, everything())
 outliers[order(outliers$time_total, decreasing = T),]
 outliers[order(outliers$time_total),]
+
+outliers_list$time_total <- outliers$user_id
 ```
 
 
@@ -358,6 +380,8 @@ outliers <- get_outliers(df.acc, df.acc$velocity_mean, 1.5)
 outliers <- select(outliers, 1:4, velocity_mean, everything())
 outliers[order(outliers$velocity_mean, decreasing = T),]
 outliers[order(outliers$velocity_mean),]
+
+outliers_list$velocity_mean <- outliers$user_id
 ```
 
 
@@ -420,6 +444,8 @@ outliers <- get_outliers(df.acc, df.acc$missings_distance, 1.5)
 outliers <- select(outliers, 1:4, missings_distance, everything())
 outliers[order(outliers$missings_distance, decreasing = T),]
 outliers[order(outliers$missings_distance),]
+
+outliers_list$missings_distance <- outliers$user_id
 ```
 
 
@@ -482,6 +508,8 @@ outliers <- get_outliers(df.acc, df.acc$distance_total, 1.5)
 outliers <- select(outliers, 1:4, distance_total, everything())
 outliers[order(outliers$distance_total, decreasing = T),]
 outliers[order(outliers$distance_total),]
+
+outliers_list$distance_total <- outliers$user_id
 ```
 
 
@@ -544,6 +572,8 @@ outliers <- get_outliers(df.acc, df.acc$pause_total, 1.5)
 outliers <- select(outliers, 1:4, pause_total, everything())
 outliers[order(outliers$pause_total, decreasing = T),]
 outliers[order(outliers$pause_total),]
+
+outliers_list$pause_total <- outliers$user_id
 ```
 
 
@@ -606,6 +636,8 @@ outliers <- get_outliers(df.acc, df.acc$time_total, 1.5)
 outliers <- select(outliers, 1:4, time_total, everything())
 outliers[order(outliers$time_total, decreasing = T),]
 outliers[order(outliers$time_total),]
+
+outliers_list$time_total <- outliers$user_id
 ```
 
 
@@ -668,6 +700,8 @@ outliers <- get_outliers(df.acc, df.acc$time_mean, 1.5)
 outliers <- select(outliers, 1:4, time_mean, everything())
 outliers[order(outliers$time_mean, decreasing = T),]
 outliers[order(outliers$time_mean),]
+
+outliers_list$time_mean <- outliers$user_id
 ```
 
 
@@ -730,6 +764,8 @@ outliers <- get_outliers(df.acc, df.acc$time_sd, 1.5)
 outliers <- select(outliers, 1:4, time_sd, everything())
 outliers[order(outliers$time_sd, decreasing = T),]
 outliers[order(outliers$time_sd),]
+
+outliers_list$time_sd <- outliers$user_id
 ```
 
 
@@ -792,6 +828,8 @@ outliers <- get_outliers(df.acc, df.acc$time_median, 1.5)
 outliers <- select(outliers, 1:4, time_median, everything())
 outliers[order(outliers$time_median, decreasing = T),]
 outliers[order(outliers$time_median),]
+
+outliers_list$time_median <- outliers$user_id
 ```
 
 
@@ -854,6 +892,8 @@ outliers <- get_outliers(df.acc, df.acc$time_trimmed, 1.5)
 outliers <- select(outliers, 1:4, time_trimmed, everything())
 outliers[order(outliers$time_trimmed, decreasing = T),]
 outliers[order(outliers$time_trimmed),]
+
+outliers_list$time_trimmed <- outliers$user_id
 ```
 
 
@@ -916,6 +956,8 @@ outliers <- get_outliers(df.acc, df.acc$time_mad, 1.5)
 outliers <- select(outliers, 1:4, time_mad, everything())
 outliers[order(outliers$time_mad, decreasing = T),]
 outliers[order(outliers$time_mad),]
+
+outliers_list$time_mad <- outliers$user_id
 ```
 
 
@@ -978,6 +1020,8 @@ outliers <- get_outliers(df.acc, df.acc$time_min, 1.5)
 outliers <- select(outliers, 1:4, time_min, everything())
 outliers[order(outliers$time_min, decreasing = T),]
 outliers[order(outliers$time_min),]
+
+outliers_list$time_min <- outliers$user_id
 ```
 
 
@@ -1040,6 +1084,8 @@ outliers <- get_outliers(df.acc, df.acc$time_max, 1.5)
 outliers <- select(outliers, 1:4, time_max, everything())
 outliers[order(outliers$time_max, decreasing = T),]
 outliers[order(outliers$time_max),]
+
+outliers_list$time_max <- outliers$user_id
 ```
 
 
@@ -1102,6 +1148,8 @@ outliers <- get_outliers(df.acc, df.acc$time_range, 1.5)
 outliers <- select(outliers, 1:4, time_range, everything())
 outliers[order(outliers$time_range, decreasing = T),]
 outliers[order(outliers$time_range),]
+
+outliers_list$time_range <- outliers$user_id
 ```
 
 
@@ -1164,6 +1212,8 @@ outliers <- get_outliers(df.acc, df.acc$time_skew, 1.5)
 outliers <- select(outliers, 1:4, time_skew, everything())
 outliers[order(outliers$time_skew, decreasing = T),]
 outliers[order(outliers$time_skew),]
+
+outliers_list$time_skew <- outliers$user_id
 ```
 
 
@@ -1226,6 +1276,8 @@ outliers <- get_outliers(df.acc, df.acc$time_kurtosis, 1.5)
 outliers <- select(outliers, 1:4, time_kurtosis, everything())
 outliers[order(outliers$time_kurtosis, decreasing = T),]
 outliers[order(outliers$time_kurtosis),]
+
+outliers_list$time_kurtosis <- outliers$user_id
 ```
 
 
@@ -1288,6 +1340,8 @@ outliers <- get_outliers(df.acc, df.acc$time_se, 1.5)
 outliers <- select(outliers, 1:4, time_se, everything())
 outliers[order(outliers$time_se, decreasing = T),]
 outliers[order(outliers$time_se),]
+
+outliers_list$time_se <- outliers$user_id
 ```
 
 
@@ -1350,6 +1404,8 @@ outliers <- get_outliers(df.acc, df.acc$time_q0.25, 1.5)
 outliers <- select(outliers, 1:4, time_q0.25, everything())
 outliers[order(outliers$time_q0.25, decreasing = T),]
 outliers[order(outliers$time_q0.25),]
+
+outliers_list$time_q0.25 <- outliers$user_id
 ```
 
 
@@ -1412,6 +1468,8 @@ outliers <- get_outliers(df.acc, df.acc$time_q0.75, 1.5)
 outliers <- select(outliers, 1:4, time_q0.75, everything())
 outliers[order(outliers$time_q0.75, decreasing = T),]
 outliers[order(outliers$time_q0.75),]
+
+outliers_list$time_q0.75 <- outliers$user_id
 ```
 
 
@@ -1474,6 +1532,8 @@ outliers <- get_outliers(df.acc, df.acc$time_trend, 1.5)
 outliers <- select(outliers, 1:4, time_trend, everything())
 outliers[order(outliers$time_trend, decreasing = T),]
 outliers[order(outliers$time_trend),]
+
+outliers_list$time_trend <- outliers$user_id
 ```
 
 
@@ -1536,6 +1596,8 @@ outliers <- get_outliers(df.acc, df.acc$fitts_a, 1.5)
 outliers <- select(outliers, 1:4, fitts_a, everything())
 outliers[order(outliers$fitts_a, decreasing = T),]
 outliers[order(outliers$fitts_a),]
+
+outliers_list$fitts_a <- outliers$user_id
 ```
 
 
@@ -1598,6 +1660,8 @@ outliers <- get_outliers(df.acc, df.acc$fitts_b, 1.5)
 outliers <- select(outliers, 1:4, fitts_b, everything())
 outliers[order(outliers$fitts_b, decreasing = T),]
 outliers[order(outliers$fitts_b),]
+
+outliers_list$fitts_b <- outliers$user_id
 ```
 
 
@@ -1660,6 +1724,8 @@ outliers <- get_outliers(df.acc, df.acc$distance_total, 1.5)
 outliers <- select(outliers, 1:4, distance_total, everything())
 outliers[order(outliers$distance_total, decreasing = T),]
 outliers[order(outliers$distance_total),]
+
+outliers_list$distance_total <- outliers$user_id
 ```
 
 
@@ -1722,6 +1788,8 @@ outliers <- get_outliers(df.acc, df.acc$distance_mean, 1.5)
 outliers <- select(outliers, 1:4, distance_mean, everything())
 outliers[order(outliers$distance_mean, decreasing = T),]
 outliers[order(outliers$distance_mean),]
+
+outliers_list$distance_mean <- outliers$user_id
 ```
 
 
@@ -1784,6 +1852,8 @@ outliers <- get_outliers(df.acc, df.acc$distance_sd, 1.5)
 outliers <- select(outliers, 1:4, distance_sd, everything())
 outliers[order(outliers$distance_sd, decreasing = T),]
 outliers[order(outliers$distance_sd),]
+
+outliers_list$distance_sd <- outliers$user_id
 ```
 
 
@@ -1846,6 +1916,8 @@ outliers <- get_outliers(df.acc, df.acc$distance_median, 1.5)
 outliers <- select(outliers, 1:4, distance_median, everything())
 outliers[order(outliers$distance_median, decreasing = T),]
 outliers[order(outliers$distance_median),]
+
+outliers_list$distance_median <- outliers$user_id
 ```
 
 
@@ -1908,6 +1980,8 @@ outliers <- get_outliers(df.acc, df.acc$distance_trimmed, 1.5)
 outliers <- select(outliers, 1:4, distance_trimmed, everything())
 outliers[order(outliers$distance_trimmed, decreasing = T),]
 outliers[order(outliers$distance_trimmed),]
+
+outliers_list$distance_trimmed <- outliers$user_id
 ```
 
 
@@ -1970,6 +2044,8 @@ outliers <- get_outliers(df.acc, df.acc$distance_mad, 1.5)
 outliers <- select(outliers, 1:4, distance_mad, everything())
 outliers[order(outliers$distance_mad, decreasing = T),]
 outliers[order(outliers$distance_mad),]
+
+outliers_list$distance_mad <- outliers$user_id
 ```
 
 
@@ -2032,6 +2108,8 @@ outliers <- get_outliers(df.acc, df.acc$distance_min, 1.5)
 outliers <- select(outliers, 1:4, distance_min, everything())
 outliers[order(outliers$distance_min, decreasing = T),]
 outliers[order(outliers$distance_min),]
+
+outliers_list$distance_min <- outliers$user_id
 ```
 
 
@@ -2094,6 +2172,8 @@ outliers <- get_outliers(df.acc, df.acc$distance_max, 1.5)
 outliers <- select(outliers, 1:4, distance_max, everything())
 outliers[order(outliers$distance_max, decreasing = T),]
 outliers[order(outliers$distance_max),]
+
+outliers_list$distance_max <- outliers$user_id
 ```
 
 
@@ -2156,6 +2236,8 @@ outliers <- get_outliers(df.acc, df.acc$distance_range, 1.5)
 outliers <- select(outliers, 1:4, distance_range, everything())
 outliers[order(outliers$distance_range, decreasing = T),]
 outliers[order(outliers$distance_range),]
+
+outliers_list$distance_range <- outliers$user_id
 ```
 
 
@@ -2218,6 +2300,8 @@ outliers <- get_outliers(df.acc, df.acc$distance_skew, 1.5)
 outliers <- select(outliers, 1:4, distance_skew, everything())
 outliers[order(outliers$distance_skew, decreasing = T),]
 outliers[order(outliers$distance_skew),]
+
+outliers_list$distance_skew <- outliers$user_id
 ```
 
 
@@ -2280,6 +2364,8 @@ outliers <- get_outliers(df.acc, df.acc$distance_kurtosis, 1.5)
 outliers <- select(outliers, 1:4, distance_kurtosis, everything())
 outliers[order(outliers$distance_kurtosis, decreasing = T),]
 outliers[order(outliers$distance_kurtosis),]
+
+outliers_list$distance_kurtosis <- outliers$user_id
 ```
 
 
@@ -2342,6 +2428,8 @@ outliers <- get_outliers(df.acc, df.acc$distance_se, 1.5)
 outliers <- select(outliers, 1:4, distance_se, everything())
 outliers[order(outliers$distance_se, decreasing = T),]
 outliers[order(outliers$distance_se),]
+
+outliers_list$distance_se <- outliers$user_id
 ```
 
 
@@ -2404,6 +2492,8 @@ outliers <- get_outliers(df.acc, df.acc$distance_q0.25, 1.5)
 outliers <- select(outliers, 1:4, distance_q0.25, everything())
 outliers[order(outliers$distance_q0.25, decreasing = T),]
 outliers[order(outliers$distance_q0.25),]
+
+outliers_list$distance_q0.25 <- outliers$user_id
 ```
 
 
@@ -2466,6 +2556,8 @@ outliers <- get_outliers(df.acc, df.acc$distance_q0.75, 1.5)
 outliers <- select(outliers, 1:4, distance_q0.75, everything())
 outliers[order(outliers$distance_q0.75, decreasing = T),]
 outliers[order(outliers$distance_q0.75),]
+
+outliers_list$distance_q0.75 <- outliers$user_id
 ```
 
 
@@ -2528,6 +2620,8 @@ outliers <- get_outliers(df.acc, df.acc$distance_trend, 1.5)
 outliers <- select(outliers, 1:4, distance_trend, everything())
 outliers[order(outliers$distance_trend, decreasing = T),]
 outliers[order(outliers$distance_trend),]
+
+outliers_list$distance_trend <- outliers$user_id
 ```
 
 
@@ -2590,6 +2684,8 @@ outliers <- get_outliers(df.acc, df.acc$pause_total, 1.5)
 outliers <- select(outliers, 1:4, pause_total, everything())
 outliers[order(outliers$pause_total, decreasing = T),]
 outliers[order(outliers$pause_total),]
+
+outliers_list$pause_total <- outliers$user_id
 ```
 
 
@@ -2652,6 +2748,8 @@ outliers <- get_outliers(df.acc, df.acc$pause_number, 1.5)
 outliers <- select(outliers, 1:4, pause_number, everything())
 outliers[order(outliers$pause_number, decreasing = T),]
 outliers[order(outliers$pause_number),]
+
+outliers_list$pause_number <- outliers$user_id
 ```
 
 
@@ -2714,6 +2812,8 @@ outliers <- get_outliers(df.acc, df.acc$pause_mean, 1.5)
 outliers <- select(outliers, 1:4, pause_mean, everything())
 outliers[order(outliers$pause_mean, decreasing = T),]
 outliers[order(outliers$pause_mean),]
+
+outliers_list$pause_mean <- outliers$user_id
 ```
 
 
@@ -2776,6 +2876,8 @@ outliers <- get_outliers(df.acc, df.acc$pause_sd, 1.5)
 outliers <- select(outliers, 1:4, pause_sd, everything())
 outliers[order(outliers$pause_sd, decreasing = T),]
 outliers[order(outliers$pause_sd),]
+
+outliers_list$pause_sd <- outliers$user_id
 ```
 
 
@@ -2838,6 +2940,8 @@ outliers <- get_outliers(df.acc, df.acc$pause_median, 1.5)
 outliers <- select(outliers, 1:4, pause_median, everything())
 outliers[order(outliers$pause_median, decreasing = T),]
 outliers[order(outliers$pause_median),]
+
+outliers_list$pause_median <- outliers$user_id
 ```
 
 
@@ -2900,6 +3004,8 @@ outliers <- get_outliers(df.acc, df.acc$pause_trimmed, 1.5)
 outliers <- select(outliers, 1:4, pause_trimmed, everything())
 outliers[order(outliers$pause_trimmed, decreasing = T),]
 outliers[order(outliers$pause_trimmed),]
+
+outliers_list$pause_trimmed <- outliers$user_id
 ```
 
 
@@ -2962,6 +3068,8 @@ outliers <- get_outliers(df.acc, df.acc$pause_mad, 1.5)
 outliers <- select(outliers, 1:4, pause_mad, everything())
 outliers[order(outliers$pause_mad, decreasing = T),]
 outliers[order(outliers$pause_mad),]
+
+outliers_list$pause_mad <- outliers$user_id
 ```
 
 
@@ -3024,6 +3132,8 @@ outliers <- get_outliers(df.acc, df.acc$pause_min, 1.5)
 outliers <- select(outliers, 1:4, pause_min, everything())
 outliers[order(outliers$pause_min, decreasing = T),]
 outliers[order(outliers$pause_min),]
+
+outliers_list$pause_min <- outliers$user_id
 ```
 
 
@@ -3086,6 +3196,8 @@ outliers <- get_outliers(df.acc, df.acc$pause_max, 1.5)
 outliers <- select(outliers, 1:4, pause_max, everything())
 outliers[order(outliers$pause_max, decreasing = T),]
 outliers[order(outliers$pause_max),]
+
+outliers_list$pause_max <- outliers$user_id
 ```
 
 
@@ -3148,6 +3260,8 @@ outliers <- get_outliers(df.acc, df.acc$pause_range, 1.5)
 outliers <- select(outliers, 1:4, pause_range, everything())
 outliers[order(outliers$pause_range, decreasing = T),]
 outliers[order(outliers$pause_range),]
+
+outliers_list$pause_range <- outliers$user_id
 ```
 
 
@@ -3210,6 +3324,8 @@ outliers <- get_outliers(df.acc, df.acc$pause_skew, 1.5)
 outliers <- select(outliers, 1:4, pause_skew, everything())
 outliers[order(outliers$pause_skew, decreasing = T),]
 outliers[order(outliers$pause_skew),]
+
+outliers_list$pause_skew <- outliers$user_id
 ```
 
 
@@ -3272,6 +3388,8 @@ outliers <- get_outliers(df.acc, df.acc$pause_kurtosis, 1.5)
 outliers <- select(outliers, 1:4, pause_kurtosis, everything())
 outliers[order(outliers$pause_kurtosis, decreasing = T),]
 outliers[order(outliers$pause_kurtosis),]
+
+outliers_list$pause_kurtosis <- outliers$user_id
 ```
 
 
@@ -3334,6 +3452,8 @@ outliers <- get_outliers(df.acc, df.acc$pause_se, 1.5)
 outliers <- select(outliers, 1:4, pause_se, everything())
 outliers[order(outliers$pause_se, decreasing = T),]
 outliers[order(outliers$pause_se),]
+
+outliers_list$pause_se <- outliers$user_id
 ```
 
 
@@ -3396,6 +3516,8 @@ outliers <- get_outliers(df.acc, df.acc$pause_q0.25, 1.5)
 outliers <- select(outliers, 1:4, pause_q0.25, everything())
 outliers[order(outliers$pause_q0.25, decreasing = T),]
 outliers[order(outliers$pause_q0.25),]
+
+outliers_list$pause_q0.25 <- outliers$user_id
 ```
 
 
@@ -3458,6 +3580,8 @@ outliers <- get_outliers(df.acc, df.acc$pause_q0.75, 1.5)
 outliers <- select(outliers, 1:4, pause_q0.75, everything())
 outliers[order(outliers$pause_q0.75, decreasing = T),]
 outliers[order(outliers$pause_q0.75),]
+
+outliers_list$pause_q0.75 <- outliers$user_id
 ```
 
 
@@ -3520,6 +3644,8 @@ outliers <- get_outliers(df.acc, df.acc$pause_trend, 1.5)
 outliers <- select(outliers, 1:4, pause_trend, everything())
 outliers[order(outliers$pause_trend, decreasing = T),]
 outliers[order(outliers$pause_trend),]
+
+outliers_list$pause_trend <- outliers$user_id
 ```
 
 
@@ -3582,6 +3708,8 @@ outliers <- get_outliers(df.acc, df.acc$stops, 1.5)
 outliers <- select(outliers, 1:4, stops, everything())
 outliers[order(outliers$stops, decreasing = T),]
 outliers[order(outliers$stops),]
+
+outliers_list$stops <- outliers$user_id
 ```
 
 
@@ -3644,6 +3772,8 @@ outliers <- get_outliers(df.acc, df.acc$velocity_mean, 1.5)
 outliers <- select(outliers, 1:4, velocity_mean, everything())
 outliers[order(outliers$velocity_mean, decreasing = T),]
 outliers[order(outliers$velocity_mean),]
+
+outliers_list$velocity_mean <- outliers$user_id
 ```
 
 
@@ -3706,6 +3836,8 @@ outliers <- get_outliers(df.acc, df.acc$velocity_sd, 1.5)
 outliers <- select(outliers, 1:4, velocity_sd, everything())
 outliers[order(outliers$velocity_sd, decreasing = T),]
 outliers[order(outliers$velocity_sd),]
+
+outliers_list$velocity_sd <- outliers$user_id
 ```
 
 
@@ -3768,6 +3900,8 @@ outliers <- get_outliers(df.acc, df.acc$velocity_mad, 1.5)
 outliers <- select(outliers, 1:4, velocity_mad, everything())
 outliers[order(outliers$velocity_mad, decreasing = T),]
 outliers[order(outliers$velocity_mad),]
+
+outliers_list$velocity_mad <- outliers$user_id
 ```
 
 
@@ -3830,6 +3964,8 @@ outliers <- get_outliers(df.acc, df.acc$velocity_min, 1.5)
 outliers <- select(outliers, 1:4, velocity_min, everything())
 outliers[order(outliers$velocity_min, decreasing = T),]
 outliers[order(outliers$velocity_min),]
+
+outliers_list$velocity_min <- outliers$user_id
 ```
 
 
@@ -3892,6 +4028,8 @@ outliers <- get_outliers(df.acc, df.acc$velocity_max, 1.5)
 outliers <- select(outliers, 1:4, velocity_max, everything())
 outliers[order(outliers$velocity_max, decreasing = T),]
 outliers[order(outliers$velocity_max),]
+
+outliers_list$velocity_max <- outliers$user_id
 ```
 
 
@@ -3954,6 +4092,8 @@ outliers <- get_outliers(df.acc, df.acc$velocity_range, 1.5)
 outliers <- select(outliers, 1:4, velocity_range, everything())
 outliers[order(outliers$velocity_range, decreasing = T),]
 outliers[order(outliers$velocity_range),]
+
+outliers_list$velocity_range <- outliers$user_id
 ```
 
 
@@ -4016,6 +4156,8 @@ outliers <- get_outliers(df.acc, df.acc$velocity_skew, 1.5)
 outliers <- select(outliers, 1:4, velocity_skew, everything())
 outliers[order(outliers$velocity_skew, decreasing = T),]
 outliers[order(outliers$velocity_skew),]
+
+outliers_list$velocity_skew <- outliers$user_id
 ```
 
 
@@ -4078,6 +4220,8 @@ outliers <- get_outliers(df.acc, df.acc$velocity_kurtosis, 1.5)
 outliers <- select(outliers, 1:4, velocity_kurtosis, everything())
 outliers[order(outliers$velocity_kurtosis, decreasing = T),]
 outliers[order(outliers$velocity_kurtosis),]
+
+outliers_list$velocity_kurtosis <- outliers$user_id
 ```
 
 
@@ -4140,6 +4284,8 @@ outliers <- get_outliers(df.acc, df.acc$velocity_se, 1.5)
 outliers <- select(outliers, 1:4, velocity_se, everything())
 outliers[order(outliers$velocity_se, decreasing = T),]
 outliers[order(outliers$velocity_se),]
+
+outliers_list$velocity_se <- outliers$user_id
 ```
 
 
@@ -4202,6 +4348,8 @@ outliers <- get_outliers(df.acc, df.acc$velocity_q0.25, 1.5)
 outliers <- select(outliers, 1:4, velocity_q0.25, everything())
 outliers[order(outliers$velocity_q0.25, decreasing = T),]
 outliers[order(outliers$velocity_q0.25),]
+
+outliers_list$velocity_q0.25 <- outliers$user_id
 ```
 
 
@@ -4264,6 +4412,8 @@ outliers <- get_outliers(df.acc, df.acc$velocity_q0.75, 1.5)
 outliers <- select(outliers, 1:4, velocity_q0.75, everything())
 outliers[order(outliers$velocity_q0.75, decreasing = T),]
 outliers[order(outliers$velocity_q0.75),]
+
+outliers_list$velocity_q0.75 <- outliers$user_id
 ```
 
 
@@ -4326,6 +4476,8 @@ outliers <- get_outliers(df.acc, df.acc$velocity_trend, 1.5)
 outliers <- select(outliers, 1:4, velocity_trend, everything())
 outliers[order(outliers$velocity_trend, decreasing = T),]
 outliers[order(outliers$velocity_trend),]
+
+outliers_list$velocity_trend <- outliers$user_id
 ```
 
 
@@ -4388,6 +4540,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_n, 1.5)
 outliers <- select(outliers, 1:4, acc_n, everything())
 outliers[order(outliers$acc_n, decreasing = T),]
 outliers[order(outliers$acc_n),]
+
+outliers_list$acc_n <- outliers$user_id
 ```
 
 
@@ -4455,6 +4609,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_sd, 1.5)
 outliers <- select(outliers, 1:4, acc_sd, everything())
 outliers[order(outliers$acc_sd, decreasing = T),]
 outliers[order(outliers$acc_sd),]
+
+outliers_list$acc_sd <- outliers$user_id
 ```
 
 
@@ -4517,6 +4673,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_median, 1.5)
 outliers <- select(outliers, 1:4, acc_median, everything())
 outliers[order(outliers$acc_median, decreasing = T),]
 outliers[order(outliers$acc_median),]
+
+outliers_list$acc_median <- outliers$user_id
 ```
 
 
@@ -4579,6 +4737,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_trimmed, 1.5)
 outliers <- select(outliers, 1:4, acc_trimmed, everything())
 outliers[order(outliers$acc_trimmed, decreasing = T),]
 outliers[order(outliers$acc_trimmed),]
+
+outliers_list$acc_trimmed <- outliers$user_id
 ```
 
 
@@ -4641,6 +4801,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_mad, 1.5)
 outliers <- select(outliers, 1:4, acc_mad, everything())
 outliers[order(outliers$acc_mad, decreasing = T),]
 outliers[order(outliers$acc_mad),]
+
+outliers_list$acc_mad <- outliers$user_id
 ```
 
 
@@ -4703,6 +4865,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_min, 1.5)
 outliers <- select(outliers, 1:4, acc_min, everything())
 outliers[order(outliers$acc_min, decreasing = T),]
 outliers[order(outliers$acc_min),]
+
+outliers_list$acc_min <- outliers$user_id
 ```
 
 
@@ -4765,6 +4929,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_max, 1.5)
 outliers <- select(outliers, 1:4, acc_max, everything())
 outliers[order(outliers$acc_max, decreasing = T),]
 outliers[order(outliers$acc_max),]
+
+outliers_list$acc_max <- outliers$user_id
 ```
 
 
@@ -4827,6 +4993,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_range, 1.5)
 outliers <- select(outliers, 1:4, acc_range, everything())
 outliers[order(outliers$acc_range, decreasing = T),]
 outliers[order(outliers$acc_range),]
+
+outliers_list$acc_range <- outliers$user_id
 ```
 
 
@@ -4889,6 +5057,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_skew, 1.5)
 outliers <- select(outliers, 1:4, acc_skew, everything())
 outliers[order(outliers$acc_skew, decreasing = T),]
 outliers[order(outliers$acc_skew),]
+
+outliers_list$acc_skew <- outliers$user_id
 ```
 
 
@@ -4951,6 +5121,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_kurtosis, 1.5)
 outliers <- select(outliers, 1:4, acc_kurtosis, everything())
 outliers[order(outliers$acc_kurtosis, decreasing = T),]
 outliers[order(outliers$acc_kurtosis),]
+
+outliers_list$acc_kurtosis <- outliers$user_id
 ```
 
 
@@ -5013,6 +5185,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_se, 1.5)
 outliers <- select(outliers, 1:4, acc_se, everything())
 outliers[order(outliers$acc_se, decreasing = T),]
 outliers[order(outliers$acc_se),]
+
+outliers_list$acc_se <- outliers$user_id
 ```
 
 
@@ -5075,6 +5249,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_q0.25, 1.5)
 outliers <- select(outliers, 1:4, acc_q0.25, everything())
 outliers[order(outliers$acc_q0.25, decreasing = T),]
 outliers[order(outliers$acc_q0.25),]
+
+outliers_list$acc_q0.25 <- outliers$user_id
 ```
 
 
@@ -5137,6 +5313,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_q0.75, 1.5)
 outliers <- select(outliers, 1:4, acc_q0.75, everything())
 outliers[order(outliers$acc_q0.75, decreasing = T),]
 outliers[order(outliers$acc_q0.75),]
+
+outliers_list$acc_q0.75 <- outliers$user_id
 ```
 
 
@@ -5199,6 +5377,8 @@ outliers <- get_outliers(df.acc, df.acc$jerk_line, 1.5)
 outliers <- select(outliers, 1:4, jerk_line, everything())
 outliers[order(outliers$jerk_line, decreasing = T),]
 outliers[order(outliers$jerk_line),]
+
+outliers_list$jerk_line <- outliers$user_id
 ```
 
 
@@ -5261,6 +5441,8 @@ outliers <- get_outliers(df.acc, df.acc$n_jerk, 1.5)
 outliers <- select(outliers, 1:4, n_jerk, everything())
 outliers[order(outliers$n_jerk, decreasing = T),]
 outliers[order(outliers$n_jerk),]
+
+outliers_list$n_jerk <- outliers$user_id
 ```
 
 
@@ -5323,6 +5505,8 @@ outliers <- get_outliers(df.acc, df.acc$dec_n, 1.5)
 outliers <- select(outliers, 1:4, dec_n, everything())
 outliers[order(outliers$dec_n, decreasing = T),]
 outliers[order(outliers$dec_n),]
+
+outliers_list$dec_n <- outliers$user_id
 ```
 
 
@@ -5385,6 +5569,8 @@ outliers <- get_outliers(df.acc, df.acc$dec_mean, 1.5)
 outliers <- select(outliers, 1:4, dec_mean, everything())
 outliers[order(outliers$dec_mean, decreasing = T),]
 outliers[order(outliers$dec_mean),]
+
+outliers_list$dec_mean <- outliers$user_id
 ```
 
 
@@ -5447,6 +5633,8 @@ outliers <- get_outliers(df.acc, df.acc$dec_sd, 1.5)
 outliers <- select(outliers, 1:4, dec_sd, everything())
 outliers[order(outliers$dec_sd, decreasing = T),]
 outliers[order(outliers$dec_sd),]
+
+outliers_list$dec_sd <- outliers$user_id
 ```
 
 
@@ -5509,6 +5697,8 @@ outliers <- get_outliers(df.acc, df.acc$dec_median, 1.5)
 outliers <- select(outliers, 1:4, dec_median, everything())
 outliers[order(outliers$dec_median, decreasing = T),]
 outliers[order(outliers$dec_median),]
+
+outliers_list$dec_median <- outliers$user_id
 ```
 
 
@@ -5571,6 +5761,8 @@ outliers <- get_outliers(df.acc, df.acc$dec_trimmed, 1.5)
 outliers <- select(outliers, 1:4, dec_trimmed, everything())
 outliers[order(outliers$dec_trimmed, decreasing = T),]
 outliers[order(outliers$dec_trimmed),]
+
+outliers_list$dec_trimmed <- outliers$user_id
 ```
 
 
@@ -5633,6 +5825,8 @@ outliers <- get_outliers(df.acc, df.acc$dec_mad, 1.5)
 outliers <- select(outliers, 1:4, dec_mad, everything())
 outliers[order(outliers$dec_mad, decreasing = T),]
 outliers[order(outliers$dec_mad),]
+
+outliers_list$dec_mad <- outliers$user_id
 ```
 
 
@@ -5695,6 +5889,8 @@ outliers <- get_outliers(df.acc, df.acc$dec_min, 1.5)
 outliers <- select(outliers, 1:4, dec_min, everything())
 outliers[order(outliers$dec_min, decreasing = T),]
 outliers[order(outliers$dec_min),]
+
+outliers_list$dec_min <- outliers$user_id
 ```
 
 
@@ -5757,6 +5953,8 @@ outliers <- get_outliers(df.acc, df.acc$dec_max, 1.5)
 outliers <- select(outliers, 1:4, dec_max, everything())
 outliers[order(outliers$dec_max, decreasing = T),]
 outliers[order(outliers$dec_max),]
+
+outliers_list$dec_max <- outliers$user_id
 ```
 
 
@@ -5819,6 +6017,8 @@ outliers <- get_outliers(df.acc, df.acc$dec_range, 1.5)
 outliers <- select(outliers, 1:4, dec_range, everything())
 outliers[order(outliers$dec_range, decreasing = T),]
 outliers[order(outliers$dec_range),]
+
+outliers_list$dec_range <- outliers$user_id
 ```
 
 
@@ -5881,6 +6081,8 @@ outliers <- get_outliers(df.acc, df.acc$dec_skew, 1.5)
 outliers <- select(outliers, 1:4, dec_skew, everything())
 outliers[order(outliers$dec_skew, decreasing = T),]
 outliers[order(outliers$dec_skew),]
+
+outliers_list$dec_skew <- outliers$user_id
 ```
 
 
@@ -5943,6 +6145,8 @@ outliers <- get_outliers(df.acc, df.acc$dec_kurtosis, 1.5)
 outliers <- select(outliers, 1:4, dec_kurtosis, everything())
 outliers[order(outliers$dec_kurtosis, decreasing = T),]
 outliers[order(outliers$dec_kurtosis),]
+
+outliers_list$dec_kurtosis <- outliers$user_id
 ```
 
 
@@ -6005,6 +6209,8 @@ outliers <- get_outliers(df.acc, df.acc$dec_se, 1.5)
 outliers <- select(outliers, 1:4, dec_se, everything())
 outliers[order(outliers$dec_se, decreasing = T),]
 outliers[order(outliers$dec_se),]
+
+outliers_list$dec_se <- outliers$user_id
 ```
 
 
@@ -6067,6 +6273,8 @@ outliers <- get_outliers(df.acc, df.acc$dec_q0.25, 1.5)
 outliers <- select(outliers, 1:4, dec_q0.25, everything())
 outliers[order(outliers$dec_q0.25, decreasing = T),]
 outliers[order(outliers$dec_q0.25),]
+
+outliers_list$dec_q0.25 <- outliers$user_id
 ```
 
 
@@ -6129,6 +6337,8 @@ outliers <- get_outliers(df.acc, df.acc$dec_q0.75, 1.5)
 outliers <- select(outliers, 1:4, dec_q0.75, everything())
 outliers[order(outliers$dec_q0.75, decreasing = T),]
 outliers[order(outliers$dec_q0.75),]
+
+outliers_list$dec_q0.75 <- outliers$user_id
 ```
 
 
@@ -6191,6 +6401,8 @@ outliers <- get_outliers(df.acc, df.acc$braking_line, 1.5)
 outliers <- select(outliers, 1:4, braking_line, everything())
 outliers[order(outliers$braking_line, decreasing = T),]
 outliers[order(outliers$braking_line),]
+
+outliers_list$braking_line <- outliers$user_id
 ```
 
 
@@ -6253,6 +6465,8 @@ outliers <- get_outliers(df.acc, df.acc$n_braking, 1.5)
 outliers <- select(outliers, 1:4, n_braking, everything())
 outliers[order(outliers$n_braking, decreasing = T),]
 outliers[order(outliers$n_braking),]
+
+outliers_list$n_braking <- outliers$user_id
 ```
 
 
@@ -6315,6 +6529,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_per_sec_mean, 1.5)
 outliers <- select(outliers, 1:4, acc_per_sec_mean, everything())
 outliers[order(outliers$acc_per_sec_mean, decreasing = T),]
 outliers[order(outliers$acc_per_sec_mean),]
+
+outliers_list$acc_per_sec_mean <- outliers$user_id
 ```
 
 
@@ -6377,6 +6593,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_per_sec_sd, 1.5)
 outliers <- select(outliers, 1:4, acc_per_sec_sd, everything())
 outliers[order(outliers$acc_per_sec_sd, decreasing = T),]
 outliers[order(outliers$acc_per_sec_sd),]
+
+outliers_list$acc_per_sec_sd <- outliers$user_id
 ```
 
 
@@ -6439,6 +6657,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_per_sec_median, 1.5)
 outliers <- select(outliers, 1:4, acc_per_sec_median, everything())
 outliers[order(outliers$acc_per_sec_median, decreasing = T),]
 outliers[order(outliers$acc_per_sec_median),]
+
+outliers_list$acc_per_sec_median <- outliers$user_id
 ```
 
 
@@ -6501,6 +6721,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_per_sec_trimmed, 1.5)
 outliers <- select(outliers, 1:4, acc_per_sec_trimmed, everything())
 outliers[order(outliers$acc_per_sec_trimmed, decreasing = T),]
 outliers[order(outliers$acc_per_sec_trimmed),]
+
+outliers_list$acc_per_sec_trimmed <- outliers$user_id
 ```
 
 
@@ -6563,6 +6785,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_per_sec_mad, 1.5)
 outliers <- select(outliers, 1:4, acc_per_sec_mad, everything())
 outliers[order(outliers$acc_per_sec_mad, decreasing = T),]
 outliers[order(outliers$acc_per_sec_mad),]
+
+outliers_list$acc_per_sec_mad <- outliers$user_id
 ```
 
 
@@ -6625,6 +6849,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_per_sec_min, 1.5)
 outliers <- select(outliers, 1:4, acc_per_sec_min, everything())
 outliers[order(outliers$acc_per_sec_min, decreasing = T),]
 outliers[order(outliers$acc_per_sec_min),]
+
+outliers_list$acc_per_sec_min <- outliers$user_id
 ```
 
 
@@ -6687,6 +6913,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_per_sec_max, 1.5)
 outliers <- select(outliers, 1:4, acc_per_sec_max, everything())
 outliers[order(outliers$acc_per_sec_max, decreasing = T),]
 outliers[order(outliers$acc_per_sec_max),]
+
+outliers_list$acc_per_sec_max <- outliers$user_id
 ```
 
 
@@ -6749,6 +6977,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_per_sec_range, 1.5)
 outliers <- select(outliers, 1:4, acc_per_sec_range, everything())
 outliers[order(outliers$acc_per_sec_range, decreasing = T),]
 outliers[order(outliers$acc_per_sec_range),]
+
+outliers_list$acc_per_sec_range <- outliers$user_id
 ```
 
 
@@ -6811,6 +7041,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_per_sec_skew, 1.5)
 outliers <- select(outliers, 1:4, acc_per_sec_skew, everything())
 outliers[order(outliers$acc_per_sec_skew, decreasing = T),]
 outliers[order(outliers$acc_per_sec_skew),]
+
+outliers_list$acc_per_sec_skew <- outliers$user_id
 ```
 
 
@@ -6873,6 +7105,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_per_sec_kurtosis, 1.5)
 outliers <- select(outliers, 1:4, acc_per_sec_kurtosis, everything())
 outliers[order(outliers$acc_per_sec_kurtosis, decreasing = T),]
 outliers[order(outliers$acc_per_sec_kurtosis),]
+
+outliers_list$acc_per_sec_kurtosis <- outliers$user_id
 ```
 
 
@@ -6935,6 +7169,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_per_sec_se, 1.5)
 outliers <- select(outliers, 1:4, acc_per_sec_se, everything())
 outliers[order(outliers$acc_per_sec_se, decreasing = T),]
 outliers[order(outliers$acc_per_sec_se),]
+
+outliers_list$acc_per_sec_se <- outliers$user_id
 ```
 
 
@@ -6997,6 +7233,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_per_sec_q0.25, 1.5)
 outliers <- select(outliers, 1:4, acc_per_sec_q0.25, everything())
 outliers[order(outliers$acc_per_sec_q0.25, decreasing = T),]
 outliers[order(outliers$acc_per_sec_q0.25),]
+
+outliers_list$acc_per_sec_q0.25 <- outliers$user_id
 ```
 
 
@@ -7059,6 +7297,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_per_sec_q0.75, 1.5)
 outliers <- select(outliers, 1:4, acc_per_sec_q0.75, everything())
 outliers[order(outliers$acc_per_sec_q0.75, decreasing = T),]
 outliers[order(outliers$acc_per_sec_q0.75),]
+
+outliers_list$acc_per_sec_q0.75 <- outliers$user_id
 ```
 
 
@@ -7121,6 +7361,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_per_sec_max_pos, 1.5)
 outliers <- select(outliers, 1:4, acc_per_sec_max_pos, everything())
 outliers[order(outliers$acc_per_sec_max_pos, decreasing = T),]
 outliers[order(outliers$acc_per_sec_max_pos),]
+
+outliers_list$acc_per_sec_max_pos <- outliers$user_id
 ```
 
 
@@ -7183,6 +7425,8 @@ outliers <- get_outliers(df.acc, df.acc$acc_per_sec_min_pos, 1.5)
 outliers <- select(outliers, 1:4, acc_per_sec_min_pos, everything())
 outliers[order(outliers$acc_per_sec_min_pos, decreasing = T),]
 outliers[order(outliers$acc_per_sec_min_pos),]
+
+outliers_list$acc_per_sec_min_pos <- outliers$user_id
 ```
 
 
@@ -7245,6 +7489,8 @@ outliers <- get_outliers(df.acc, df.acc$missings_distance, 1.5)
 outliers <- select(outliers, 1:4, missings_distance, everything())
 outliers[order(outliers$missings_distance, decreasing = T),]
 outliers[order(outliers$missings_distance),]
+
+outliers_list$missings_distance <- outliers$user_id
 ```
 
 
@@ -7307,6 +7553,8 @@ outliers <- get_outliers(df.acc, df.acc$missings_mean, 1.5)
 outliers <- select(outliers, 1:4, missings_mean, everything())
 outliers[order(outliers$missings_mean, decreasing = T),]
 outliers[order(outliers$missings_mean),]
+
+outliers_list$missings_mean <- outliers$user_id
 ```
 
 
@@ -7369,6 +7617,8 @@ outliers <- get_outliers(df.acc, df.acc$missings_sd, 1.5)
 outliers <- select(outliers, 1:4, missings_sd, everything())
 outliers[order(outliers$missings_sd, decreasing = T),]
 outliers[order(outliers$missings_sd),]
+
+outliers_list$missings_sd <- outliers$user_id
 ```
 
 
@@ -7431,6 +7681,8 @@ outliers <- get_outliers(df.acc, df.acc$missings_median, 1.5)
 outliers <- select(outliers, 1:4, missings_median, everything())
 outliers[order(outliers$missings_median, decreasing = T),]
 outliers[order(outliers$missings_median),]
+
+outliers_list$missings_median <- outliers$user_id
 ```
 
 
@@ -7493,6 +7745,8 @@ outliers <- get_outliers(df.acc, df.acc$missings_trimmed, 1.5)
 outliers <- select(outliers, 1:4, missings_trimmed, everything())
 outliers[order(outliers$missings_trimmed, decreasing = T),]
 outliers[order(outliers$missings_trimmed),]
+
+outliers_list$missings_trimmed <- outliers$user_id
 ```
 
 
@@ -7555,6 +7809,8 @@ outliers <- get_outliers(df.acc, df.acc$missings_mad, 1.5)
 outliers <- select(outliers, 1:4, missings_mad, everything())
 outliers[order(outliers$missings_mad, decreasing = T),]
 outliers[order(outliers$missings_mad),]
+
+outliers_list$missings_mad <- outliers$user_id
 ```
 
 
@@ -7617,6 +7873,8 @@ outliers <- get_outliers(df.acc, df.acc$missings_min, 1.5)
 outliers <- select(outliers, 1:4, missings_min, everything())
 outliers[order(outliers$missings_min, decreasing = T),]
 outliers[order(outliers$missings_min),]
+
+outliers_list$missings_min <- outliers$user_id
 ```
 
 
@@ -7679,6 +7937,8 @@ outliers <- get_outliers(df.acc, df.acc$missings_max, 1.5)
 outliers <- select(outliers, 1:4, missings_max, everything())
 outliers[order(outliers$missings_max, decreasing = T),]
 outliers[order(outliers$missings_max),]
+
+outliers_list$missings_max <- outliers$user_id
 ```
 
 
@@ -7741,6 +8001,8 @@ outliers <- get_outliers(df.acc, df.acc$missings_range, 1.5)
 outliers <- select(outliers, 1:4, missings_range, everything())
 outliers[order(outliers$missings_range, decreasing = T),]
 outliers[order(outliers$missings_range),]
+
+outliers_list$missings_range <- outliers$user_id
 ```
 
 
@@ -7803,6 +8065,8 @@ outliers <- get_outliers(df.acc, df.acc$missings_skew, 1.5)
 outliers <- select(outliers, 1:4, missings_skew, everything())
 outliers[order(outliers$missings_skew, decreasing = T),]
 outliers[order(outliers$missings_skew),]
+
+outliers_list$missings_skew <- outliers$user_id
 ```
 
 
@@ -7865,6 +8129,8 @@ outliers <- get_outliers(df.acc, df.acc$missings_kurtosis, 1.5)
 outliers <- select(outliers, 1:4, missings_kurtosis, everything())
 outliers[order(outliers$missings_kurtosis, decreasing = T),]
 outliers[order(outliers$missings_kurtosis),]
+
+outliers_list$missings_kurtosis <- outliers$user_id
 ```
 
 
@@ -7927,6 +8193,8 @@ outliers <- get_outliers(df.acc, df.acc$missings_se, 1.5)
 outliers <- select(outliers, 1:4, missings_se, everything())
 outliers[order(outliers$missings_se, decreasing = T),]
 outliers[order(outliers$missings_se),]
+
+outliers_list$missings_se <- outliers$user_id
 ```
 
 
@@ -7989,6 +8257,8 @@ outliers <- get_outliers(df.acc, df.acc$missings_q0.25, 1.5)
 outliers <- select(outliers, 1:4, missings_q0.25, everything())
 outliers[order(outliers$missings_q0.25, decreasing = T),]
 outliers[order(outliers$missings_q0.25),]
+
+outliers_list$missings_q0.25 <- outliers$user_id
 ```
 
 
@@ -8051,6 +8321,8 @@ outliers <- get_outliers(df.acc, df.acc$missings_q0.75, 1.5)
 outliers <- select(outliers, 1:4, missings_q0.75, everything())
 outliers[order(outliers$missings_q0.75, decreasing = T),]
 outliers[order(outliers$missings_q0.75),]
+
+outliers_list$missings_q0.75 <- outliers$user_id
 ```
 
 
@@ -8113,6 +8385,8 @@ outliers <- get_outliers(df.acc, df.acc$missings, 1.5)
 outliers <- select(outliers, 1:4, missings, everything())
 outliers[order(outliers$missings, decreasing = T),]
 outliers[order(outliers$missings),]
+
+outliers_list$missings <- outliers$user_id
 ```
 
 
@@ -8175,6 +8449,8 @@ outliers <- get_outliers(df.acc, df.acc$hits, 1.5)
 outliers <- select(outliers, 1:4, hits, everything())
 outliers[order(outliers$hits, decreasing = T),]
 outliers[order(outliers$hits),]
+
+outliers_list$hits <- outliers$user_id
 ```
 
 
@@ -8237,6 +8513,8 @@ outliers <- get_outliers(df.acc, df.acc$missings_trend, 1.5)
 outliers <- select(outliers, 1:4, missings_trend, everything())
 outliers[order(outliers$missings_trend, decreasing = T),]
 outliers[order(outliers$missings_trend),]
+
+outliers_list$missings_trend <- outliers$user_id
 ```
 
 
@@ -8299,6 +8577,8 @@ outliers <- get_outliers(df.acc, df.acc$accuracy_rate, 1.5)
 outliers <- select(outliers, 1:4, accuracy_rate, everything())
 outliers[order(outliers$accuracy_rate, decreasing = T),]
 outliers[order(outliers$accuracy_rate),]
+
+outliers_list$accuracy_rate <- outliers$user_id
 ```
 
 
@@ -8361,6 +8641,8 @@ outliers <- get_outliers(df.acc, df.acc$combo_hits, 1.5)
 outliers <- select(outliers, 1:4, combo_hits, everything())
 outliers[order(outliers$combo_hits, decreasing = T),]
 outliers[order(outliers$combo_hits),]
+
+outliers_list$combo_hits <- outliers$user_id
 ```
 
 
@@ -8423,6 +8705,8 @@ outliers <- get_outliers(df.acc, df.acc$combo_missings, 1.5)
 outliers <- select(outliers, 1:4, combo_missings, everything())
 outliers[order(outliers$combo_missings, decreasing = T),]
 outliers[order(outliers$combo_missings),]
+
+outliers_list$combo_missings <- outliers$user_id
 ```
 
 
@@ -8495,11 +8779,20 @@ outliers <- get_outliers(df.acc, df.acc$corr_sat, 1.5)
 outliers <- select(outliers, 1:4, corr_sat, everything())
 outliers[order(outliers$corr_sat, decreasing = T),]
 outliers[order(outliers$corr_sat),]
+
+outliers_list$corr_sat <- outliers$user_id
 ```
 
 
 
 
+
+
+### Outliers
+
+```{r}
+save(outliers_list, file = "./data/envs/1_desc_stat/outliers.acc.RData")
+```
 
 
 ### Корреляционный анализ {.tabset .tabset-fade .tabset-pills}
