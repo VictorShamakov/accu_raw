@@ -31,7 +31,7 @@ files_ca <- list(
 
 files_sp <- lapply(list.files()[grep("^5.[1-9].*.Rmd", list.files())], function(name) {
   list(
-    input = paste0('./', name, '.Rmd'),
+    input = paste0('./', name),
     output = paste0('./reports/', name, '.html')
   )
 })

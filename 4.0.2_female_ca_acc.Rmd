@@ -48,10 +48,6 @@ set.seed(10)
 n_clusters <- 5
 ```
 
-```{r}
-#Пропуски
-df.acc <- na.omit(df.acc)
-```
 
 
 ```{r}
@@ -60,12 +56,44 @@ df.acc <- df.acc[df.acc$gender == "F",]
 
 
 
+
+
 ```{r}
-df <- df.acc
+## Логарифмирование
+logarithmized_vars <- c("time_total", "time_mean", "time_sd", "time_median", "time_trimmed", "time_mad", 
+                        "time_max", "time_range", "time_kurtosis", "time_q0.25", "time_q0.75",
+                        "distance_sd", "distance_max", "distance_range", "distance_skew", "distance_se",
+                        "pause_total", "pause_mean", "pause_sd", "pause_median", "pause_trimmed", 
+                        "pause_mad", "pause_min", "pause_max", "pause_range", "pause_kurtosis", "pause_se", "pause_q0.25", "pause_q0.75", "stops",
+                        "velocity_kurtosis", 
+                        "acc_n", "acc_sd", "acc_median", "acc_trimmed", "acc_mad", "acc_max", "acc_range", "acc_skew", 
+                        "acc_kurtosis", "acc_se", "acc_q0.75", "jerk_line", "dec_n",
+                        "dec_sd", "dec_mad", "dec_range", "dec_kurtosis", "dec_se", "n_braking",
+                        "acc_per_sec_mean", "acc_per_sec_sd", "acc_per_sec_median", "acc_per_sec_trimmed", "acc_per_sec_mad", 
+                        "acc_per_sec_min", "acc_per_sec_max", "acc_per_sec_range", "acc_per_sec_se", "acc_per_sec_q0.25", 
+                        "acc_per_sec_q0.75", "acc_per_sec_max_pos",
+                        "missings_sd", "missings_max", "missings_range", "missings_skew", 
+                        "missings_kurtosis", "missings_se", "missings", "combo_missings")
+
+df.acc[, logarithmized_vars] <- lapply(df.acc[, logarithmized_vars], function(x) {
+  if (sum(x <= 0, na.rm = T) > 0) {
+    x <- log1p(x)
+  } else {
+    x <- log(x)
+  }
+})
 ```
 
 
 
+```{r}
+#Пропуски
+df.acc <- na.omit(df.acc)
+```
+
+```{r}
+df <- df.acc
+```
 
 ## Иерархический кластерный анализ
 
