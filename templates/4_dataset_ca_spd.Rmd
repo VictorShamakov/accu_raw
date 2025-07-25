@@ -1,6 +1,6 @@
 
 ```{r}
-# Набор данных: Точность
+# Набор данных: скорость
 load("./data/envs/4_cluster_analysis/df.spd.RData")
 
 ```
