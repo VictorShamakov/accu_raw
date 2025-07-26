@@ -49,17 +49,21 @@ n_clusters <- 5
 ```
 
 
+```{r}
+df <- df.{{stage}}
+```
+
 {% if gender == 'male' %}
 ```{r}
-df.{{stage}} <- df.{{stage}}[df.{{stage}}$gender == "M",]
+df <- df[df$gender == "M",]
 ```
 {% elif gender == "female" %}
 ```{r}
-df.{{stage}} <- df.{{stage}}[df.{{stage}}$gender == "F",]
+df <- df[df$gender == "F",]
 ```
 {% else %}
 ```{r}
-df.{{stage}}$gender_num <- as.numeric(df.{{stage}}$gender) - 1
+df$gender_num <- as.numeric(df$gender) - 1
 ```
 {% endif %}
 
@@ -83,7 +87,7 @@ logarithmized_vars <- c("time_total", "time_mean", "time_sd", "time_median", "ti
                         "missings_sd", "missings_max", "missings_range", "missings_skew", 
                         "missings_kurtosis", "missings_se", "missings", "combo_missings")
 
-df.{{stage}}[, logarithmized_vars] <- lapply(df.{{stage}}[, logarithmized_vars], function(x) {
+df[, logarithmized_vars] <- lapply(df[, logarithmized_vars], function(x) {
   if (sum(x <= 0, na.rm = T) > 0) {
     x <- log1p(x)
   } else {
@@ -96,11 +100,7 @@ df.{{stage}}[, logarithmized_vars] <- lapply(df.{{stage}}[, logarithmized_vars],
 
 ```{r}
 #Пропуски
-df.{{stage}} <- na.omit(df.{{stage}})
-```
-
-```{r}
-df <- df.{{stage}}
+df <- na.omit(df)
 ```
 
 ## Иерархический кластерный анализ
@@ -530,6 +530,7 @@ df <- rbind(df, select(clickers.{{stage}}, names(df)))
 
 ```{r}
 df[, grep("clust", names(df))] <- lapply(df[, grep("clust", names(df))], factor)
+df <- merge(df.{{stage}}, select(df, user_id, contains("clust")), by = "user_id")
 ```
 
 

@@ -49,9 +49,13 @@ n_clusters <- 5
 ```
 
 
+```{r}
+df <- df.acc
+```
+
 
 ```{r}
-df.acc$gender_num <- as.numeric(df.acc$gender) - 1
+df$gender_num <- as.numeric(df$gender) - 1
 ```
 
 
@@ -75,7 +79,7 @@ logarithmized_vars <- c("time_total", "time_mean", "time_sd", "time_median", "ti
                         "missings_sd", "missings_max", "missings_range", "missings_skew", 
                         "missings_kurtosis", "missings_se", "missings", "combo_missings")
 
-df.acc[, logarithmized_vars] <- lapply(df.acc[, logarithmized_vars], function(x) {
+df[, logarithmized_vars] <- lapply(df[, logarithmized_vars], function(x) {
   if (sum(x <= 0, na.rm = T) > 0) {
     x <- log1p(x)
   } else {
@@ -88,11 +92,7 @@ df.acc[, logarithmized_vars] <- lapply(df.acc[, logarithmized_vars], function(x)
 
 ```{r}
 #Пропуски
-df.acc <- na.omit(df.acc)
-```
-
-```{r}
-df <- df.acc
+df <- na.omit(df)
 ```
 
 ## Иерархический кластерный анализ
@@ -507,11 +507,8 @@ for (k in 2:n_clusters) {
 
 ```{r}
 df[, grep("clust", names(df))] <- lapply(df[, grep("clust", names(df))], factor)
+df <- merge(df.acc, select(df, user_id, contains("clust")), by = "user_id")
 ```
-
-
-
-
 
 
 ```{r}
