@@ -4,13 +4,13 @@ author: "SVA"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
-    css: "styles.css"
+    css: "../styles.css"
     code_folding: hide
-    self_contained: no
     toc: yes
     toc_depth: 4
     toc_float:
       collapsed: no
+    self_contained: no
     df_print: paged
   word_document:
     toc: yes
