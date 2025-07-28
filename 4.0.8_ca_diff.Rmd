@@ -1,0 +1,473 @@
+---
+title: "Кластерный анализ"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    df_print: paged
+    toc: yes
+    toc_depth: 4
+    toc_float:
+      collapsed: no
+    self_contained: no
+  word_document:
+    toc: yes
+    toc_depth: '4'
+editor_options:
+  chunk_output_type: inline
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  include = TRUE,
+  message= FALSE, 
+  warning= FALSE
+)
+```
+
+
+```{r}
+rm(list=ls())
+load("./data/envs/1_desc_stat/df.RData")
+load("./data/envs/1_desc_stat/df.acc.RData")
+load("./data/envs/1_desc_stat/df.spd.RData")
+load("./data/envs/1_desc_stat/clickers.acc.RData")
+load("./data/envs/1_desc_stat/clickers.spd.RData")
+
+source("functions.R")
+library("factoextra")
+library("ggdendro")
+library(cluster)
+set.seed(10)
+n_clusters <- 5
+```
+
+
+
+
+
+```{r}
+pd <- select(df.acc, user_id, gender)
+df.acc <- select(df.acc, everything(), -user_id, -session_id, -test_id, -ratio, -gender, -clicked_through_targets, -combo_clicked_through_targets, -stage)
+
+df.spd <- select(df.spd, everything(), -user_id, -session_id, -test_id, -ratio, -gender, -clicked_through_targets, -combo_clicked_through_targets, -stage)
+
+df.diff <- df.acc - df.spd
+df.diff <- cbind(pd, df.diff)
+```
+
+```{r}
+df <- df.diff
+```
+
+
+
+
+
+
+```{r}
+df$gender_num <- as.numeric(df$gender) - 1
+```
+
+
+
+
+
+
+
+```{r}
+## Логарифмирование
+logarithmized_vars <- c("time_total", "time_mean", "time_sd", "time_median", "time_trimmed", "time_mad", 
+                        "time_max", "time_range", "time_kurtosis", "time_q0.25", "time_q0.75",
+                        "distance_sd", "distance_max", "distance_range", "distance_skew", "distance_se",
+                        "pause_total", "pause_mean", "pause_sd", "pause_median", "pause_trimmed", 
+                        "pause_mad", "pause_min", "pause_max", "pause_range", "pause_kurtosis", "pause_se", "pause_q0.25", "pause_q0.75", "stops",
+                        "velocity_kurtosis", 
+                        "acc_n", "acc_sd", "acc_median", "acc_trimmed", "acc_mad", "acc_max", "acc_range", "acc_skew", 
+                        "acc_kurtosis", "acc_se", "acc_q0.75", "jerk_line", "dec_n",
+                        "dec_sd", "dec_mad", "dec_range", "dec_kurtosis", "dec_se", "n_braking",
+                        "acc_per_sec_mean", "acc_per_sec_sd", "acc_per_sec_median", "acc_per_sec_trimmed", "acc_per_sec_mad", 
+                        "acc_per_sec_min", "acc_per_sec_max", "acc_per_sec_range", "acc_per_sec_se", "acc_per_sec_q0.25", 
+                        "acc_per_sec_q0.75", "acc_per_sec_max_pos",
+                        "missings_sd", "missings_max", "missings_range", "missings_skew", 
+                        "missings_kurtosis", "missings_se", "missings", "combo_missings")
+
+logz_pattern <- paste0("^", logarithmized_vars, "(.acc$|.spd$|$)", collapse = "|")
+df[, grep(logz_pattern, names(df))] <- lapply(df[, grep(logz_pattern, names(df))], function(x) {
+  if (sum(x <= 0, na.rm = T) > 0) {
+    x <- log1p(x)
+  } else {
+    x <- log(x)
+  }
+})
+```
+
+
+
+
+
+```{r}
+#Пропуски
+df <- na.omit(df)
+```
+
+
+```{r}
+# Подготовка датасетов для кластеризации
+## Все переменные
+vars_class <- lapply(df, class)
+df.num <- df[, vars_class == "numeric" | vars_class == "integer"]
+df.num <- select(df.num, -user_id)
+df.num.scaled <- scale(df.num)
+```
+
+```{r}
+## Некоррелированные переменные
+corr_vars <- c("distance_trimmed", "dec_trimmed", "acc_q0.75", "pause_q0.25", "missings_range", "time_q0.75", "missings_se", "missings_max", "acc_q0.25", "dec_q0.25", "acc_per_sec_q0.25", "pause_se", "acc_per_sec_q0.75", "pause_kurtosis", "missings_q0.25", "pause_trimmed", "missings_q0.75", "acc_kurtosis", "missings_kurtosis", "dec_mad", "acc_mad", "pause_q0.75", "missings_median", "acc_per_sec_median", "time_median", "time_q0.25", "time_trend", "time_trimmed", "acc_per_sec_trimmed", "missings_trimmed", "time_mean", "distance_se", "velocity_se", "missings_mean", "distance_mean", "acc_range", "dec_range", "time_range", "dec_median", "time_max", "dec_kurtosis", "acc_trimmed", "pause_median", "velocity_q0.75", "distance_kurtosis", "distance_range", "pause_mad", "dec_q0.75", "velocity_q0.25", "acc_se", "acc_max", "acc_per_sec_mad", "time_mad", "dec_se", "time_kurtosis", "distance_max", "time_se", "missings_mad", "dec_min", "distance_median", "dec_sd", "distance_sd", "distance_q0.75", "acc_median", "velocity_mad", "velocity_range", "dec_mean", "time_sd", "pause_mean", "distance_q0.25", "acc_per_sec_se", "velocity_max", "missings_skew", "missings_min", "accuracy_rate", "time_min", "distance_min", "jerk_line", "velocity_mean", "missings_sd")
+
+df.not_corr <- scale(select(df.num, -contains(corr_vars)))
+```
+
+```{r}
+## Время, расстояние, точность
+df.tdm <- scale(select(df.num, contains(c("time_total", "distance_total", "missings_distance"))))
+```
+
+```{r}
+## Паузы
+df.pauses <- scale(select(df.num, starts_with("pause")))
+```
+
+```{r}
+## Время, расстояние, точность и паузы
+df.tdmp <- scale(select(df.num, contains(c("time_total", "distance_total", "missings_distance")), starts_with("pause")))
+```
+
+## Иерархический кластерный анализ
+### Все переменные
+
+```{r}
+dist <- dist(df.num.scaled)
+hc <- hclust(dist, method = "ward.D2")
+
+for (k in 2:n_clusters) {
+  plot(hc, cex = 0.3, hang = -1)
+  rect.hclust(hc, k = k, border = 2:10)
+  
+  df[, paste0("all_hclust", k)] <- cutree(hc, k = k)
+  
+  sil <- silhouette(cutree(hc, k = k), dist)
+  print(fviz_silhouette(sil))
+}
+```
+
+```{r fig.height=11, fig.width=11}
+# ggpairs(df, columns = 8:22, mapping = aes(color = gender),
+        # diag = list(continuous = wrap("densityDiag", alpha = 0.5), discrete = "barDiag", na = "naDiag"))
+```
+
+### Все некоррелированные переменные
+
+```{r}
+dist <- dist(df.not_corr)
+hc <- hclust(dist, method = "ward.D2")
+
+for (k in 2:n_clusters) {
+  plot(hc, cex = 0.3, hang = -1)
+  rect.hclust(hc, k = k, border = 2:9)
+  
+  df[, paste0("notcorr_hclust", k)] <- cutree(hc, k = k)
+  
+  sil <- silhouette(cutree(hc, k = k), dist)
+  print(fviz_silhouette(sil))
+}
+```
+
+
+### Время, расстояние, точность
+```{r}
+dist <- dist(df.tdm)
+hc <- hclust(dist, method = "ward.D2")
+
+for (k in 2:n_clusters) {
+  plot(hc, cex = 0.3, hang = -1)
+  rect.hclust(hc, k = k, border = 2:10)
+  
+  df[, paste0("tdm_hclust", k)] <- cutree(hc, k = k)
+  
+  sil <- silhouette(cutree(hc, k = k), dist)
+  print(fviz_silhouette(sil))
+}
+```
+
+### Паузы
+```{r}
+dist <- dist(df.pauses)
+hc <- hclust(dist, method = "ward.D2")
+
+for (k in 2:n_clusters) {
+  plot(hc, cex = 0.3, hang = -1)
+  rect.hclust(hc, k = k, border = 2:10)
+  
+  df[, paste0("pauses_hclust", k)] <- cutree(hc, k = k)
+  
+  sil <- silhouette(cutree(hc, k = k), dist)
+  print(fviz_silhouette(sil))
+}
+```
+
+
+### Время, расстояние, точность и паузы
+```{r}
+dist <- dist(df.tdmp)
+hc <- hclust(dist, method = "ward.D2")
+
+for (k in 2:n_clusters) {
+  plot(hc, cex = 0.3, hang = -1)
+  rect.hclust(hc, k = k, border = 2:10)
+  
+  df[, paste0("tdmp_hclust", k)] <- cutree(hc, k = k)
+  
+  sil <- silhouette(cutree(hc, k = k), dist)
+  print(fviz_silhouette(sil))
+}
+```
+
+
+### Все кластеры
+```{r}
+df[, grep("hclust", names(df))]
+```
+
+
+## Кластерный анализ K-means
+
+```{r}
+# Вычисляем WSS для k от 1 до 10
+wss_values <- sapply(1:10, function(k) {
+  kmeans(df.num.scaled, centers = k, nstart = 25)$tot.withinss
+})
+
+# Создаем датафрейм для ggplot
+elbow_df <- data.frame(
+  k = 1:10,
+  wss = wss_values
+)
+
+# Строим график метода локтя с ggplot2
+ggplot(elbow_df, aes(x = k, y = wss)) +
+  geom_line(color = "steelblue", size = 1) +
+  geom_point(color = "steelblue", size = 3) +
+  scale_x_continuous(breaks = 1:10) +
+  labs(title = "Метод локтя для выбора числа кластеров",
+       x = "Количество кластеров K",
+       y = "Сумма внутрикластерных квадратов (WSS)") +
+  theme_minimal()
+```
+
+### Все переменные
+```{r}
+for (k in 2:n_clusters) {
+  km.res <- kmeans(df.num.scaled, k, nstart = 25)
+  df[, paste0("all_kmclust", k)] <- km.res$cluster
+  
+  sil <- silhouette(km.res$cluster, dist(df.num.scaled))
+  print(fviz_silhouette(sil))
+  
+  print(fviz_cluster(km.res, data = na.omit(df.num.scaled),
+               ggtheme = theme_minimal(),
+               main = "Partitioning Clustering Plot",
+               geom = c("point")
+               ))
+}
+
+
+```
+
+
+### Все некоррелированные переменные
+
+```{r}
+for (k in 2:n_clusters) {
+  km.res <- kmeans(df.not_corr, k, nstart = 25)
+  df[, paste0("notcorr_kmclust", k)] <- km.res$cluster
+  
+  sil <- silhouette(km.res$cluster, dist(df.not_corr))
+  print(fviz_silhouette(sil))
+  
+  print(fviz_cluster(km.res, data = na.omit(df.not_corr),
+               ggtheme = theme_minimal(),
+               main = "Partitioning Clustering Plot",
+               geom = c("point")
+               ))
+}
+
+```
+
+
+### Время, расстояние, точность
+
+```{r}
+for (k in 2:n_clusters) {
+  km.res <- kmeans(df.tdm, k, nstart = 25)
+  df[, paste0("tdm_kmclust", k)] <- km.res$cluster
+  
+  sil <- silhouette(km.res$cluster, dist(df.tdm))
+  print(fviz_silhouette(sil))
+  
+  print(fviz_cluster(km.res, data = na.omit(df.tdm),
+               ggtheme = theme_minimal(),
+               main = "Partitioning Clustering Plot",
+               geom = c("point")
+               ))
+}
+```
+
+### Паузы
+
+```{r}
+for (k in 2:n_clusters) {
+  km.res <- kmeans(df.pauses, k, nstart = 25)
+  df[, paste0("pauses_kmclust", k)] <- km.res$cluster
+  
+  sil <- silhouette(km.res$cluster, dist(df.pauses))
+  print(fviz_silhouette(sil))
+  
+  print(fviz_cluster(km.res, data = na.omit(df.pauses),
+               ggtheme = theme_minimal(),
+               main = "Partitioning Clustering Plot",
+               geom = c("point")
+               ))
+}
+```
+
+
+### Время, расстояние, точность и паузы
+```{r}
+for (k in 2:n_clusters) {
+  km.res <- kmeans(df.tdmp, k, nstart = 25)
+  df[, paste0("tdmp_kmclust", k)] <- km.res$cluster
+  
+  sil <- silhouette(km.res$cluster, dist(df.tdmp))
+  print(fviz_silhouette(sil))
+  
+  print(fviz_cluster(km.res, data = na.omit(df.tdmp),
+               ggtheme = theme_minimal(),
+               main = "Partitioning Clustering Plot",
+               geom = c("point")
+               ))
+}
+```
+
+
+## K-medoids
+### Все переменные
+```{r}
+for (k in 2:n_clusters) {
+  kmd.res <- pam(df.num.scaled, k = k)
+  df[, paste0("all_kmdclust", k)] <- kmd.res$cluster
+  
+  sil <- silhouette(kmd.res$cluster, dist(df.num.scaled))
+  print(fviz_silhouette(sil))
+  
+  print(fviz_cluster(kmd.res, data = na.omit(df.num.scaled),
+               ggtheme = theme_minimal(),
+               main = "Partitioning Clustering Plot",
+               geom = c("point")
+               ))
+}
+```
+
+### Все некоррелированные переменные
+
+```{r}
+for (k in 2:n_clusters) {
+  kmd.res <- pam(df.not_corr, k)
+  df[, paste0("notcorr_kmdclust", k)] <- kmd.res$cluster
+  
+  sil <- silhouette(kmd.res$cluster, dist(df.not_corr))
+  print(fviz_silhouette(sil))
+  
+  print(fviz_cluster(kmd.res, data = na.omit(df.not_corr),
+               ggtheme = theme_minimal(),
+               main = "Partitioning Clustering Plot",
+               geom = c("point")
+               ))
+}
+
+```
+
+
+### Время, расстояние, точность
+
+```{r}
+for (k in 2:n_clusters) {
+  kmd.res <- pam(df.tdm, k)
+  df[, paste0("tdm_kmdclust", k)] <- kmd.res$cluster
+  
+  sil <- silhouette(kmd.res$cluster, dist(df.tdm))
+  print(fviz_silhouette(sil))
+  
+  print(fviz_cluster(kmd.res, data = na.omit(df.tdm),
+               ggtheme = theme_minimal(),
+               main = "Partitioning Clustering Plot",
+               geom = c("point")
+               ))
+}
+
+```
+
+### Паузы
+
+```{r}
+for (k in 2:n_clusters) {
+  kmd.res <- pam(df.pauses, k)
+  df[, paste0("pauses_kmdclust", k)] <- kmd.res$cluster
+  
+  sil <- silhouette(kmd.res$cluster, dist(df.pauses))
+  print(fviz_silhouette(sil))
+  
+  print(fviz_cluster(kmd.res, data = na.omit(df.pauses),
+               ggtheme = theme_minimal(),
+               main = "Partitioning Clustering Plot",
+               geom = c("point")
+               ))
+}
+```
+
+
+### Время, расстояние, точность и паузы
+```{r}
+for (k in 2:n_clusters) {
+  kmd.res <- pam(df.tdmp, k)
+  df[, paste0("tdmp_kmdclust", k)] <- kmd.res$cluster
+  
+  sil <- silhouette(kmd.res$cluster, dist(df.tdmp))
+  print(fviz_silhouette(sil))
+  
+  print(fviz_cluster(kmd.res, data = na.omit(df.tdmp),
+               ggtheme = theme_minimal(),
+               main = "Partitioning Clustering Plot",
+               geom = c("point")
+               ))
+}
+
+```
+
+
+
+
+```{r}
+df[, grep("clust", names(df))] <- lapply(df[, grep("clust", names(df))], factor)
+df <- merge(df.diff, select(df, user_id, contains("clust")), by = "user_id")
+```
+
+
+```{r}
+save(df, file = "./data/envs/4_cluster_analysis/df.diff.RData")
+```
+
+
+

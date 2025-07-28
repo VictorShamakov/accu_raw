@@ -13,8 +13,8 @@ def get_template(filepath):
     return template
 
 
-def render_and_save_pages(template, data_dictionary, dataset, file_name, cluster_name, number):
-    for n in range(2, 6):
+def render_and_save_pages(template, data_dictionary, dataset, file_name, cluster_name, number, n_clusters=5):
+    for n in range(2, n_clusters + 1):
         rendered_page = template.render(data_dictionary=data_dictionary, group=cluster_name + str(n), dataset=dataset, filename=f"{number}.{n - 1}_{file_name}_{cluster_name}{n}")
         filename = f"./{number}.{n - 1}_{file_name}_{cluster_name}{n}.Rmd"
         with open(filename, 'w', encoding="utf8") as file:
@@ -76,25 +76,33 @@ def main():
     with open("./4.0.1_ca_acc.Rmd", 'w', encoding="utf8") as file:
         file.write(rendered_page)
 
-    rendered_page = ca_template.render(stage="acc", gender="female", custom=False, logarithmization=True)
-    with open("./4.0.2_female_ca_acc.Rmd", 'w', encoding="utf8") as file:
-        file.write(rendered_page)
-
-    rendered_page = ca_template.render(stage="acc", gender="male", custom=False, logarithmization=True)
-    with open("./4.0.3_male_ca_acc.Rmd", 'w', encoding="utf8") as file:
-        file.write(rendered_page)
-
     rendered_page = ca_template.render(stage="spd", gender="", custom=False, logarithmization=True)
     with open("./4.0.4_ca_spd.Rmd", 'w', encoding="utf8") as file:
         file.write(rendered_page)
 
-    rendered_page = ca_template.render(stage="spd", gender="female", custom=False, logarithmization=True)
-    with open("./4.0.5_female_ca_spd.Rmd", 'w', encoding="utf8") as file:
+    rendered_page = ca_template.render(stage="acc_spd", gender="", custom=False, logarithmization=True)
+    with open("./4.0.7_ca_acc_spd.Rmd", 'w', encoding="utf8") as file:
         file.write(rendered_page)
 
-    rendered_page = ca_template.render(stage="spd", gender="male", custom=False, logarithmization=True)
-    with open("./4.0.6_male_ca_spd.Rmd", 'w', encoding="utf8") as file:
+    rendered_page = ca_template.render(stage="diff", gender="", custom=False, logarithmization=True)
+    with open("./4.0.8_ca_diff.Rmd", 'w', encoding="utf8") as file:
         file.write(rendered_page)
+        
+    # rendered_page = ca_template.render(stage="acc", gender="female", custom=False, logarithmization=True)
+    # with open("./4.0.2_female_ca_acc.Rmd", 'w', encoding="utf8") as file:
+    #     file.write(rendered_page)
+
+    # rendered_page = ca_template.render(stage="acc", gender="male", custom=False, logarithmization=True)
+    # with open("./4.0.3_male_ca_acc.Rmd", 'w', encoding="utf8") as file:
+    #     file.write(rendered_page)
+
+    # rendered_page = ca_template.render(stage="spd", gender="female", custom=False, logarithmization=True)
+    # with open("./4.0.5_female_ca_spd.Rmd", 'w', encoding="utf8") as file:
+    #     file.write(rendered_page)
+
+    # rendered_page = ca_template.render(stage="spd", gender="male", custom=False, logarithmization=True)
+    # with open("./4.0.6_male_ca_spd.Rmd", 'w', encoding="utf8") as file:
+    #     file.write(rendered_page)
 
 
 
@@ -239,10 +247,48 @@ def main():
     # render_and_save_pages(template_group2, data_dictionary, dataset_ca_spd_male, "ds_spd_male_by", "pauses_kmdclust", 4.18)
 
 
+    dataset_ca_acc_spd = open("./templates/4_dataset_ca_acc_spd.Rmd", "r", encoding="utf8").read()
+
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_spd, "ds_acc_spd_by", "all_hclust", 4.19, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_spd, "ds_acc_spd_by", "notcorr_hclust", 4.19, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_spd, "ds_acc_spd_by", "tdm_hclust", 4.19, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_spd, "ds_acc_spd_by", "pauses_hclust", 4.19, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_spd, "ds_acc_spd_by", "tdmp_hclust", 4.19, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_spd, "ds_acc_spd_by", "all_kmclust", "4.20", 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_spd, "ds_acc_spd_by", "notcorr_kmclust", "4.20", 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_spd, "ds_acc_spd_by", "tdm_kmclust", "4.20", 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_spd, "ds_acc_spd_by", "pauses_kmclust", "4.20", 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_spd, "ds_acc_spd_by", "tdmp_kmclust", "4.20", 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_spd, "ds_acc_spd_by", "all_kmdclust", 4.21, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_spd, "ds_acc_spd_by", "notcorr_kmdclust", 4.21, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_spd, "ds_acc_spd_by", "tdm_kmdclust", 4.21, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_spd, "ds_acc_spd_by", "pauses_kmdclust", 4.21, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_acc_spd, "ds_acc_spd_by", "tdmp_kmdclust", 4.21, 5)
+
+    dataset_ca_diff = open("./templates/4_dataset_ca_diff.Rmd", "r", encoding="utf8").read()
+
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_diff, "ds_diff_by", "all_hclust", 4.22, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_diff, "ds_diff_by", "notcorr_hclust", 4.22, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_diff, "ds_diff_by", "tdm_hclust", 4.22, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_diff, "ds_diff_by", "pauses_hclust", 4.22, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_diff, "ds_diff_by", "tdmp_hclust", 4.22, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_diff, "ds_diff_by", "all_kmclust", 4.23, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_diff, "ds_diff_by", "notcorr_kmclust", 4.23, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_diff, "ds_diff_by", "tdm_kmclust", 4.23, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_diff, "ds_diff_by", "pauses_kmclust", 4.23, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_diff, "ds_diff_by", "tdmp_kmclust", 4.23, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_diff, "ds_diff_by", "all_kmdclust", 4.24, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_diff, "ds_diff_by", "notcorr_kmdclust", 4.24, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_diff, "ds_diff_by", "tdm_kmdclust", 4.24, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_diff, "ds_diff_by", "pauses_kmdclust", 4.24, 5)
+    render_and_save_pages(template_group2, data_dictionary, dataset_ca_diff, "ds_diff_by", "tdmp_kmdclust", 4.24, 5)
+
+
     ## Psy.test and AST clusters
-    ### acc
     sp_data_dictionary = pd.read_excel("./data/sp_data_dictionary.xlsx").to_dict(orient='records')
     sp_template = get_template('./templates/5_sp_template.Rmd')
+
+    ### acc
     dataset_sp_acc = open("./templates/5_dataset_sp_acc.Rmd", "r", encoding="utf8").read()
 
     render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc, "sp_ds_acc_by", "all_hclust", 5.1)
@@ -266,8 +312,6 @@ def main():
     # render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_male, "sp_ds_acc_male_by", "pauses_hclust", 5.3)
 
     ### spd
-    sp_data_dictionary = pd.read_excel("./data/sp_data_dictionary.xlsx").to_dict(orient='records')
-    sp_template = get_template('./templates/5_sp_template.Rmd')
     dataset_sp_spd = open("./templates/5_dataset_sp_spd.Rmd", "r", encoding="utf8").read()
 
     render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd, "sp_ds_spd_by", "all_hclust", 5.4)
@@ -315,8 +359,6 @@ def main():
     # render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_male, "sp_ds_acc_male_by", "pauses_kmclust", 5.9)
 
     ### spd
-    sp_data_dictionary = pd.read_excel("./data/sp_data_dictionary.xlsx").to_dict(orient='records')
-    sp_template = get_template('./templates/5_sp_template.Rmd')
     dataset_sp_spd = open("./templates/5_dataset_sp_spd.Rmd", "r", encoding="utf8").read()
 
     render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd, "sp_ds_spd_by", "all_kmclust", "5.10")
@@ -364,8 +406,6 @@ def main():
     # render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_male, "sp_ds_acc_male_by", "pauses_kmdclust", 5.15)
 
     ### spd
-    sp_data_dictionary = pd.read_excel("./data/sp_data_dictionary.xlsx").to_dict(orient='records')
-    sp_template = get_template('./templates/5_sp_template.Rmd')
     dataset_sp_spd = open("./templates/5_dataset_sp_spd.Rmd", "r", encoding="utf8").read()
 
     render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd, "sp_ds_spd_by", "all_kmdclust", 5.16)
@@ -387,6 +427,43 @@ def main():
     # render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_male, "sp_ds_spd_male_by", "notcorr_kmdclust", 5.18)
     # render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_male, "sp_ds_spd_male_by", "tdm_kmdclust", 5.18)
     # render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_spd_male, "sp_ds_spd_male_by", "pauses_kmdclust", 5.18)
+
+    dataset_sp_acc_spd = open("./templates/5_dataset_sp_acc_spd.Rmd", "r", encoding="utf8").read()
+
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_spd, "sp_ds_acc_spd_by", "all_hclust", 5.19, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_spd, "sp_ds_acc_spd_by", "notcorr_hclust", 5.19, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_spd, "sp_ds_acc_spd_by", "tdm_hclust", 5.19, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_spd, "sp_ds_acc_spd_by", "pauses_hclust", 5.19, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_spd, "sp_ds_acc_spd_by", "tdmp_hclust", 5.19, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_spd, "sp_ds_acc_spd_by", "all_kmclust", "5.20", 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_spd, "sp_ds_acc_spd_by", "notcorr_kmclust", "5.20", 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_spd, "sp_ds_acc_spd_by", "tdm_kmclust", "5.20", 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_spd, "sp_ds_acc_spd_by", "pauses_kmclust", "5.20", 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_spd, "sp_ds_acc_spd_by", "tdmp_kmclust", "5.20", 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_spd, "sp_ds_acc_spd_by", "all_kmdclust", 5.21, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_spd, "sp_ds_acc_spd_by", "notcorr_kmdclust", 5.21, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_spd, "sp_ds_acc_spd_by", "tdm_kmdclust", 5.21, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_spd, "sp_ds_acc_spd_by", "pauses_kmdclust", 5.21, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_acc_spd, "sp_ds_acc_spd_by", "tdmp_kmdclust", 5.21, 5)
+
+
+    dataset_sp_diff = open("./templates/5_dataset_sp_diff.Rmd", "r", encoding="utf8").read()
+
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_diff, "sp_ds_diff_by", "all_hclust", 5.22, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_diff, "sp_ds_diff_by", "notcorr_hclust", 5.22, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_diff, "sp_ds_diff_by", "tdm_hclust", 5.22, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_diff, "sp_ds_diff_by", "pauses_hclust", 5.22, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_diff, "sp_ds_diff_by", "tdmp_hclust", 5.22, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_diff, "sp_ds_diff_by", "all_kmclust", 5.23, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_diff, "sp_ds_diff_by", "notcorr_kmclust", 5.23, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_diff, "sp_ds_diff_by", "tdm_kmclust", 5.23, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_diff, "sp_ds_diff_by", "pauses_kmclust", 5.23, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_diff, "sp_ds_diff_by", "tdmp_kmclust", 5.23, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_diff, "sp_ds_diff_by", "all_kmdclust", 5.24, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_diff, "sp_ds_diff_by", "notcorr_kmdclust", 5.24, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_diff, "sp_ds_diff_by", "tdm_kmdclust", 5.24, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_diff, "sp_ds_diff_by", "pauses_kmdclust", 5.24, 5)
+    render_and_save_pages(sp_template, sp_data_dictionary, dataset_sp_diff, "sp_ds_diff_by", "tdmp_kmdclust", 5.24, 5)
 
 if __name__ == '__main__':
     main()

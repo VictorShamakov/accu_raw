@@ -71,6 +71,8 @@ rmarkdown::render('./4.0.4_ca_spd.Rmd', output_file = './reports/4.0.4_ca_spd.ht
 # rmarkdown::render('./4.0.3_male_ca_acc.Rmd', output_file = './reports/4.0.3_male_ca_acc.html')
 # rmarkdown::render('./4.0.5_female_ca_spd.Rmd', output_file = './reports/4.0.5_female_ca_spd.html')
 # rmarkdown::render('./4.0.6_male_ca_spd.Rmd', output_file = './reports/4.0.6_male_ca_spd.html')
+rmarkdown::render('./4.0.7_ca_acc_spd.Rmd', output_file = './reports/4.0.7_ca_acc_spd.html')
+rmarkdown::render('./4.0.8_ca_diff.Rmd', output_file = './reports/4.0.8_ca_diff.html')
 
 
 

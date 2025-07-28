@@ -12,7 +12,7 @@ sd.diff <- sd[order(sd$feature, sd$diff, decreasing = T), ]
 sd.diff
 
 
-sd.diff[!duplicated(sd.diff$feature),]
+# sd.diff[!duplicated(sd.diff$feature),]
 
 ```
 

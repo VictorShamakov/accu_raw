@@ -15,10 +15,6 @@ output:
     toc_depth: '4'
 editor_options:
   chunk_output_type: inline
-params:
-  user_id: 3438
-  test_id: 84
-  data_from_db: TRUE
 ---
 
 
@@ -49,9 +45,52 @@ n_clusters <- 5
 ```
 
 
+
+{% if stage == "acc" or stage == "spd" %}
+
 ```{r}
 df <- df.{{stage}}
 ```
+
+{% elif stage == 'acc_spd' %}
+
+```{r}
+pd <- select(df.acc, user_id, gender)
+df.acc <- select(df.acc, user_id, everything(), -session_id, -test_id, -ratio, -gender, -clicked_through_targets, -combo_clicked_through_targets, -stage)
+names(df.acc)[-1] <- paste0(names(df.acc)[-1], ".acc")
+
+df.spd <- select(df.spd, user_id, everything(), -session_id, -test_id, -ratio, -gender, -clicked_through_targets, -combo_clicked_through_targets, -stage)
+names(df.spd)[-1] <- paste0(names(df.spd)[-1], ".spd")
+
+df.acc_spd <- merge(df.acc, df.spd, by = "user_id")
+
+df.acc_spd <- merge(df.acc_spd, pd, by = "user_id")
+df.acc_spd <- select(df.acc_spd, user_id, gender, everything())
+```
+
+```{r}
+df <- df.acc_spd
+```
+
+{% elif stage == 'diff' %}
+
+```{r}
+pd <- select(df.acc, user_id, gender)
+df.acc <- select(df.acc, everything(), -user_id, -session_id, -test_id, -ratio, -gender, -clicked_through_targets, -combo_clicked_through_targets, -stage)
+
+df.spd <- select(df.spd, everything(), -user_id, -session_id, -test_id, -ratio, -gender, -clicked_through_targets, -combo_clicked_through_targets, -stage)
+
+df.diff <- df.acc - df.spd
+df.diff <- cbind(pd, df.diff)
+```
+
+```{r}
+df <- df.diff
+```
+
+{% endif %}
+
+
 
 {% if gender == 'male' %}
 ```{r}
@@ -66,6 +105,8 @@ df <- df[df$gender == "F",]
 df$gender_num <- as.numeric(df$gender) - 1
 ```
 {% endif %}
+
+
 
 
 {% if logarithmization %}
@@ -87,7 +128,8 @@ logarithmized_vars <- c("time_total", "time_mean", "time_sd", "time_median", "ti
                         "missings_sd", "missings_max", "missings_range", "missings_skew", 
                         "missings_kurtosis", "missings_se", "missings", "combo_missings")
 
-df[, logarithmized_vars] <- lapply(df[, logarithmized_vars], function(x) {
+logz_pattern <- paste0("^", logarithmized_vars, "(.acc$|.spd$|$)", collapse = "|")
+df[, grep(logz_pattern, names(df))] <- lapply(df[, grep(logz_pattern, names(df))], function(x) {
   if (sum(x <= 0, na.rm = T) > 0) {
     x <- log1p(x)
   } else {
@@ -98,23 +140,49 @@ df[, logarithmized_vars] <- lapply(df[, logarithmized_vars], function(x) {
 
 {% endif %}
 
+
+
 ```{r}
 #Пропуски
 df <- na.omit(df)
 ```
 
-## Иерархический кластерный анализ
 
 ```{r}
+# Подготовка датасетов для кластеризации
+## Все переменные
 vars_class <- lapply(df, class)
 df.num <- df[, vars_class == "numeric" | vars_class == "integer"]
-df.num <- select(df.num, -user_id, -test_id, -ratio, -clicked_through_targets, -combo_clicked_through_targets)
+df.num <- select(df.num, -user_id)
+df.num.scaled <- scale(df.num)
 ```
 
+```{r}
+## Некоррелированные переменные
+corr_vars <- c("distance_trimmed", "dec_trimmed", "acc_q0.75", "pause_q0.25", "missings_range", "time_q0.75", "missings_se", "missings_max", "acc_q0.25", "dec_q0.25", "acc_per_sec_q0.25", "pause_se", "acc_per_sec_q0.75", "pause_kurtosis", "missings_q0.25", "pause_trimmed", "missings_q0.75", "acc_kurtosis", "missings_kurtosis", "dec_mad", "acc_mad", "pause_q0.75", "missings_median", "acc_per_sec_median", "time_median", "time_q0.25", "time_trend", "time_trimmed", "acc_per_sec_trimmed", "missings_trimmed", "time_mean", "distance_se", "velocity_se", "missings_mean", "distance_mean", "acc_range", "dec_range", "time_range", "dec_median", "time_max", "dec_kurtosis", "acc_trimmed", "pause_median", "velocity_q0.75", "distance_kurtosis", "distance_range", "pause_mad", "dec_q0.75", "velocity_q0.25", "acc_se", "acc_max", "acc_per_sec_mad", "time_mad", "dec_se", "time_kurtosis", "distance_max", "time_se", "missings_mad", "dec_min", "distance_median", "dec_sd", "distance_sd", "distance_q0.75", "acc_median", "velocity_mad", "velocity_range", "dec_mean", "time_sd", "pause_mean", "distance_q0.25", "acc_per_sec_se", "velocity_max", "missings_skew", "missings_min", "accuracy_rate", "time_min", "distance_min", "jerk_line", "velocity_mean", "missings_sd")
+
+df.not_corr <- scale(select(df.num, -contains(corr_vars)))
+```
+
+```{r}
+## Время, расстояние, точность
+df.tdm <- scale(select(df.num, contains(c("time_total", "distance_total", "missings_distance"))))
+```
+
+```{r}
+## Паузы
+df.pauses <- scale(select(df.num, starts_with("pause")))
+```
+
+```{r}
+## Время, расстояние, точность и паузы
+df.tdmp <- scale(select(df.num, contains(c("time_total", "distance_total", "missings_distance")), starts_with("pause")))
+```
+
+## Иерархический кластерный анализ
 ### Все переменные
 
 ```{r}
-df.num.scaled <- scale(df.num)
 dist <- dist(df.num.scaled)
 hc <- hclust(dist, method = "ward.D2")
 
@@ -137,91 +205,6 @@ for (k in 2:n_clusters) {
 ### Все некоррелированные переменные
 
 ```{r}
-corr_vars <- c("distance_trimmed", 
-"dec_trimmed", 
-"acc_q0.75", 
-"pause_q0.25", 
-"missings_range", 
-"time_q0.75", 
-"missings_se", 
-"missings_max", 
-"acc_q0.25", 
-"dec_q0.25", 
-"acc_per_sec_q0.25", 
-"pause_se", 
-"acc_per_sec_q0.75", 
-"pause_kurtosis", 
-"missings_q0.25", 
-"pause_trimmed", 
-"missings_q0.75", 
-"acc_kurtosis", 
-"missings_kurtosis", 
-"dec_mad", 
-"acc_mad", 
-"pause_q0.75", 
-"missings_median", 
-"acc_per_sec_median", 
-"time_median", 
-"time_q0.25", 
-"time_trend", 
-"time_trimmed", 
-"acc_per_sec_trimmed", 
-"missings_trimmed", 
-"time_mean", 
-"distance_se", 
-"velocity_se", 
-"missings_mean", 
-"distance_mean", 
-"acc_range", 
-"dec_range", 
-"time_range", 
-"dec_median", 
-"time_max", 
-"dec_kurtosis", 
-"acc_trimmed", 
-"pause_median", 
-"velocity_q0.75", 
-"distance_kurtosis", 
-"distance_range", 
-"pause_mad", 
-"dec_q0.75", 
-"velocity_q0.25", 
-"acc_se", 
-"acc_max", 
-"acc_per_sec_mad", 
-"time_mad", 
-"dec_se", 
-"time_kurtosis", 
-"distance_max", 
-"time_se", 
-"missings_mad", 
-"dec_min", 
-"distance_median", 
-"dec_sd", 
-"distance_sd", 
-"distance_q0.75", 
-"acc_median", 
-"velocity_mad", 
-"velocity_range", 
-"dec_mean", 
-"time_sd", 
-"pause_mean", 
-"distance_q0.25", 
-"acc_per_sec_se", 
-"velocity_max", 
-"missings_skew", 
-"missings_min", 
-"accuracy_rate", 
-"time_min", 
-"distance_min", 
-"jerk_line", 
-"velocity_mean", 
-"missings_sd")
-```
-
-
-```{r}
-df.not_corr <- scale(select(df.num, -corr_vars))
 dist <- dist(df.not_corr)
 hc <- hclust(dist, method = "ward.D2")
 
@@ -239,7 +222,6 @@ for (k in 2:n_clusters) {
 
 ### Время, расстояние, точность
 ```{r}
-df.tdm <- scale(select(df.num, time_total, distance_total, missings_distance))
 dist <- dist(df.tdm)
 hc <- hclust(dist, method = "ward.D2")
 
@@ -256,7 +238,6 @@ for (k in 2:n_clusters) {
 
 ### Паузы
 ```{r}
-df.pauses <- scale(select(df.num, starts_with("pause")))
 dist <- dist(df.pauses)
 hc <- hclust(dist, method = "ward.D2")
 
@@ -274,7 +255,6 @@ for (k in 2:n_clusters) {
 
 ### Время, расстояние, точность и паузы
 ```{r}
-df.tdmp <- scale(select(df.num, time_total, distance_total, missings_distance, starts_with("pause")))
 dist <- dist(df.tdmp)
 hc <- hclust(dist, method = "ward.D2")
 
@@ -533,10 +513,6 @@ df[, grep("clust", names(df))] <- lapply(df[, grep("clust", names(df))], factor)
 df <- merge(df.{{stage}}, select(df, user_id, contains("clust")), by = "user_id")
 ```
 
-
-
-
-
 {% if gender == 'male' %}
 ```{r}
 save(df, file = "./data/envs/4_cluster_analysis/df.{{stage}}.male.RData")
@@ -550,4 +526,6 @@ save(df, file = "./data/envs/4_cluster_analysis/df.{{stage}}.female.RData")
 save(df, file = "./data/envs/4_cluster_analysis/df.{{stage}}.RData")
 ```
 {% endif %}
+
+
 

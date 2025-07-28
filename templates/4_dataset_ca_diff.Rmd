@@ -1,0 +1,10 @@
+
+```{r}
+# Набор данных: Точность и скорость
+load("./data/envs/4_cluster_analysis/df.diff.RData")
+```
+
+
+```{r}
+sign_differences <- vector()
+```
