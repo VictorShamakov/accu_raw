@@ -1,0 +1,145 @@
+---
+title: "Кластеризация"
+author: "SVA"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    css: "../styles.css"
+    code_folding: hide
+    df_print: paged
+    toc: yes
+    toc_depth: 4
+    toc_float:
+      collapsed: no
+    self_contained: no
+  word_document:
+    toc: yes
+    toc_depth: '4'
+editor_options:
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  include = TRUE,
+  message = FALSE, 
+  warning = FALSE
+)
+
+rm(list=ls())
+source("functions.R")
+library("ARTool")
+```
+<script>
+function addClassToTitle(containerId, className) {
+  // Находим контейнер по id
+  var container = document.getElementById(containerId);
+  if (!container) {
+    console.warn('Контейнер с id "' + containerId + '" не найден.');
+    return;
+  }
+
+  // Добавляем класс к найденному h3
+  container.classList.add(className);
+}
+</script>
+
+
+```{r}
+# Набор данных: Точность
+load("./data/envs/4_cluster_analysis/df.acc.RData")
+df.acc <- df
+```
+
+
+```{r}
+load("./data/envs/4_cluster_analysis/df.spd.RData")
+df.spd <- df
+```
+
+
+```{r}
+df.diff <- rbind(select(df.acc, user_id, distance_total, all_hclust2, stage), select(df.spd, user_id, distance_total, all_hclust2, stage))
+
+df.diff$user_id <- factor(df.diff$user_id)
+df.diff$stage <- factor(df.diff$stage, levels = c("accuracy", "speed"))
+```
+
+
+```{r}
+ggplot(df.diff, aes(x = stage, y = distance_total, color = factor(all_hclust2))) +
+    stat_summary(fun = mean, geom = "line", size = 1.2) +
+    theme_minimal() +
+    labs(title = "Изменение показателя по кластерам",
+         x = "Время", y = "Значение", color = "Кластер")
+```
+
+
+```{r}
+library(pheatmap)
+# matrix_data — матрица (объекты x параметры), clusters — вектор кластеров
+pheatmap(matrix_data, cluster_rows = TRUE, cluster_cols = FALSE,
+         annotation_row = data.frame(cluster=factor(clusters)))
+
+
+
+heatmap(cbind(df.acc$all_hclust2, df.spd$all_hclust2))
+```
+
+
+```{r}
+set.seed(123)  # Для воспроизводимости
+# Делаем данные для 3 кластеров по 10 временных точек каждый
+cluster <- rep(1:3, each = 4)
+time <- rep(0:1, times = 6)
+value <- c(seq(1, 5, length.out = 4) + rnorm(4, 0, 0.3),
+           seq(1, 5, length.out = 4) + rnorm(4, 0, 0.3),
+           seq(1, 5, length.out = 4) + rnorm(4, 0, 0.3))
+data <- data.frame(cluster = cluster, time = time, value = value)
+data
+```
+
+
+```{r}
+library(ggplot2)
+
+ggplot(data, aes(x = time, y = value, color = factor(cluster))) +
+    stat_summary(fun = mean, geom = "line", size = 1.2) +
+    theme_minimal() +
+    labs(
+        title = "Изменение показателя по кластерам",
+        x = "Время",
+        y = "Значение",
+        color = "Кластер"
+    )
+
+```
+
+
+
+```{r}
+# Создаем пример данных (переформатированные в длинный формат)
+data <- data.frame(
+  Cluster = rep(c("K1", "K2", "K3", "K4", "K5", "K6"), each = 3),
+  Variable = rep(c("Фетг", "Фитт", "Фэкз"), times = 6),
+  Value = c(0.1, 0.05, -1.2, 0.8, 1.5, -0.8, 0.1, 0.5, 1.2,
+            1.6, 1.7, 0.8, 0.3, 0.0, 0.2, 0.0, -1.0, 0.6)
+)
+
+# Определяем уникальные формы точек и типы линий для кластеров
+shapes <- c(1, 0, 2, 5, 16, 15)   # разные символы для точек
+linetypes <- c("dotted", "dashed", "dotted", "dashed", "solid", "solid")
+
+# Строим график
+ggplot(data, aes(x = Variable, y = Value, group = Cluster, color = Cluster)) +
+  geom_point(aes(shape = Cluster), size = 3) +       # точки с формами
+  geom_line(aes(linetype = Cluster), size = 1) +     # линии с типами
+  scale_shape_manual(values = shapes) +
+  scale_linetype_manual(values = linetypes) +
+  theme_minimal() +
+  ggtitle("График средних для каждого кластера") +
+  theme(legend.position = "right")
+
+```
+
