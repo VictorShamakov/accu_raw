@@ -27,7 +27,7 @@ files_ca <- list(
   list(input = './4.0.4_ca_spd.Rmd', output = './reports/4.0.4_ca_spd.html'),
   # list(input = './4.0.5_female_ca_spd.Rmd', output = './reports/4.0.5_female_ca_spd.html'),
   # list(input = './4.0.6_male_ca_spd.Rmd', output = './reports/4.0.6_male_ca_spd.html'),
-  list(input = './4.0.7_ca_acc_spd.Rmd', output = './reports/4.0.7_ca_acc_spd.html')
+  list(input = './4.0.7_ca_acc_spd.Rmd', output = './reports/4.0.7_ca_acc_spd.html'),
   list(input = './4.0.8_ca_diff.Rmd', output = './reports/4.0.8_ca_diff.html')
 )
 
@@ -37,7 +37,7 @@ sp_list.acc_spd <- list.files()[grep("^[5].*.*ds_acc_spd_by*", list.files())]
 sp_list.diff <- list.files()[grep("^[5].*.*ds_diff_by*", list.files())]
 sp_list.all <- c(sp_list.acc, sp_list.spd, sp_list.acc_spd, sp_list.diff)
 
-files_sp <- lapply(sp_list.acc, function(name) {
+files_sp <- lapply(sp_list.all, function(name) {
   list(
     input = paste0('./', name),
     output = paste0('./reports/', name, '.html')
