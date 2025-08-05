@@ -54,10 +54,17 @@ mclapply(files_sp, render_file, mc.cores = detectCores())
 
 sd <- read.csv("./reports/sign_differences.csv")
 
-files_sp <- gsub(pattern = "^5", replacement = "4", x = unique(sd$filename))
-files_sp <- gsub(pattern = "_sp_ds_", replacement = "_ds_", x = files_sp)
+files_ds <- gsub(pattern = "^5", replacement = "4", x = unique(sd$filename))
+files_ds <- gsub(pattern = "_sp_ds_", replacement = "_ds_", x = files_ds)
 
-files_ds <- lapply(files_sp, function(name) {
+files_ds.acc <- grep(pattern = "^[4].*.*ds_acc_by*", files_ds, value = T)
+files_ds.spd <- grep(pattern = "^[4].*.*ds_spd_by*", files_ds, value = T)
+files_ds.acc_spd <- grep(pattern = "^[4].*.*ds_acc_spd_by*", files_ds, value = T)
+files_ds.diff <- grep(pattern = "^[4].*.*ds_diff_by*", files_ds, value = T)
+files_ds.all <- c(files_ds.acc, files_ds.spd, files_ds.acc_spd, files_ds.diff)
+
+
+files_ds <- lapply(c(files_ds.acc, files_ds.spd, files_ds.diff), function(name) {
   list(
     input = paste0('./', name, '.Rmd'),
     output = paste0('./reports/', name, '.html')
