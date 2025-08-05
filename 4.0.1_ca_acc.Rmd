@@ -15,10 +15,6 @@ output:
     toc_depth: '4'
 editor_options:
   chunk_output_type: inline
-params:
-  user_id: 3438
-  test_id: 84
-  data_from_db: TRUE
 ---
 
 
@@ -53,8 +49,7 @@ n_clusters <- 5
 
 
 ```{r}
-df <- df.acc
-df <- select(df, -session_id, -test_id, -ratio, -clicked_through_targets, -combo_clicked_through_targets, -stage)
+df <- select(df.acc, -session_id, -test_id, -ratio, -clicked_through_targets, -combo_clicked_through_targets, -stage)
 ```
 
 

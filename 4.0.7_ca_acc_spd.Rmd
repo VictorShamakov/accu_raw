@@ -15,10 +15,6 @@ output:
     toc_depth: '4'
 editor_options:
   chunk_output_type: inline
-params:
-  user_id: 3438
-  test_id: 84
-  data_from_db: TRUE
 ---
 
 
@@ -53,7 +49,8 @@ n_clusters <- 5
 
 
 ```{r}
-pd <- select(df.acc, user_id, gender)
+info <- select(df.acc, user_id, session_id, test_id, ratio, gender)
+
 df.acc <- select(df.acc, user_id, everything(), -session_id, -test_id, -ratio, -gender, -clicked_through_targets, -combo_clicked_through_targets, -stage)
 names(df.acc)[-1] <- paste0(names(df.acc)[-1], ".acc")
 
@@ -62,12 +59,11 @@ names(df.spd)[-1] <- paste0(names(df.spd)[-1], ".spd")
 
 df.acc_spd <- merge(df.acc, df.spd, by = "user_id")
 
-df.acc_spd <- merge(df.acc_spd, pd, by = "user_id")
-df.acc_spd <- select(df.acc_spd, user_id, gender, everything())
+df.acc_spd <- merge(info, df.acc_spd, by = "user_id")
 ```
 
 ```{r}
-df <- df.acc_spd
+df <- select(df.acc_spd, -session_id, -test_id, -ratio)
 ```
 
 
