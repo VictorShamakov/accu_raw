@@ -59,6 +59,60 @@ sign_differences <- vector()
 
 # Описательные статистики
 
+
+# Описательные статистики
+
+### Портрет {.tabset .tabset-fade .tabset-pills}
+#### Основные показатели
+
+```{r}
+vars <- c('time_total', 'distance_total', 'pause_total', 'velocity_mean', 'missings_distance')
+df.portrait <- select(df, vars, contains("clust"))
+
+draw_cluster_portrait(df.portrait, vars, all_kmdclust4)
+```
+
+#### Время
+```{r}
+vars <- grep("^time", names(df), value = T)
+df.portrait <- select(df, vars, contains("clust"))
+
+draw_cluster_portrait(df.portrait, vars, all_kmdclust4)
+```
+
+#### Расстояние
+```{r}
+vars <- grep("^distance", names(df), value = T)
+df.portrait <- select(df, vars, contains("clust"))
+
+draw_cluster_portrait(df.portrait, vars, all_kmdclust4)
+```
+
+#### Скорость
+```{r}
+vars <- grep("^velocity", names(df), value = T)
+df.portrait <- select(df, vars, contains("clust"))
+
+draw_cluster_portrait(df.portrait, vars, all_kmdclust4)
+```
+
+#### Промахи
+```{r}
+vars <- grep("^missings|^accuracy", names(df), value = T)
+df.portrait <- select(df, vars, contains("clust"))
+
+draw_cluster_portrait(df.portrait, vars, all_kmdclust4)
+```
+
+#### Паузы
+```{r}
+vars <- c("pause_total", "pause_number", "pause_mean", "pause_sd", "pause_median", "pause_trimmed", "pause_mad", "pause_min", "pause_max", "pause_range", "pause_skew", "pause_kurtosis", "pause_se", "pause_q0.25", "pause_q0.75", "pause_trend")
+df.portrait <- select(df, vars, contains("clust"))
+
+draw_cluster_portrait(df.portrait, vars, all_kmdclust4)
+```
+
+
 ### all_kmdclust4 {.tabset .tabset-fade .tabset-pills}
 
 #### Table

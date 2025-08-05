@@ -259,6 +259,31 @@ draw_plots_continuous_by_group <- function(data, var, group, group_lab, x_lab = 
 }
 
 
+draw_cluster_portrait <- function(df.portrait, vars, cluster) {
+  vars_num <- grep(paste0("^", vars, collapse = "|"), names(df.portrait))
+  df.portrait[, vars_num] <- scale(df.portrait[, vars_num])
+  
+  long_means <- df.portrait %>%
+    group_by({{cluster}}) %>%
+    summarise(across(c(vars), mean, na.rm = TRUE)) %>%
+    tidyr::pivot_longer(cols = -{{cluster}}, names_to = "variable", values_to = "value")
+  
+  long_means$variable <- factor(long_means$variable, levels = vars)
+  
+  ggplot(long_means, aes(x = variable, y = value, group = {{cluster}}, color = {{cluster}}, shape = {{cluster}}, linetype = {{cluster}})) +
+    stat_summary(fun = mean, geom = "line", size = 1) +     # соединяем средние линии
+    geom_point(size = 3) +                                  # отображаем точки средних
+    scale_shape_manual(values = c(16, 15, 17, 3, 18, 8)) +  # разные формы точек для кластеров
+    scale_linetype_manual(values = c("solid", "dashed", "dotted", "dotdash", "twodash", "longdash")) + # разные линии
+    theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+    labs(
+      title = "График средних для каждого кластера",
+      x = NULL, y = NULL, color = "Кластер",
+      shape = "Кластер", linetype = "Кластер"
+    )
+}
+
+
 change_names <- function(df, from, to, prefix) {
   names(df)[from:to] <- paste0(prefix, 1:length(names(df)[from:to]))
   return(df)
