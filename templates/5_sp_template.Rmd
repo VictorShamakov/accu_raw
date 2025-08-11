@@ -61,6 +61,7 @@ sign_differences <- list()
 #### Table
 ```{r}
 table(df${{group}})
+round(prop.table(table(df${{group}})) * 100, 1)
 ```
 
 #### Barplot
@@ -170,8 +171,8 @@ users_with_na <- df$user_id[is.na(df${{feature.short_name}})]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test${{feature.short_name}}, df.test${{group}}, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test${{feature.short_name}}, df.test${{group}}, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test${{feature.short_name}}, df.test${{group}}, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test${{feature.short_name}}, df.test${{group}}, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}

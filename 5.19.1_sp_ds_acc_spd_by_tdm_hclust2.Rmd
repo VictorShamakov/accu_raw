@@ -72,6 +72,7 @@ sign_differences <- list()
 #### Table
 ```{r}
 table(df$tdm_hclust2)
+round(prop.table(table(df$tdm_hclust2)) * 100, 1)
 ```
 
 #### Barplot
@@ -207,8 +208,8 @@ users_with_na <- df$user_id[is.na(df$bfst_extraversion)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$bfst_extraversion, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_extraversion, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$bfst_extraversion, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_extraversion, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -333,8 +334,8 @@ users_with_na <- df$user_id[is.na(df$bfst_benevolence)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$bfst_benevolence, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_benevolence, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$bfst_benevolence, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_benevolence, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -459,8 +460,8 @@ users_with_na <- df$user_id[is.na(df$bfst_conscientiousness)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$bfst_conscientiousness, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_conscientiousness, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$bfst_conscientiousness, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_conscientiousness, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -585,8 +586,8 @@ users_with_na <- df$user_id[is.na(df$bfst_neuroticism)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$bfst_neuroticism, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_neuroticism, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$bfst_neuroticism, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_neuroticism, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -711,8 +712,8 @@ users_with_na <- df$user_id[is.na(df$bfst_openness)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$bfst_openness, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_openness, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$bfst_openness, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_openness, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -837,8 +838,8 @@ users_with_na <- df$user_id[is.na(df$bfst_sociability)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$bfst_sociability, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_sociability, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$bfst_sociability, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_sociability, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -963,8 +964,8 @@ users_with_na <- df$user_id[is.na(df$bfst_persistence)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$bfst_persistence, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_persistence, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$bfst_persistence, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_persistence, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -1089,8 +1090,8 @@ users_with_na <- df$user_id[is.na(df$bfst_energy)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$bfst_energy, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_energy, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$bfst_energy, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_energy, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -1215,8 +1216,8 @@ users_with_na <- df$user_id[is.na(df$bfst_empathy)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$bfst_empathy, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_empathy, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$bfst_empathy, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_empathy, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -1341,8 +1342,8 @@ users_with_na <- df$user_id[is.na(df$bfst_respect)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$bfst_respect, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_respect, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$bfst_respect, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_respect, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -1467,8 +1468,8 @@ users_with_na <- df$user_id[is.na(df$bfst_confidence)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$bfst_confidence, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_confidence, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$bfst_confidence, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_confidence, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -1593,8 +1594,8 @@ users_with_na <- df$user_id[is.na(df$bfst_organization)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$bfst_organization, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_organization, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$bfst_organization, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_organization, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -1719,8 +1720,8 @@ users_with_na <- df$user_id[is.na(df$bfst_productivity)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$bfst_productivity, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_productivity, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$bfst_productivity, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_productivity, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -1845,8 +1846,8 @@ users_with_na <- df$user_id[is.na(df$bfst_responsibility)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$bfst_responsibility, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_responsibility, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$bfst_responsibility, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_responsibility, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -1971,8 +1972,8 @@ users_with_na <- df$user_id[is.na(df$bfst_anxiety)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$bfst_anxiety, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_anxiety, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$bfst_anxiety, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_anxiety, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -2097,8 +2098,8 @@ users_with_na <- df$user_id[is.na(df$bfst_depression)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$bfst_depression, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_depression, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$bfst_depression, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_depression, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -2223,8 +2224,8 @@ users_with_na <- df$user_id[is.na(df$bfst_emotional_volatility)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$bfst_emotional_volatility, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_emotional_volatility, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$bfst_emotional_volatility, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_emotional_volatility, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -2349,8 +2350,8 @@ users_with_na <- df$user_id[is.na(df$bfst_aesthetics)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$bfst_aesthetics, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_aesthetics, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$bfst_aesthetics, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_aesthetics, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -2475,8 +2476,8 @@ users_with_na <- df$user_id[is.na(df$bfst_curiosity)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$bfst_curiosity, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_curiosity, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$bfst_curiosity, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_curiosity, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -2601,8 +2602,8 @@ users_with_na <- df$user_id[is.na(df$bfst_personal_creativity)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$bfst_personal_creativity, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_personal_creativity, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$bfst_personal_creativity, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$bfst_personal_creativity, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -2729,8 +2730,8 @@ users_with_na <- df$user_id[is.na(df$mrot_time_all)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$mrot_time_all, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_all, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$mrot_time_all, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_all, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -2855,8 +2856,8 @@ users_with_na <- df$user_id[is.na(df$mrot_time_all_mean)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$mrot_time_all_mean, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_all_mean, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$mrot_time_all_mean, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_all_mean, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -2981,8 +2982,8 @@ users_with_na <- df$user_id[is.na(df$mrot_time_all_sd)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$mrot_time_all_sd, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_all_sd, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$mrot_time_all_sd, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_all_sd, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -3107,8 +3108,8 @@ users_with_na <- df$user_id[is.na(df$mrot_time_static)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$mrot_time_static, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_static, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$mrot_time_static, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_static, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -3233,8 +3234,8 @@ users_with_na <- df$user_id[is.na(df$mrot_time_static_mean)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$mrot_time_static_mean, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_static_mean, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$mrot_time_static_mean, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_static_mean, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -3359,8 +3360,8 @@ users_with_na <- df$user_id[is.na(df$mrot_time_static_sd)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$mrot_time_static_sd, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_static_sd, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$mrot_time_static_sd, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_static_sd, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -3485,8 +3486,8 @@ users_with_na <- df$user_id[is.na(df$mrot_time_animation)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$mrot_time_animation, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_animation, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$mrot_time_animation, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_animation, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -3611,8 +3612,8 @@ users_with_na <- df$user_id[is.na(df$mrot_time_animation_mean)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$mrot_time_animation_mean, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_animation_mean, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$mrot_time_animation_mean, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_animation_mean, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -3737,8 +3738,8 @@ users_with_na <- df$user_id[is.na(df$mrot_time_animation_sd)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$mrot_time_animation_sd, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_animation_sd, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$mrot_time_animation_sd, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_time_animation_sd, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -3863,8 +3864,8 @@ users_with_na <- df$user_id[is.na(df$mrot_right_all)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$mrot_right_all, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_right_all, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$mrot_right_all, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_right_all, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -3989,8 +3990,8 @@ users_with_na <- df$user_id[is.na(df$mrot_right_static)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$mrot_right_static, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_right_static, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$mrot_right_static, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_right_static, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -4115,8 +4116,8 @@ users_with_na <- df$user_id[is.na(df$mrot_right_animation)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$mrot_right_animation, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_right_animation, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$mrot_right_animation, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_right_animation, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -4241,8 +4242,8 @@ users_with_na <- df$user_id[is.na(df$mrot_error_all)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$mrot_error_all, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_error_all, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$mrot_error_all, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_error_all, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -4367,8 +4368,8 @@ users_with_na <- df$user_id[is.na(df$mrot_error_static)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$mrot_error_static, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_error_static, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$mrot_error_static, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_error_static, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -4493,8 +4494,8 @@ users_with_na <- df$user_id[is.na(df$mrot_error_animation)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$mrot_error_animation, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_error_animation, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$mrot_error_animation, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$mrot_error_animation, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -4621,8 +4622,8 @@ users_with_na <- df$user_id[is.na(df$vit_total)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$vit_total, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$vit_total, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$vit_total, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$vit_total, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -4747,8 +4748,8 @@ users_with_na <- df$user_id[is.na(df$vit_involvement)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$vit_involvement, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$vit_involvement, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$vit_involvement, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$vit_involvement, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -4873,8 +4874,8 @@ users_with_na <- df$user_id[is.na(df$vit_control)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$vit_control, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$vit_control, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$vit_control, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$vit_control, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -4999,8 +5000,8 @@ users_with_na <- df$user_id[is.na(df$vit_risk)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$vit_risk, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$vit_risk, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$vit_risk, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$vit_risk, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -5125,8 +5126,8 @@ users_with_na <- df$user_id[is.na(df$lc)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$lc, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$lc, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$lc, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$lc, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -5143,6 +5144,132 @@ if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
 ```{r}
 pd = position_dodge(0.1)
 ggplot(df, aes(x=tdm_hclust2, y=lc, color=tdm_hclust2)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### soa_total {.tabset .tabset-fade .tabset-pills}
+**Индекс самоорганизации**
+
+#### Descriptive stat by tdm_hclust2
+```{r}
+desc_by_group <- describeBy(df$soa_total, df$tdm_hclust2, mat = T)
+desc_by_group <- desc_by_group[order(desc_by_group$mean, decreasing = T),]
+desc_by_group
+```
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "soa_total"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$soa_total, group = df$tdm_hclust2, group_lab = "tdm_hclust2", title = plot_title, legend_title = "tdm_hclust2", x_lab = "Индекс самоорганизации", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+```
+
+#### Normal test
+```{r}
+st <- shapiro.test(df$soa_total);print(st)
+check_normal_distribution(st)
+ks <- ks.test(df$soa_total, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r}
+tryCatch(
+    expr = {
+      df %>%
+        group_by(tdm_hclust2) %>%
+        summarise(
+          W = shapiro.test(soa_total)$statistic,
+          p.value = shapiro.test(soa_total)$p.value,
+          message = ifelse(p.value < 0.05, "Проверка на нормальность не пройдена", "Проверка на нормальность пройдена")
+        )
+    },
+    error = function(e){
+      print(e)
+    }
+)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df, aes(sample = soa_total)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - soa_total", tabname="QQPlot", filename=paste0(plot_title, "_QQplot")) + facet_wrap(". ~ tdm_hclust2")
+
+create_tabs(list(p1))
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(soa_total ~ tdm_hclust2, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ tdm_hclust2)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal_test <- kruskal.test(soa_total ~ tdm_hclust2, df)
+kruskal_test
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, soa_total ~ tdm_hclust2)
+```
+
+#### Pairwise comparison
+
+```{r}
+users_with_na <- df$user_id[is.na(df$soa_total)]
+df.test <- df[!df$user_id %in% users_with_na,]
+df.test$user_id <- factor(df.test$user_id)
+
+t_test_results <- pairwise.t.test(df.test$soa_total, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$soa_total, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
+```
+
+```{r results='asis'}
+if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "soa_total")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
+  sign_differences[["diff"]] <- c(sign_differences[["diff"]], desc_by_group$mean[1] - desc_by_group$mean[nrow(desc_by_group)])
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('soa_total', 'highlight');});</script>")
+}
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=tdm_hclust2, y=soa_total, color=tdm_hclust2)) +
   stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
   stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
   stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
@@ -5251,8 +5378,8 @@ users_with_na <- df$user_id[is.na(df$soa_planfulness)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$soa_planfulness, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$soa_planfulness, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$soa_planfulness, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$soa_planfulness, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -5377,8 +5504,8 @@ users_with_na <- df$user_id[is.na(df$soa_purposefulness)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$soa_purposefulness, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$soa_purposefulness, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$soa_purposefulness, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$soa_purposefulness, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -5503,8 +5630,8 @@ users_with_na <- df$user_id[is.na(df$soa_persistence)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$soa_persistence, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$soa_persistence, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$soa_persistence, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$soa_persistence, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -5629,8 +5756,8 @@ users_with_na <- df$user_id[is.na(df$soa_fixation)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$soa_fixation, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$soa_fixation, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$soa_fixation, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$soa_fixation, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -5755,8 +5882,8 @@ users_with_na <- df$user_id[is.na(df$soa_organization)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$soa_organization, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$soa_organization, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$soa_organization, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$soa_organization, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -5881,8 +6008,8 @@ users_with_na <- df$user_id[is.na(df$soa_present)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$soa_present, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$soa_present, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$soa_present, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$soa_present, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -5899,6 +6026,258 @@ if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
 ```{r}
 pd = position_dodge(0.1)
 ggplot(df, aes(x=tdm_hclust2, y=soa_present, color=tdm_hclust2)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### soa_purposefulness_index {.tabset .tabset-fade .tabset-pills}
+**Индекс целеустремленности**
+
+#### Descriptive stat by tdm_hclust2
+```{r}
+desc_by_group <- describeBy(df$soa_purposefulness_index, df$tdm_hclust2, mat = T)
+desc_by_group <- desc_by_group[order(desc_by_group$mean, decreasing = T),]
+desc_by_group
+```
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "soa_purposefulness_index"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$soa_purposefulness_index, group = df$tdm_hclust2, group_lab = "tdm_hclust2", title = plot_title, legend_title = "tdm_hclust2", x_lab = "Индекс целеустремленности", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+```
+
+#### Normal test
+```{r}
+st <- shapiro.test(df$soa_purposefulness_index);print(st)
+check_normal_distribution(st)
+ks <- ks.test(df$soa_purposefulness_index, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r}
+tryCatch(
+    expr = {
+      df %>%
+        group_by(tdm_hclust2) %>%
+        summarise(
+          W = shapiro.test(soa_purposefulness_index)$statistic,
+          p.value = shapiro.test(soa_purposefulness_index)$p.value,
+          message = ifelse(p.value < 0.05, "Проверка на нормальность не пройдена", "Проверка на нормальность пройдена")
+        )
+    },
+    error = function(e){
+      print(e)
+    }
+)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df, aes(sample = soa_purposefulness_index)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - soa_purposefulness_index", tabname="QQPlot", filename=paste0(plot_title, "_QQplot")) + facet_wrap(". ~ tdm_hclust2")
+
+create_tabs(list(p1))
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(soa_purposefulness_index ~ tdm_hclust2, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ tdm_hclust2)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal_test <- kruskal.test(soa_purposefulness_index ~ tdm_hclust2, df)
+kruskal_test
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, soa_purposefulness_index ~ tdm_hclust2)
+```
+
+#### Pairwise comparison
+
+```{r}
+users_with_na <- df$user_id[is.na(df$soa_purposefulness_index)]
+df.test <- df[!df$user_id %in% users_with_na,]
+df.test$user_id <- factor(df.test$user_id)
+
+t_test_results <- pairwise.t.test(df.test$soa_purposefulness_index, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$soa_purposefulness_index, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
+```
+
+```{r results='asis'}
+if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "soa_purposefulness_index")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
+  sign_differences[["diff"]] <- c(sign_differences[["diff"]], desc_by_group$mean[1] - desc_by_group$mean[nrow(desc_by_group)])
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('soa_purposefulness_index', 'highlight');});</script>")
+}
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=tdm_hclust2, y=soa_purposefulness_index, color=tdm_hclust2)) +
+  stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
+  stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+```
+
+
+
+
+### soa_rationality_index {.tabset .tabset-fade .tabset-pills}
+**Индекс рациональности**
+
+#### Descriptive stat by tdm_hclust2
+```{r}
+desc_by_group <- describeBy(df$soa_rationality_index, df$tdm_hclust2, mat = T)
+desc_by_group <- desc_by_group[order(desc_by_group$mean, decreasing = T),]
+desc_by_group
+```
+
+```{r fig.width=7, fig.height=4, results='asis'}
+plot_title <- "soa_rationality_index"
+plot_list <- draw_plots_continuous_by_cluster(df, var = df$soa_rationality_index, group = df$tdm_hclust2, group_lab = "tdm_hclust2", title = plot_title, legend_title = "tdm_hclust2", x_lab = "Индекс рациональности", filename = NULL, binwidth = NULL, bins = 15, alpha = 0.5, angle = 90)
+
+create_tabs(plot_list)
+```
+
+#### Normal test
+```{r}
+st <- shapiro.test(df$soa_rationality_index);print(st)
+check_normal_distribution(st)
+ks <- ks.test(df$soa_rationality_index, "pnorm");print(ks)
+check_normal_distribution(ks)
+```
+
+```{r}
+tryCatch(
+    expr = {
+      df %>%
+        group_by(tdm_hclust2) %>%
+        summarise(
+          W = shapiro.test(soa_rationality_index)$statistic,
+          p.value = shapiro.test(soa_rationality_index)$p.value,
+          message = ifelse(p.value < 0.05, "Проверка на нормальность не пройдена", "Проверка на нормальность пройдена")
+        )
+    },
+    error = function(e){
+      print(e)
+    }
+)
+```
+
+```{r results='asis'}
+p1 <- ggplot(df, aes(sample = soa_rationality_index)) +  geom_qq(col=main_color) + geom_qq_line() + labs(title = "QQPlot - soa_rationality_index", tabname="QQPlot", filename=paste0(plot_title, "_QQplot")) + facet_wrap(". ~ tdm_hclust2")
+
+create_tabs(list(p1))
+```
+
+#### ANOVA
+
+```{r}
+aov_model <- aov(soa_rationality_index ~ tdm_hclust2, data = df)
+summary(aov_model)
+```
+
+#### Tables of means
+```{r}
+model.tables(aov_model, "means")
+```
+
+```{r}
+tukey <- TukeyHSD(aov_model)
+tukey
+```
+
+
+#### Post-hoc
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+emm <- emmeans(aov_model, ~ tdm_hclust2)
+post_hoc <- data.frame(pairs(emm))
+post_hoc[order(post_hoc$p.value),]
+```
+
+#### Significant differences
+
+```{r}
+apa_post_hoc(post_hoc)
+```
+
+#### Kruskal-Wallis Test
+
+```{r}
+kruskal_test <- kruskal.test(soa_rationality_index ~ tdm_hclust2, df)
+kruskal_test
+```
+
+**Effect size**
+```{r}
+kruskal_effsize(df, soa_rationality_index ~ tdm_hclust2)
+```
+
+#### Pairwise comparison
+
+```{r}
+users_with_na <- df$user_id[is.na(df$soa_rationality_index)]
+df.test <- df[!df$user_id %in% users_with_na,]
+df.test$user_id <- factor(df.test$user_id)
+
+t_test_results <- pairwise.t.test(df.test$soa_rationality_index, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$soa_rationality_index, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
+```
+
+```{r results='asis'}
+if (sum(wilcox_test_results$p.value <= 0.05, na.rm = T) > 0) {
+  sign_differences[["feature"]] <- c(sign_differences[["feature"]], "soa_rationality_index")
+  sign_differences[["p"]] <- c(sign_differences[["p"]], round(kruskal_test$p.value, 3))
+  sign_differences[["diff"]] <- c(sign_differences[["diff"]], desc_by_group$mean[1] - desc_by_group$mean[nrow(desc_by_group)])
+  cat("<script>document.addEventListener('DOMContentLoaded', function() {addClassToTitle('soa_rationality_index', 'highlight');});</script>")
+}
+```
+
+
+#### CI ~ faculty
+```{r}
+pd = position_dodge(0.1)
+ggplot(df, aes(x=tdm_hclust2, y=soa_rationality_index, color=tdm_hclust2)) +
   stat_summary(fun.data = mean_cl_boot, geom="errorbar", width=0.3, lwd=0.8, position=pd, alpha=alpha) +
   stat_summary(fun.data = mean_cl_boot, geom="line", size=1, position=pd, alpha=alpha) +
   stat_summary(fun.data = mean_cl_boot, geom="point", size=3, position = pd, pch = 15, alpha=alpha) + 
@@ -6009,8 +6388,8 @@ users_with_na <- df$user_id[is.na(df$kot_total)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$kot_total, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$kot_total, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$kot_total, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$kot_total, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -6135,8 +6514,8 @@ users_with_na <- df$user_id[is.na(df$kot_verbal)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$kot_verbal, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$kot_verbal, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$kot_verbal, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$kot_verbal, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -6261,8 +6640,8 @@ users_with_na <- df$user_id[is.na(df$kot_number)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$kot_number, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$kot_number, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$kot_number, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$kot_number, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -6387,8 +6766,8 @@ users_with_na <- df$user_id[is.na(df$kot_attention)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$kot_attention, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$kot_attention, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$kot_attention, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$kot_attention, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -6513,8 +6892,8 @@ users_with_na <- df$user_id[is.na(df$kot_spatial)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$kot_spatial, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$kot_spatial, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$kot_spatial, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$kot_spatial, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -6639,8 +7018,8 @@ users_with_na <- df$user_id[is.na(df$kot_general)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$kot_general, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$kot_general, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$kot_general, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$kot_general, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
@@ -6765,8 +7144,8 @@ users_with_na <- df$user_id[is.na(df$kot_logic)]
 df.test <- df[!df$user_id %in% users_with_na,]
 df.test$user_id <- factor(df.test$user_id)
 
-t_test_results <- pairwise.t.test(df.test$kot_logic, df.test$tdm_hclust2, p.adjust.method = "BH");t_test_results
-wilcox_test_results <- pairwise.wilcox.test(df.test$kot_logic, df.test$tdm_hclust2, p.adjust.method = "BH");wilcox_test_results
+t_test_results <- pairwise.t.test(df.test$kot_logic, df.test$tdm_hclust2, p.adjust.method = "bonferroni");t_test_results
+wilcox_test_results <- pairwise.wilcox.test(df.test$kot_logic, df.test$tdm_hclust2, p.adjust.method = "bonferroni");wilcox_test_results
 ```
 
 ```{r results='asis'}
