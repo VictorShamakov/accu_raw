@@ -60,9 +60,6 @@ sign_differences <- vector()
 
 # Описательные статистики
 
-
-# Описательные статистики
-
 ### Портрет {.tabset .tabset-fade .tabset-pills}
 #### Основные показатели
 
@@ -70,7 +67,7 @@ sign_differences <- vector()
 vars <- c('time_total', 'distance_total', 'pause_total', 'velocity_mean', 'missings_distance')
 df.portrait <- select(df, vars, contains("clust"))
 
-draw_cluster_portrait(df.portrait, vars, notcorr_kmdclust3)
+draw_cluster_portrait(df.portrait, vars, notcorr_kmdclust3, scale = "min_max")
 ```
 
 #### Время
@@ -78,7 +75,7 @@ draw_cluster_portrait(df.portrait, vars, notcorr_kmdclust3)
 vars <- grep("^time", names(df), value = T)
 df.portrait <- select(df, vars, contains("clust"))
 
-draw_cluster_portrait(df.portrait, vars, notcorr_kmdclust3)
+draw_cluster_portrait(df.portrait, vars, notcorr_kmdclust3, scale = "min_max")
 ```
 
 #### Расстояние
@@ -86,7 +83,7 @@ draw_cluster_portrait(df.portrait, vars, notcorr_kmdclust3)
 vars <- grep("^distance", names(df), value = T)
 df.portrait <- select(df, vars, contains("clust"))
 
-draw_cluster_portrait(df.portrait, vars, notcorr_kmdclust3)
+draw_cluster_portrait(df.portrait, vars, notcorr_kmdclust3, scale = "min_max")
 ```
 
 #### Скорость
@@ -94,7 +91,7 @@ draw_cluster_portrait(df.portrait, vars, notcorr_kmdclust3)
 vars <- grep("^velocity", names(df), value = T)
 df.portrait <- select(df, vars, contains("clust"))
 
-draw_cluster_portrait(df.portrait, vars, notcorr_kmdclust3)
+draw_cluster_portrait(df.portrait, vars, notcorr_kmdclust3, scale = "min_max")
 ```
 
 #### Промахи
@@ -102,7 +99,7 @@ draw_cluster_portrait(df.portrait, vars, notcorr_kmdclust3)
 vars <- grep("^missings|^accuracy", names(df), value = T)
 df.portrait <- select(df, vars, contains("clust"))
 
-draw_cluster_portrait(df.portrait, vars, notcorr_kmdclust3)
+draw_cluster_portrait(df.portrait, vars, notcorr_kmdclust3, scale = "min_max")
 ```
 
 #### Паузы
@@ -110,7 +107,7 @@ draw_cluster_portrait(df.portrait, vars, notcorr_kmdclust3)
 vars <- c("pause_total", "pause_number", "pause_mean", "pause_sd", "pause_median", "pause_trimmed", "pause_mad", "pause_min", "pause_max", "pause_range", "pause_skew", "pause_kurtosis", "pause_se", "pause_q0.25", "pause_q0.75", "pause_trend")
 df.portrait <- select(df, vars, contains("clust"))
 
-draw_cluster_portrait(df.portrait, vars, notcorr_kmdclust3)
+draw_cluster_portrait(df.portrait, vars, notcorr_kmdclust3, scale = "min_max")
 ```
 
 
@@ -119,6 +116,7 @@ draw_cluster_portrait(df.portrait, vars, notcorr_kmdclust3)
 #### Table
 ```{r}
 table(df$notcorr_kmdclust3)
+round(prop.table(table(df$notcorr_kmdclust3)) * 100, 1)
 ```
 
 #### Barplot
