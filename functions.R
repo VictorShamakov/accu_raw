@@ -259,9 +259,14 @@ draw_plots_continuous_by_group <- function(data, var, group, group_lab, x_lab = 
 }
 
 
-draw_cluster_portrait <- function(df.portrait, vars, cluster) {
+draw_cluster_portrait <- function(df.portrait, vars, cluster, scale = "none") {
   vars_num <- grep(paste0("^", vars, collapse = "|"), names(df.portrait))
-  df.portrait[, vars_num] <- scale(df.portrait[, vars_num])
+  
+  if (!missing(scale) & scale == "z") {
+    df.portrait[, vars_num] <- scale(df.portrait[, vars_num])
+  } else if (!missing(scale) & scale == "min_max") {
+    df.portrait[, vars_num] <- lapply(df.portrait[, vars_num], normalize_minmax)
+  }
   
   long_means <- df.portrait %>%
     group_by({{cluster}}) %>%
@@ -287,6 +292,11 @@ draw_cluster_portrait <- function(df.portrait, vars, cluster) {
 change_names <- function(df, from, to, prefix) {
   names(df)[from:to] <- paste0(prefix, 1:length(names(df)[from:to]))
   return(df)
+}
+
+
+normalize_minmax <- function(x) {
+  (x - min(x)) / (max(x) - min(x))
 }
 
 
