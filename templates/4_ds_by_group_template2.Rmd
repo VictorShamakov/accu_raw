@@ -50,6 +50,9 @@ function addClassToTitle(containerId, className) {
 
 # Описательные статистики
 
+
+# Описательные статистики
+
 ### Портрет {.tabset .tabset-fade .tabset-pills}
 #### Основные показатели
 
@@ -106,7 +109,6 @@ draw_cluster_portrait(df.portrait, vars, {{group}}, scale = "min_max")
 #### Table
 ```{r}
 table(df${{group}})
-round(prop.table(table(df${{group}})) * 100, 1)
 ```
 
 #### Barplot

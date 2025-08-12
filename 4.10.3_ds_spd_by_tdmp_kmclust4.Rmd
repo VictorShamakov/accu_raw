@@ -60,6 +60,9 @@ sign_differences <- vector()
 
 # Описательные статистики
 
+
+# Описательные статистики
+
 ### Портрет {.tabset .tabset-fade .tabset-pills}
 #### Основные показатели
 
@@ -116,7 +119,6 @@ draw_cluster_portrait(df.portrait, vars, tdmp_kmclust4, scale = "min_max")
 #### Table
 ```{r}
 table(df$tdmp_kmclust4)
-round(prop.table(table(df$tdmp_kmclust4)) * 100, 1)
 ```
 
 #### Barplot

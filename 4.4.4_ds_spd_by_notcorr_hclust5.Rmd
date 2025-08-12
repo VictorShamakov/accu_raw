@@ -60,6 +60,9 @@ sign_differences <- vector()
 
 # Описательные статистики
 
+
+# Описательные статистики
+
 ### Портрет {.tabset .tabset-fade .tabset-pills}
 #### Основные показатели
 
@@ -116,7 +119,6 @@ draw_cluster_portrait(df.portrait, vars, notcorr_hclust5, scale = "min_max")
 #### Table
 ```{r}
 table(df$notcorr_hclust5)
-round(prop.table(table(df$notcorr_hclust5)) * 100, 1)
 ```
 
 #### Barplot
