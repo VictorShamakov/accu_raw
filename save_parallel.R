@@ -33,9 +33,9 @@ files_ca <- list(
 
 sp_list.acc <- list.files()[grep("^[5].*.*ds_acc_by*", list.files())]
 sp_list.spd <- list.files()[grep("^[5].*.*ds_spd_by*", list.files())]
-sp_list.acc_spd <- list.files()[grep("^[5].*.*ds_acc_spd_by*", list.files())]
+# sp_list.acc_spd <- list.files()[grep("^[5].*.*ds_acc_spd_by*", list.files())]
 sp_list.diff <- list.files()[grep("^[5].*.*ds_diff_by*", list.files())]
-sp_list.all <- c(sp_list.acc, sp_list.spd, sp_list.acc_spd, sp_list.diff)
+sp_list.all <- c(sp_list.acc, sp_list.spd, sp_list.diff) # sp_list.acc_spd
 
 files_sp <- lapply(sp_list.all, function(name) {
   list(
@@ -44,9 +44,17 @@ files_sp <- lapply(sp_list.all, function(name) {
   )
 })
 
-mclapply(files_ds, render_file, mc.cores = detectCores())
-mclapply(files_ca, render_file, mc.cores = detectCores())
-mclapply(files_sp, render_file, mc.cores = detectCores())
+# files_sp_ready <- lapply(gsub(pattern = "\\.html", replacement = "", grep("^5.*\\.html$", list.files("./reports/"), value = T)), function(name) {
+#   list(
+#     input = paste0('./', name),
+#     output = paste0('./reports/', name, '.html')
+#   )
+# })
+
+mclapply(files_ds, render_file, mc.cores = detectCores() - 1)
+mclapply(files_ca, render_file, mc.cores = detectCores() - 1)
+mclapply(files_sp, render_file, mc.cores = detectCores() - 1)
+# mclapply(files_sp_ready, render_file, mc.cores = detectCores() - 1)
 # mclapply(files_sp_hclust, render_file, mc.cores = detectCores())
 # mclapply(files_sp_kmclust, render_file, mc.cores = detectCores())
 # mclapply(files_sp_kmdclust, render_file, mc.cores = detectCores())

@@ -3,18 +3,27 @@
 rm(list=ls())
 
 # sd1 <- read.csv("./reports/Кластеризация 1/sign_differences.csv")
-sd <- read.csv("./reports/sign_differences.csv")
+sd <- read.csv("./reports/Кластеризация 2/sign_differences.csv")
 ```
 
 
 ```{r}
-sd.diff <- sd[order(sd$feature, sd$diff, decreasing = T), ]
-sd.diff[grep("ds_acc_by", sd.diff$filename),]
-sd.diff[grep("ds_spd_by", sd.diff$filename),]
+sd <- sd[order(sd$feature, sd$diff, decreasing = T), ]
+sd.acc <- sd[grep("ds_acc_by", sd$filename),]
+sd.spd <- sd[grep("ds_spd_by", sd$filename),]
+sd.diff <- sd[grep("ds_diff_by", sd$filename),]
 
+
+sd.diff.acc[grep("^kot", sd.diff.acc$feature), ]
 
 # sd.diff[!duplicated(sd.diff$feature),]
 
+```
+
+```{r}
+sd.diff <- sd[order(sd$feature, sd$diff, decreasing = T), ]
+sd.diff.acc <- sd.diff[grep("ds_acc_by", sd.diff$filename),]
+sd.diff.spd <- sd.diff[grep("ds_spd_by", sd.diff$filename),]
 ```
 
 

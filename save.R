@@ -1,5 +1,4 @@
 rm(list=ls())
-library(parallel)
 # Функция для рендеринга одного файла
 render_file <- function(file) {
   rmarkdown::render(input = file$input, output_file = file$output)
@@ -75,6 +74,8 @@ rmarkdown::render('./4.0.8_ca_diff.Rmd', output_file = './reports/4.0.8_ca_diff.
 # rmarkdown::render('./4.0.6_male_ca_spd.Rmd', output_file = './reports/4.0.6_male_ca_spd.html')
 
 
+rmarkdown::render('./4.13.2_ds_acc_by_pauses_kmdclust3.Rmd', output_file = './reports/4.13.2_ds_acc_by_pauses_kmdclust3.Rmd.html')
+rmarkdown::render('./5.13.2_sp_ds_acc_by_pauses_kmdclust3.Rmd', output_file = './reports/5.13.2_sp_ds_acc_by_pauses_kmdclust3.Rmd.html')
 
 
 
