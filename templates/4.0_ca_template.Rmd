@@ -81,7 +81,7 @@ df.acc <- select(df.acc, everything(), -user_id, -session_id, -test_id, -ratio, 
 
 df.spd <- select(df.spd, everything(), -user_id, -session_id, -test_id, -ratio, -gender, -clicked_through_targets, -combo_clicked_through_targets, -stage)
 
-df.diff <- df.acc - df.spd
+df.diff <- df.spd - df.acc
 df.diff <- cbind(info, df.diff)
 ```
 
